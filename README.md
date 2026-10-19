@@ -70,7 +70,7 @@ npm run test:e2e                            # browser test through the UI (both 
    | `SENDGRID_API_KEY`, `EMAIL_FROM` | optional; without them emails are only logged |
 
 5. **Settings → Networking → Generate Domain** and note the URL, e.g. `https://meridian-api.up.railway.app`.
-6. Optional demo data, once: run `npm run seed` with `SEED_DEMO=true` (Railway CLI: `railway run -s <backend service> -- env SEED_DEMO=true npm run seed`). Never seed the production database you'll use for real members.
+6. Demo data: add the variable `SEED_DEMO` = `true` and redeploy. The pre-deploy step migrates and then seeds (idempotently). Never set this on the production database you'll use for real members.
 
 The server refuses to start without a `JWT_SECRET` of 32+ characters unless `NODE_ENV` is `development` or `test`.
 
