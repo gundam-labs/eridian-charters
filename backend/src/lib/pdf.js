@@ -5,8 +5,8 @@
 const PDFDocument = require('pdfkit');
 const { fmtIST } = require('./time');
 
-const NAVY = '#0b1b33';
-const GOLD = '#c9a24a';
+const NAVY = '#171032'; // monal violet-black
+const GOLD = '#d06a1f'; // monal copper
 const GREY = '#64748b';
 
 const inr = (n) => {
@@ -40,7 +40,7 @@ function table(doc, cols, rows, { y } = {}) {
   const left = 50;
   let yy = y ?? doc.y;
   const totalW = cols.reduce((s, c) => s + c.w, 0);
-  doc.rect(left, yy, totalW, 18).fill('#eef1f6');
+  doc.rect(left, yy, totalW, 18).fill('#f2f0f7');
   let x = left;
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(8);
   for (const c of cols) { doc.text(c.label, x + 4, yy + 5, { width: c.w - 8, align: c.align || 'left' }); x += c.w; }
@@ -56,7 +56,7 @@ function table(doc, cols, rows, { y } = {}) {
     }
     for (const [i, c] of cols.entries()) { doc.fillColor(NAVY).text(String(r[i] ?? ''), x + 4, yy + 2, { width: c.w - 8, align: c.align || 'left' }); x += c.w; }
     yy += rowH;
-    doc.moveTo(left, yy).lineTo(left + totalW, yy).lineWidth(0.5).strokeColor('#e2e8f0').stroke();
+    doc.moveTo(left, yy).lineTo(left + totalW, yy).lineWidth(0.5).strokeColor('#e3e0ec').stroke();
   }
   doc.y = yy + 8;
   return doc.y;
