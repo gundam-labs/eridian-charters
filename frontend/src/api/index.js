@@ -64,7 +64,7 @@ export function errText(err) {
 export async function openPdf(path) {
   // Open the window synchronously so popup blockers allow it
   const win = window.open('', '_blank');
-  if (win) win.document.write('<p style="font-family:sans-serif;padding:2rem;color:#0b1b33">Preparing document…</p>');
+  if (win) win.document.write('<p style="font-family:sans-serif;padding:2rem;color:#171032">Preparing document…</p>');
   try {
     const res = await api.get(path, { responseType: 'blob' });
     const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
