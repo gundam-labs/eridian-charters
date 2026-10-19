@@ -154,3 +154,52 @@ API base URL from `import.meta.env.VITE_API_URL` (empty in dev; Vite proxies /ap
 - 25 members from seed-data/members.csv.
 - Users (password for all demo users: `Meridian@2026`): admin@meridian.test (admin), sales@meridian.test (sales), ops@meridian.test (ops), pilot1@meridian.test & pilot2@meridian.test (pilot, linked to two captains), arjun.mehra@example.in (member MC-1001), rajiv.malhotra@example.in (member MC-1011).
 - Sample flow data relative to today: 2 open requests, 1 sent quote, 1 accepted charter, 1 confirmed charter with manifest, 1 flown charter with unpaid invoice, 1 closed charter, 1 maintenance block.
+
+---
+
+# v1.1 — Empty legs (whole aircraft, public)
+
+An **empty leg** is a positioning flight an aircraft must fly anyway with no passengers (out to the first departure, or back to base after the last arrival). Meridian sells it as a **whole-aircraft charter at a discount**, to members (instant booking) and to the **public** (booking request that sales confirms, which also onboards the buyer as a new member).
+
+## Data model (add to initDB; must migrate an EXISTING production DB idempotently — use `CREATE TABLE IF NOT EXISTS`, `ALTER TABLE … ADD COLUMN IF NOT EXISTS`, `ALTER TABLE charters ALTER COLUMN quote_id DROP NOT NULL`)
+- **empty_legs**: leg_no (`EL-2026-0001`), source_charter_id NULL FK charters (null = created manually), source_leg TEXT NULL ('positioning_out'|'positioning_back'), aircraft_id, from_code, to_code (FK airports), depart_earliest TIMESTAMPTZ, depart_latest TIMESTAMPTZ (the window the flight can leave in; generated legs use scheduled positioning departure −2h / +1h, clamped so it never conflicts with the source charter's passenger legs), flight_hours NUMERIC, distance_nm INT, seats INT (from aircraft), list_price_inr (what this flight would cost as a normal charter: hours × hourly rate + landing at destination + handling at both ends), price_inr (selling price excl. GST), status ('draft'|'published'|'booked'|'withdrawn'|'expired'), notes, published_at, booked_at, withdrawn_reason, created_by, created_at.
+- **empty_leg_bookings**: booking_no (`ELB-2026-0001`), empty_leg_id, member_id NULL, channel ('member'|'public'), guest_name, guest_email, guest_phone, guest_company NULL, pax INT, message NULL, status ('requested'|'confirmed'|'rejected'|'cancelled'), charter_id NULL, decided_by NULL, decided_at NULL, reject_reason NULL, created_at.
+- **charters**: `quote_id` becomes nullable; add `empty_leg_id UUID NULL REFERENCES empty_legs(id)`. A charter has exactly one of quote_id / empty_leg_id (enforce in code). Charters list/detail show "Empty leg EL-…" as their origin where relevant.
+- **members**: add `source TEXT NOT NULL DEFAULT 'invited'` ('invited'|'empty_leg_public').
+- settings defaults (insert if missing): `empty_leg_discount_pct`=`60` (price = list × (1 − 60%), rounded to nearest ₹1,000), `empty_leg_auto_publish`=`false`, `empty_leg_min_notice_hours`=`6` (not bookable when depart_latest − now is less than this).
+
+## Rules
+- **Generation**: when a charter is confirmed (`POST /charters/:id/confirm`), create `draft` empty legs for each positioning leg on its quote (if not already generated for that charter + source_leg). If `empty_leg_auto_publish` is true, publish them immediately. Also `POST /empty-legs/generate/:charterId` (sales/ops/admin) to (re)generate missing ones for an existing charter in accepted|confirmed|manifest_complete.
+- **Manual**: sales/ops/admin may create one with aircraft, from, to, window, price (list_price computed via the pricing lib for one leg).
+- **Publish/withdraw**: only draft → published; published|draft → withdrawn (reason). Editing (price, window within ±limits, notes) allowed while draft|published. A published leg whose `depart_latest − now < min_notice` reads as status `expired` (persist lazily on read).
+- **Source charter cancelled** → its non-booked empty legs become withdrawn ("Source charter cancelled"); pending requests on them → cancelled + email guest. If an empty leg was already booked, do NOT cancel the derived charter automatically: add an event + ops_notes warning on the derived charter ("Source charter CH-… was cancelled — confirm this flight is still operating") and email sales.
+- **Member booking** (instant): `POST /empty-legs/:id/book {pax}` (role member): leg must be published, not expired, pax 1..seats. In ONE transaction (lock the leg row `FOR UPDATE`): create booking (confirmed), create charter (status `accepted`, member, aircraft, legs = one leg {from,to,depart_at: depart_earliest, arrive_at, distance_nm, flight_hours}, starts_on/ends_on from that, pax, empty_leg_id, crew copied from the source charter if any), create invoice (price_inr + GST at the current gst_rate_pct, due per invoice_due_days), leg → booked, other `requested` bookings on the leg → rejected ("Booked by another customer") with email. 409 if already booked.
+- **Public booking request**: `POST /public/empty-legs/:id/request {name, email, phone, company?, pax, message?, accept_terms:true, website:""}` (no auth; `website` is a honeypot — if non-empty, return 202 and do nothing). Validates email/phone/name, pax 1..seats, leg published and bookable, accept_terms true. Creates booking `requested`, emails the requester an acknowledgement and emails `SALES_EMAIL` (env; fallback: all active sales/admin users). Returns `{booking_no}`. Rate limit 5 per hour keyed by IP + email. Multiple requests per leg allowed; first confirmed wins.
+- **Confirm a public request** (sales/admin): `POST /empty-legs/bookings/:id/confirm`. In one transaction: find member by email (case-insensitive) or create one (member_type individual or corporate if company given, tier silver, status active, source empty_leg_public, member_since current YYYY-MM), then same as member booking (charter + invoice + leg booked + reject other requests), then create/refresh the member's invite (72h) and email the invite link + booking confirmation. Response includes `{charter, invoice, member, invite_url}`.
+- **Reject**: `POST /empty-legs/bookings/:id/reject {reason}` → email guest.
+- **Conflicts**: the derived charter flies inside the source charter's dates on the same aircraft. `conflicts()` and crew-busy checks must ignore the pair (source charter ↔ charters with empty_leg_id whose empty leg has that source_charter_id) in both directions. Manual legs check normally.
+- Confirming the derived charter (ops) works like any charter (needs crew; copies from source when present).
+
+## API additions
+Public (no auth, no rates/partner/registration/aircraft id exposed — only aircraft type, seats, from/to code + city + airport name, window, flight_hours, price_inr, list_price_inr, savings_pct, leg_no, id):
+- `GET /api/public/empty-legs?from=&to=&month=YYYY-MM` → published & bookable, soonest first.
+- `GET /api/public/empty-legs/:id` → one (404 if not published/bookable).
+- `POST /api/public/empty-legs/:id/request` (above).
+Authenticated:
+- `GET /api/empty-legs?status=` — staff: all with source charter no, bookings count, pending requests count; member: published & bookable only (same shape as public plus `can_book`).
+- `GET /api/empty-legs/:id` — staff: with bookings and source charter; member: published only.
+- `POST /api/empty-legs` (manual), `PATCH /api/empty-legs/:id`, `POST /api/empty-legs/:id/publish`, `POST /api/empty-legs/:id/withdraw {reason}`, `POST /api/empty-legs/generate/:charterId` — sales, ops, admin.
+- `POST /api/empty-legs/:id/book {pax}` — member.
+- `GET /api/empty-legs/bookings?status=` — sales/ops/admin (with leg summary). `POST /api/empty-legs/bookings/:id/confirm`, `POST /api/empty-legs/bookings/:id/reject {reason}` — sales, admin.
+- `GET /api/charters/:id` additionally returns `empty_legs` (legs generated from it, staff only) and `empty_leg` (if derived).
+- `GET /api/dashboard` adds `empty_legs: { published, pending_requests, booked_90d, revenue_recovered_90d_inr, positioning_hours_sold_pct_90d }` (sold = booked legs' flight_hours / all generated legs' flight_hours with source charters starting in the last 90 days).
+
+## Frontend additions
+- **Public page `/empty-legs`** (no login; linked from the login page: "Empty-leg deals — no membership needed"): Meridian-branded header with "Member sign in" link; filters (from, to, month); cards showing route with city names, date + departure window in IST, aircraft type and seats, flight time, price incl. "+ GST", struck-through list price and "Save N%"; detail `/empty-legs/:id` with a booking-request form (name, email, phone, company optional, passengers select up to seats, message, terms checkbox: "Empty legs depend on the operator's main charter and may be retimed or withdrawn; the booking is confirmed only when Meridian Charters confirms it", hidden honeypot field `website`). On success show the booking number and what happens next. Mobile-first, looks premium (this is the marketing page an investor will see). Empty state when nothing is listed. Page `<title>` set.
+- **Member**: nav item "Empty legs" (`/m/empty-legs`) listing the same cards with a "Book now" button → confirm dialog with pax → on success navigate to the new trip.
+- **Sales & ops**: nav item "Empty legs" (`/s/empty-legs`, `/o/empty-legs`, both same page) with tabs: Listings (table: leg no, route, window, aircraft reg, list price, price, discount %, status pill, source charter link, requests count; actions publish / edit price & window / withdraw; "New empty leg" form) and Requests (table of public/member bookings with Confirm / Reject; confirm shows the invite link with a copy button).
+- **Ops charter detail**: section "Empty legs from this charter" with status and a "Generate" button if none.
+- **Staff dashboard**: an "Empty legs" card with the dashboard numbers (published, pending requests, revenue recovered 90d, % positioning hours sold).
+
+## Seed additions (idempotent)
+- For the seeded confirmed charter(s) with positioning: generated empty legs; publish them so the public page is never empty. Plus 2 manual published legs on popular routes (e.g. DEL→JAI, BOM→GOI) 1–3 weeks out, 1 draft leg, and 1 public pending request from a fictional person (example.in email) on a published leg.
