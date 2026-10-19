@@ -14,7 +14,7 @@
     "predeploy": "node src/db/migrate.js && node src/db/seed-if-demo.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

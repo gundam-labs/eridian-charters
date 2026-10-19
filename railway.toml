@@ -1,0 +1,13 @@
+# Used when the Railway service's Root Directory is the repository root.
+# (If Root Directory is set to /backend, backend/railway.toml is used instead.)
+# The root package.json's build/start scripts install and run the backend API.
+[build]
+builder = "RAILPACK"
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "npm start"
+preDeployCommand = "npm run predeploy"
+healthcheckPath = "/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
