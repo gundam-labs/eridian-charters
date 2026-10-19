@@ -2,8 +2,7 @@
 builder = "RAILPACK"
 
 [deploy]
-startCommand = "node src/index.js"
-preDeployCommand = "npm run predeploy"
+startCommand = "npm start"
 healthcheckPath = "/health"
-healthcheckTimeout = 30
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"

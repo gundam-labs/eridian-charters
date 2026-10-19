@@ -7,7 +7,6 @@ buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm start"
-preDeployCommand = "npm run predeploy"
 healthcheckPath = "/health"
-healthcheckTimeout = 60
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
