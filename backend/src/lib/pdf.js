@@ -159,7 +159,7 @@ function invoicePdf(inv, out) {
   const y2 = doc.y;
   kv(doc, 50, y2, [['Invoice date', dateFmt(inv.issued_on)], ['Due date', dateFmt(inv.due_on)]]);
   const y3 = kv(doc, 310, y2, [
-    ['Charter', `${inv.charter_no} (quote ${inv.quote_no})`],
+    ['Charter', `${inv.charter_no} (${inv.quote_no ? `quote ${inv.quote_no}` : `empty leg ${inv.empty_leg_no}`})`],
     ['Aircraft', `${inv.aircraft_type} · ${inv.aircraft_registration}`],
   ]);
   doc.y = Math.max(doc.y, y3) + 8;

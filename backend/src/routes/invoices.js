@@ -9,11 +9,16 @@ const router = asyncRouter();
 
 const INVOICE_SELECT = `SELECT i.*, c.charter_no, c.status AS charter_status, c.starts_on, c.ends_on, c.legs, c.pax,
   m.member_no, m.contact_name AS member_name, m.company AS member_company, m.city AS member_city, m.email AS member_email, m.gstin AS member_gstin,
-  q.quote_no, q.line_items, a.registration AS aircraft_registration, a.type AS aircraft_type
+  q.quote_no, el.leg_no AS empty_leg_no,
+  COALESCE(q.line_items, CASE WHEN el.id IS NOT NULL THEN jsonb_build_array(jsonb_build_object(
+    'code', 'EMPTY_LEG', 'description', 'Empty-leg charter ' || el.leg_no || ' (' || el.from_code || ' – ' || el.to_code || ', whole aircraft)',
+    'qty', 1, 'unit', 'flight', 'rate', i.subtotal::float8, 'amount', i.subtotal::float8)) END) AS line_items,
+  a.registration AS aircraft_registration, a.type AS aircraft_type
   FROM invoices i
   JOIN charters c ON c.id = i.charter_id
   JOIN members m ON m.id = i.member_id
-  JOIN quotes q ON q.id = c.quote_id
+  LEFT JOIN quotes q ON q.id = c.quote_id
+  LEFT JOIN empty_legs el ON el.id = c.empty_leg_id
   JOIN aircraft a ON a.id = c.aircraft_id`;
 
 async function loadInvoice(id, user) {

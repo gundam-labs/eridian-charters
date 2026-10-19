@@ -5,7 +5,8 @@
     "build": "npm --prefix backend ci --omit=dev",
     "start": "npm --prefix backend start",
     "predeploy": "npm --prefix backend run predeploy",
-    "test:e2e": "node --test tests/e2e/lifecycle.e2e.mjs"
+    "test:e2e": "node --test tests/e2e/lifecycle.e2e.mjs",
+    "test:e2e:empty-legs": "node --test tests/e2e/empty-legs.e2e.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.64.1"

@@ -101,8 +101,67 @@ function sendCharterCancelled({ to, name, charter, reason }) {
   });
 }
 
+// ── Empty legs (v1.1) ────────────────────────────────────────────────────────
+const legRoute = (leg) => `${leg.from_city || leg.from_code} (${leg.from_code}) → ${leg.to_city || leg.to_code} (${leg.to_code})`;
+const legWindow = (leg) => `${fmtWindow(leg.depart_earliest)} – ${fmtWindow(leg.depart_latest).slice(-5)} IST`;
+function fmtWindow(d) {
+  return new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+    .format(new Date(d));
+}
+
+function sendEmptyLegRequestAck({ to, name, booking, leg }) {
+  return sendEmail({
+    to, type: 'empty_leg_request', subject: `We received your empty-leg request ${booking.booking_no}`,
+    text: `Hello ${name}, thank you for your request ${booking.booking_no} for ${legRoute(leg)} departing ${legWindow(leg)}. Our team will confirm availability shortly. The booking is confirmed only when Meridian Charters confirms it.`,
+    html: layout('Request received', `<p>Hello ${esc(name)},</p><p>Thank you — we have received your request <b>${esc(booking.booking_no)}</b> for the empty leg <b>${esc(legRoute(leg))}</b>, departing ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
+      <p>Our charter team will review it and get back to you shortly. Empty legs depend on the operator's main charter and may be retimed or withdrawn; the booking is confirmed only when Meridian Charters confirms it.</p>`),
+  });
+}
+
+function sendEmptyLegSalesNotice({ to, booking, leg }) {
+  const url = `${APP_URL()}/s/empty-legs`;
+  return sendEmail({
+    to, type: 'empty_leg_request_sales', subject: `New empty-leg request ${booking.booking_no} — ${leg.leg_no}`,
+    text: `${booking.guest_name} <${booking.guest_email}>, ${booking.guest_phone} requested ${leg.leg_no} ${legRoute(leg)} for ${booking.pax} pax. Review: ${url}`,
+    html: layout(`New request ${booking.booking_no}`, `<p><b>${esc(booking.guest_name)}</b>${booking.guest_company ? ` (${esc(booking.guest_company)})` : ''} — ${esc(booking.guest_email)}, ${esc(booking.guest_phone)}</p>
+      <p>Empty leg ${esc(leg.leg_no)}: ${esc(legRoute(leg))}, ${esc(legWindow(leg))}, ${esc(booking.pax)} pax.</p>${booking.message ? `<p>Message: ${esc(booking.message)}</p>` : ''}
+      <p><a href="${esc(url)}">Review requests</a></p>`),
+  });
+}
+
+function sendEmptyLegBooked({ to, name, booking, leg, charter, invoice, inviteUrl = null }) {
+  const tripUrl = `${APP_URL()}/m/trips/${charter.id}`;
+  return sendEmail({
+    to, type: 'empty_leg_booked', subject: `Empty leg confirmed — charter ${charter.charter_no}`,
+    text: `Hello ${name}, your empty-leg booking ${booking.booking_no} (${legRoute(leg)}, ${legWindow(leg)}) is confirmed as charter ${charter.charter_no}. Invoice ${invoice.invoice_no} for ${formatINR(invoice.total)} is due ${invoice.due_on}.${inviteUrl ? ` Set your password to manage the trip: ${inviteUrl} (valid 72 hours)` : ` Add your passengers: ${tripUrl}`}`,
+    html: layout(`Charter ${charter.charter_no} confirmed`, `<p>Hello ${esc(name)},</p><p>Your empty-leg booking <b>${esc(booking.booking_no)}</b> — ${esc(legRoute(leg))}, departing ${esc(legWindow(leg))} — is confirmed as charter <b>${esc(charter.charter_no)}</b>.</p>
+      <p>Invoice ${esc(invoice.invoice_no)} for ${esc(formatINR(invoice.total))} (incl. GST) is due on ${esc(invoice.due_on)}.</p>
+      ${inviteUrl ? `<p>We have created a Meridian Charters account for you. Set your password (link valid 72 hours) to add your passenger manifest:</p>
+      <p style="text-align:center;margin:28px 0"><a href="${esc(inviteUrl)}" style="background:#c9a24a;color:#0b1b33;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:bold">Set password</a></p>
+      <p style="font-size:12px;color:#64748b">${esc(inviteUrl)}</p>` : `<p>Please add your passenger manifest in <a href="${esc(tripUrl)}">My trips</a>.</p>`}
+      <p style="font-size:12px;color:#64748b">Empty legs depend on the operator's main charter and may be retimed; our ops team will confirm the exact departure time.</p>`),
+  });
+}
+
+function sendEmptyLegRequestClosed({ to, name, booking, leg, reason }) {
+  return sendEmail({
+    to, type: 'empty_leg_request_closed', subject: `Your empty-leg request ${booking.booking_no}`,
+    text: `Hello ${name}, unfortunately we cannot confirm your request ${booking.booking_no} for ${legRoute(leg)}. Reason: ${reason}`,
+    html: layout('About your request', `<p>Hello ${esc(name)},</p><p>Unfortunately we cannot confirm your request <b>${esc(booking.booking_no)}</b> for ${esc(legRoute(leg))} (${esc(legWindow(leg))}).</p><p>Reason: ${esc(reason)}</p>
+      <p>See other available flights at <a href="${esc(APP_URL())}/empty-legs">our empty-leg deals</a>.</p>`),
+  });
+}
+
+function sendSourceCancelledWarning({ to, sourceCharterNo, derived }) {
+  return sendEmail({
+    to, type: 'empty_leg_source_cancelled', subject: `Source charter ${sourceCharterNo} cancelled — check ${derived.charter_no}`,
+    text: `Source charter ${sourceCharterNo} was cancelled. Charter ${derived.charter_no} (empty leg ${derived.leg_no}) was sold on its positioning flight — confirm this flight is still operating.`,
+    html: layout('Empty-leg charter needs attention', `<p>Source charter <b>${esc(sourceCharterNo)}</b> was cancelled.</p><p>Charter <b>${esc(derived.charter_no)}</b> was sold on its positioning flight (empty leg ${esc(derived.leg_no)}). Confirm this flight is still operating.</p>`),
+  });
+}
+
 function formatINR(n) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(n) || 0);
 }
 
-module.exports = { sendEmail, sendInvite, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };
+module.exports = { sendEmail, sendInvite, sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendEmptyLegBooked, sendEmptyLegRequestClosed, sendSourceCancelledWarning, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };

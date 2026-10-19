@@ -8,6 +8,7 @@ const NAVS = {
     { to: '/m/request', label: 'Request a quote' },
     { to: '/m/requests', label: 'My requests' },
     { to: '/m/trips', label: 'My trips' },
+    { to: '/m/empty-legs', label: 'Empty legs' },
     { to: '/m/invoices', label: 'Invoices' },
   ],
   pilot: [

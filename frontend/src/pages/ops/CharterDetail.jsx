@@ -11,6 +11,7 @@ import ManifestEditor from '../../components/ManifestEditor';
 import FlightLogForm from '../../components/FlightLogForm';
 import CancelModal from '../../components/CancelModal';
 import { fmtDate, fmtDateTime, inr, route, memberName, aircraftReg, aircraftType, humanize } from '../../lib/format';
+import { normLeg, legRoute, legWindow, emptyLegsPath } from '../../lib/emptyLegs';
 
 const EDITABLE = ['accepted', 'confirmed', 'manifest_complete'];
 
@@ -37,11 +38,13 @@ export default function CharterDetail() {
 
   const hasCrew = !!(c.captain_id && c.first_officer_id);
   const inv = c.invoice;
+  const derived = c.empty_leg || data?.empty_leg || (c.empty_leg_no ? { leg_no: c.empty_leg_no } : null);
+  const emptyLegs = c.empty_legs || data?.empty_legs;
 
   return (
     <>
       <PageHead back={<Link to="/o/charters" className="back">← Charters</Link>}
-        eyebrow={c.charter_no}
+        eyebrow={<>{c.charter_no}{derived && <span className="el-badge" title="This charter was sold from an empty leg">Empty-leg booking {derived.leg_no || ''}</span>}</>}
         title={route(c.legs)}
         sub={<>{memberName(c)}{c.member_no ? ` (${c.member_no})` : ''} · {fmtDate(c.starts_on)}{c.ends_on !== c.starts_on ? ` – ${fmtDate(c.ends_on)}` : ''} · {c.pax} pax · <StatusPill status={c.status} /></>}
         actions={isOps && <>
@@ -109,6 +112,10 @@ export default function CharterDetail() {
                 </dl>
               </div>
             )}
+          {Array.isArray(emptyLegs) && (
+            <EmptyLegsPanel charter={c} legs={emptyLegs} canGenerate={['sales', 'ops', 'admin'].includes(user.role)}
+              listPath={emptyLegsPath(user.role)} onGenerated={(n) => { setOk(n ? `${n} empty leg${n > 1 ? 's' : ''} generated as draft.` : 'No positioning legs to generate.'); reload(); }} />
+          )}
           {inv && <InvoiceCard inv={inv} />}
           {c.ops_notes && <div className="card card-pad"><h3 style={{ marginBottom: 8 }}>Ops notes</h3><p className="small">{c.ops_notes}</p></div>}
         </div>
@@ -213,6 +220,51 @@ function InvoiceCard({ inv }) {
         <button className="btn btn-sm" onClick={async () => { setErr(''); try { await openPdf(`/api/invoices/${inv.id}/pdf`); } catch (e) { setErr(e.message); } }}>Invoice PDF</button>
         <Link to="/s/invoices" className="btn btn-sm btn-ghost">All invoices</Link>
       </div>
+      <ErrorAlert error={err} />
+    </div>
+  );
+}
+
+function EmptyLegsPanel({ charter: c, legs, canGenerate, listPath, onGenerated }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const list = legs.map(normLeg);
+  const canGen = canGenerate && ['accepted', 'confirmed', 'manifest_complete'].includes(c.status);
+  const generate = async () => {
+    setBusy(true); setErr('');
+    try {
+      const r = await api.post(`/api/empty-legs/generate/${c.id}`);
+      const d = r.data;
+      onGenerated(typeof d?.created === 'number' ? d.created : Array.isArray(d) ? d.length : Array.isArray(d?.created) ? d.created.length : Array.isArray(d?.empty_legs) ? d.empty_legs.length : 1);
+    } catch (e) { setErr(errText(e)); } finally { setBusy(false); }
+  };
+  return (
+    <div className="card card-pad">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 12 }}>
+        <h3>Empty legs from this charter</h3>
+        <Link to={listPath} className="xs nowrap">View all →</Link>
+      </div>
+      {list.length === 0 ? (
+        <>
+          <p className="small muted">No empty legs yet. Positioning flights can be sold as discounted whole-aircraft charters.</p>
+          {canGen && <button className="btn btn-sm btn-gold" onClick={generate} disabled={busy}>{busy ? 'Generating…' : 'Generate empty legs'}</button>}
+        </>
+      ) : (
+        <ul className="el-mini">
+          {list.map(l => {
+            const w = legWindow(l);
+            return (
+              <li key={l.id}>
+                <div>
+                  <Link to={listPath} className="strong">{legRoute(l)}</Link>
+                  <div className="muted xs">{l.leg_no} · {w.day} {w.range}{l.price_inr != null ? ` · ${inr(l.price_inr)}` : ''}</div>
+                </div>
+                <StatusPill status={l.status} />
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <ErrorAlert error={err} />
     </div>
   );

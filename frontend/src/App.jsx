@@ -16,6 +16,10 @@ import MemberRequestDetail from './pages/member/RequestDetail';
 import MyTrips from './pages/member/MyTrips';
 import TripDetail from './pages/member/TripDetail';
 import Invoices from './pages/shared/Invoices';
+import MemberEmptyLegs from './pages/member/EmptyLegs';
+import EmptyLegsAdmin from './pages/shared/EmptyLegsAdmin';
+import EmptyLegsPublic from './pages/public/EmptyLegsPublic';
+import EmptyLegPublicDetail from './pages/public/EmptyLegPublicDetail';
 
 import StaffDashboard from './pages/shared/StaffDashboard';
 import RequestsInbox from './pages/sales/RequestsInbox';
@@ -54,6 +58,9 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/invite/:token" element={<Invite />} />
+      {/* Public marketing pages — no auth, never redirect signed-in users */}
+      <Route path="/empty-legs" element={<EmptyLegsPublic />} />
+      <Route path="/empty-legs/:id" element={<EmptyLegPublicDetail />} />
 
       {/* Member */}
       <Route path="/m" element={guard(['member'], <TopNavLayout kind="member" />)}>
@@ -63,6 +70,7 @@ export default function App() {
         <Route path="requests/:id" element={<MemberRequestDetail />} />
         <Route path="trips" element={<MyTrips />} />
         <Route path="trips/:id" element={<TripDetail />} />
+        <Route path="empty-legs" element={<MemberEmptyLegs />} />
         <Route path="invoices" element={<Invoices />} />
       </Route>
 
@@ -86,6 +94,7 @@ export default function App() {
         <Route path="/s/members" element={guard(STAFF, <Members />)} />
         <Route path="/s/members/:id" element={guard(STAFF, <MemberDetail />)} />
         <Route path="/s/invoices" element={guard(STAFF, <Invoices />)} />
+        <Route path="/s/empty-legs" element={guard(STAFF, <EmptyLegsAdmin />)} />
 
         <Route path="/o" element={guard(['ops', 'admin'], <StaffDashboard title="Operations dashboard" />)} />
         <Route path="/o/calendar" element={guard(['ops', 'admin'], <FleetCalendar />)} />
@@ -94,6 +103,7 @@ export default function App() {
         <Route path="/o/maintenance" element={guard(['ops', 'admin'], <Maintenance />)} />
         <Route path="/o/crew" element={guard(['ops', 'admin'], <Crew />)} />
         <Route path="/o/aircraft" element={guard(['ops', 'admin'], <Aircraft />)} />
+        <Route path="/o/empty-legs" element={guard(STAFF, <EmptyLegsAdmin />)} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

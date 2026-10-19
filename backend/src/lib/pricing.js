@@ -157,4 +157,28 @@ function priceQuote({ legs, aircraft, airports, settings = {}, adjustment_inr = 
   };
 }
 
-module.exports = { priceQuote, haversineNm, ceil10 };
+/**
+ * Empty-leg pricing for one leg (pure). See SPEC.md v1.1.
+ * list_price_inr = flight_hours × hourly rate + landing at destination + handling at both ends.
+ * price_inr      = list × (1 − empty_leg_discount_pct/100), rounded to the nearest ₹1,000.
+ * flight_hours / distance_nm may be passed in (e.g. from a quote's positioning leg) to keep them identical.
+ */
+function priceEmptyLeg({ from, to, aircraft, airports, settings = {}, flight_hours = null, distance_nm = null, discount_pct = null }) {
+  if (!aircraft) throw badRequest('Aircraft is required');
+  const ap = indexAirports(airports);
+  const a = ap[from];
+  const b = ap[to];
+  if (!a) throw badRequest(`Unknown airport: ${from}`);
+  if (!b) throw badRequest(`Unknown airport: ${to}`);
+  if (from === to) throw badRequest('From and to must be different airports');
+  const nm = haversineNm({ lat: Number(a.lat), lon: Number(a.lon) }, { lat: Number(b.lat), lon: Number(b.lon) });
+  const taxi = Number(settings.taxi_allowance_hours ?? 0.3);
+  const hours = flight_hours != null ? Number(flight_hours) : ceil10(nm / Number(aircraft.cruise_speed_kts) + taxi);
+  const list_price_inr = rupees(hours * Number(aircraft.hourly_rate_inr))
+    + rupees(Number(b.landing_fee_inr) || 0) + rupees(Number(a.handling_fee_inr) || 0) + rupees(Number(b.handling_fee_inr) || 0);
+  const pct = Number(discount_pct ?? settings.empty_leg_discount_pct ?? 60);
+  const price_inr = Math.max(0, Math.round((list_price_inr * (1 - pct / 100)) / 1000) * 1000);
+  return { distance_nm: distance_nm != null ? Number(distance_nm) : Math.round(nm), flight_hours: hours, list_price_inr, price_inr };
+}
+
+module.exports = { priceQuote, priceEmptyLeg, haversineNm, ceil10 };

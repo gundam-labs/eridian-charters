@@ -4,11 +4,41 @@ const { requireRole, STAFF } = require('../middleware/auth');
 const { expireStaleQuotes } = require('../lib/quotes');
 const { todayIST, addDays } = require('../lib/time');
 const { BUSY_STATUSES } = require('../lib/availability');
+const { expireStaleLegs } = require('../lib/emptyLegs');
 
 const router = asyncRouter();
 
+/**
+ * Empty-leg KPIs over generated/booked legs. "90d" scope = legs whose source charter starts within the last 90 days
+ * (or later, i.e. upcoming), plus manual legs created/booked in the last 90 days for the booked/revenue figures.
+ */
+async function emptyLegStats(today) {
+  const from90 = addDays(today, -89);
+  const r = (await pool.query(
+    `SELECT
+       (SELECT count(*)::int FROM empty_legs WHERE status = 'published') AS published,
+       (SELECT count(*)::int FROM empty_leg_bookings b JOIN empty_legs el ON el.id = b.empty_leg_id
+         WHERE b.status = 'requested') AS pending_requests,
+       (SELECT count(*)::int FROM empty_legs el WHERE el.status = 'booked' AND el.booked_at >= now() - interval '90 days') AS booked_90d,
+       (SELECT COALESCE(sum(i.subtotal), 0)::float8 FROM charters c JOIN invoices i ON i.charter_id = c.id
+         WHERE c.empty_leg_id IS NOT NULL AND c.status <> 'cancelled' AND i.status <> 'cancelled'
+           AND c.created_at >= now() - interval '90 days') AS revenue_90d,
+       (SELECT COALESCE(sum(el.flight_hours), 0)::float8 FROM empty_legs el JOIN charters sc ON sc.id = el.source_charter_id
+         WHERE sc.starts_on >= $1::date) AS gen_hours,
+       (SELECT COALESCE(sum(el.flight_hours), 0)::float8 FROM empty_legs el JOIN charters sc ON sc.id = el.source_charter_id
+         WHERE sc.starts_on >= $1::date AND el.status = 'booked') AS sold_hours`, [from90])).rows[0];
+  return {
+    published: r.published,
+    pending_requests: r.pending_requests,
+    booked_90d: r.booked_90d,
+    revenue_recovered_90d_inr: Math.round(r.revenue_90d),
+    positioning_hours_sold_pct_90d: r.gen_hours > 0 ? Math.round((r.sold_hours / r.gen_hours) * 1000) / 10 : 0,
+  };
+}
+
 router.get('/', requireRole(...STAFF), async (req, res) => {
   await expireStaleQuotes();
+  await expireStaleLegs();
   const today = todayIST();
   const in7 = addDays(today, 6);
   const from30 = addDays(today, -29);
@@ -47,6 +77,7 @@ router.get('/', requireRole(...STAFF), async (req, res) => {
     unpaid_invoices_total: unpaid.n,
     aircraft_in_maintenance_today: inMaint.n,
     fleet_utilisation_30d_pct: util.fleet ? Math.round((util.busy_days / (util.fleet * 30)) * 1000) / 10 : 0,
+    empty_legs: await emptyLegStats(today),
   });
 });
 

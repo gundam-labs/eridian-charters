@@ -16,6 +16,10 @@ const STATUS_COLOURS = {
   free: 'green', charter: 'navy', maintenance: 'amber',
   // email
   logged: 'grey', failed: 'red',
+  // empty legs (draft/withdrawn/expired share quote colours above)
+  published: 'green', booked: 'navy',
+  // empty-leg bookings (confirmed/cancelled share charter colours above)
+  requested: 'amber', rejected: 'red',
 };
 
 export function StatusPill({ status, label }) {
