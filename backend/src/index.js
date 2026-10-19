@@ -2,7 +2,7 @@ require('dotenv').config({ quiet: true });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const { version: APP_VERSION } = require('../package.json');
 
 // Fail closed: the dev fallback secret is only allowed when NODE_ENV is explicitly
@@ -47,9 +47,12 @@ app.use(cors({
 
 app.use(express.json({ limit: '1mb' }));
 
+// Keyed by IP + email: behind the Vercel /api rewrite many users can share an
+// edge IP, so a per-IP-only limit would lock out everyone at a demo or an office.
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
+  keyGenerator: (req) => `${ipKeyGenerator(req.ip || '')}:${String(req.body?.email || '').toLowerCase().trim()}`,
   message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,

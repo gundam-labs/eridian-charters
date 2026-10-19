@@ -76,11 +76,10 @@ The server refuses to start without a `JWT_SECRET` of 32+ characters unless `NOD
 
 ### 2. Vercel (frontend)
 
-1. **Add New → Project → Import** `gundam-labs/meridian-charters`. Keep the root directory as the repo root; the root `vercel.json` builds `frontend/` and serves it as a single-page app.
-2. Environment variables:
-   - `VITE_API_URL` = the Railway URL from step 5 above (no trailing slash)
-   - `VITE_SHOW_DEMO_ACCOUNTS` = `true` only for a demo environment
-3. Deploy. If the Vercel URL differs from what you put in `CORS_ORIGINS`, update it on Railway.
+1. **Add New → Project → Import** the repo. Set **Root Directory** to `frontend`; `frontend/vercel.json` pins the Vite preset.
+2. `frontend/vercel.json` rewrites `/api/*` to the Railway API, so the browser only ever talks to the Vercel domain and no CORS setup is needed. If the Railway URL changes, update the `destination` there.
+3. Optional: `VITE_SHOW_DEMO_ACCOUNTS` = `true` for a demo environment.
+4. Deploy.
 
 ### 3. Check
 

@@ -3,7 +3,10 @@ import axios from 'axios';
 export const STORAGE_TOKEN = 'meridian_token';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  // Same-origin by default: Vercel rewrites /api/* to the Railway API (frontend/vercel.json)
+  // and Vite proxies it in dev, so the browser never makes a cross-site call.
+  // Set VITE_API_DIRECT=true to call VITE_API_URL directly instead (needs CORS_ORIGINS on the API).
+  baseURL: import.meta.env.VITE_API_DIRECT === 'true' ? (import.meta.env.VITE_API_URL || '') : '',
   headers: { 'Content-Type': 'application/json' },
 });
 
