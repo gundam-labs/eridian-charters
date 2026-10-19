@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth, homeFor } from '../context/AuthContext';
 import { errText } from '../api';
 import { ErrorAlert } from '../components/ui';
@@ -82,6 +82,10 @@ export default function Login() {
             </div>
             <button className="btn btn-primary btn-block" disabled={saving}>{saving ? 'Signing in…' : 'Sign in'}</button>
           </form>
+          <Link to="/empty-legs" className="login-el">
+            <span className="eyebrow">Not a member?</span>
+            <span className="t">Empty-leg deals — no membership needed <span aria-hidden="true">→</span></span>
+          </Link>
           {SHOW_DEMO && (
             <details className="demo">
               <summary>Demo accounts</summary>

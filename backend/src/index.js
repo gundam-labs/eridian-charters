@@ -66,6 +66,25 @@ const inviteLimiter = rateLimit({
   legacyHeaders: false,
   skip: isDevLike,
 });
+// Public empty-leg booking requests: 5 per hour per IP + email (SPEC v1.1).
+const publicRequestLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => `${ipKeyGenerator(req.ip || '')}:${String(req.body?.email || '').toLowerCase().trim()}`,
+  message: { error: 'Too many requests. Please try again in an hour or contact us directly.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: isDevLike,
+});
+// Public read endpoints: generous per-IP cap on top of the global API limiter.
+const publicReadLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  message: { error: 'Too many requests' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: isDevLike,
+});
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 600,
@@ -93,6 +112,11 @@ app.use('/api/auth/accept-invite', inviteLimiter);
 app.use('/api/auth/invite', inviteLimiter);
 app.use('/api/auth', authRoutes);
 
+// Public empty-leg deals (no auth; whitelisted fields only)
+app.post('/api/public/empty-legs/:id/request', publicRequestLimiter);
+app.use('/api/public', publicReadLimiter);
+app.use('/api/public/empty-legs', require('./routes/publicEmptyLegs'));
+
 // Everything else requires a valid JWT
 const ref = require('./routes/reference');
 const mount = (path, router) => app.use(path, authenticate, router);
@@ -109,6 +133,7 @@ mount('/api/charters', require('./routes/charters'));
 mount('/api/pilot', require('./routes/pilot'));
 mount('/api/invoices', require('./routes/invoices'));
 mount('/api/dashboard', require('./routes/dashboard'));
+mount('/api/empty-legs', require('./routes/emptyLegs'));
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 

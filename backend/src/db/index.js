@@ -40,6 +40,9 @@ const DEFAULT_SETTINGS = {
   positioning_rate_pct: '100',
   taxi_allowance_hours: '0.3',
   manifest_cutoff_hours: '24',
+  empty_leg_discount_pct: '60',
+  empty_leg_auto_publish: 'false',
+  empty_leg_min_notice_hours: '6',
 };
 
 // Idempotent schema. Safe to run on every deploy.
@@ -162,7 +165,7 @@ CREATE INDEX IF NOT EXISTS idx_quotes_member ON quotes(member_id);
 CREATE TABLE IF NOT EXISTS charters (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   charter_no       TEXT UNIQUE NOT NULL,
-  quote_id         UUID UNIQUE NOT NULL REFERENCES quotes(id),
+  quote_id         UUID UNIQUE REFERENCES quotes(id),
   member_id        UUID NOT NULL REFERENCES members(id),
   aircraft_id      UUID NOT NULL REFERENCES aircraft(id),
   legs             JSONB NOT NULL,
@@ -262,8 +265,78 @@ CREATE TABLE IF NOT EXISTS email_log (
 );
 `;
 
+// v1.1 — Empty legs. Written to upgrade an existing v1.0 database in place:
+// every statement is idempotent (IF NOT EXISTS / DROP NOT NULL / guarded constraints).
+const SCHEMA_V11 = `
+CREATE TABLE IF NOT EXISTS empty_legs (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  leg_no            TEXT UNIQUE NOT NULL,
+  source_charter_id UUID REFERENCES charters(id),
+  source_leg        TEXT CHECK (source_leg IN ('positioning_out','positioning_back')),
+  aircraft_id       UUID NOT NULL REFERENCES aircraft(id),
+  from_code         TEXT NOT NULL REFERENCES airports(code),
+  to_code           TEXT NOT NULL REFERENCES airports(code),
+  depart_earliest   TIMESTAMPTZ NOT NULL,
+  depart_latest     TIMESTAMPTZ NOT NULL,
+  flight_hours      NUMERIC(5,1) NOT NULL,
+  distance_nm       INT NOT NULL,
+  seats             INT NOT NULL,
+  list_price_inr    NUMERIC(14,2) NOT NULL,
+  price_inr         NUMERIC(14,2) NOT NULL,
+  status            TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published','booked','withdrawn','expired')),
+  notes             TEXT,
+  published_at      TIMESTAMPTZ,
+  booked_at         TIMESTAMPTZ,
+  withdrawn_reason  TEXT,
+  created_by        UUID REFERENCES users(id),
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CHECK (depart_latest >= depart_earliest)
+);
+CREATE INDEX IF NOT EXISTS idx_empty_legs_status ON empty_legs(status, depart_earliest);
+CREATE INDEX IF NOT EXISTS idx_empty_legs_source ON empty_legs(source_charter_id);
+-- one generated leg per charter + positioning direction
+CREATE UNIQUE INDEX IF NOT EXISTS uq_empty_legs_source_leg ON empty_legs(source_charter_id, source_leg) WHERE source_charter_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS empty_leg_bookings (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_no    TEXT UNIQUE NOT NULL,
+  empty_leg_id  UUID NOT NULL REFERENCES empty_legs(id),
+  member_id     UUID REFERENCES members(id),
+  channel       TEXT NOT NULL CHECK (channel IN ('member','public')),
+  guest_name    TEXT NOT NULL,
+  guest_email   TEXT NOT NULL,
+  guest_phone   TEXT,
+  guest_company TEXT,
+  pax           INT NOT NULL CHECK (pax > 0),
+  message       TEXT,
+  status        TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested','confirmed','rejected','cancelled')),
+  charter_id    UUID REFERENCES charters(id),
+  decided_by    UUID REFERENCES users(id),
+  decided_at    TIMESTAMPTZ,
+  reject_reason TEXT,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_elb_leg ON empty_leg_bookings(empty_leg_id, status);
+
+ALTER TABLE charters ALTER COLUMN quote_id DROP NOT NULL;
+ALTER TABLE charters ADD COLUMN IF NOT EXISTS empty_leg_id UUID REFERENCES empty_legs(id);
+-- an empty leg is sold once
+CREATE UNIQUE INDEX IF NOT EXISTS uq_charters_empty_leg ON charters(empty_leg_id) WHERE empty_leg_id IS NOT NULL;
+
+ALTER TABLE members ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'invited';
+
+DO $$ BEGIN
+  ALTER TABLE members ADD CONSTRAINT members_source_check CHECK (source IN ('invited','empty_leg_public'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  ALTER TABLE charters ADD CONSTRAINT charters_origin_check CHECK (num_nonnulls(quote_id, empty_leg_id) = 1);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+`;
+
 async function initDB() {
   await pool.query(SCHEMA);
+  await pool.query(SCHEMA_V11);
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await pool.query('INSERT INTO settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING', [key, value]);
   }
@@ -274,8 +347,9 @@ async function initDB() {
 async function getSettings(db = pool) {
   const { rows } = await db.query('SELECT key, value FROM settings');
   const out = {};
-  for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) out[k] = Number(v);
-  for (const r of rows) out[r.key] = r.value !== '' && !isNaN(Number(r.value)) ? Number(r.value) : r.value;
+  const conv = (v) => (v !== '' && !isNaN(Number(v)) ? Number(v) : v);
+  for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) out[k] = conv(v);
+  for (const r of rows) out[r.key] = conv(r.value);
   return out;
 }
 

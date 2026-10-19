@@ -32,6 +32,15 @@ api.interceptors.response.use(
   }
 );
 
+/**
+ * Unauthenticated client for /api/public/* — no token header and no 401 redirect,
+ * so a stale session never bounces a visitor off the public pages.
+ */
+export const publicApi = axios.create({
+  baseURL: import.meta.env.VITE_API_DIRECT === 'true' ? (import.meta.env.VITE_API_URL || '') : '',
+  headers: { 'Content-Type': 'application/json' },
+});
+
 /** Extract a human readable message from an axios error ({error} from API). */
 export async function errMsg(err) {
   const data = err?.response?.data;

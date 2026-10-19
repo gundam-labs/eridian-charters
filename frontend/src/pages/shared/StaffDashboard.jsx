@@ -28,6 +28,7 @@ export default function StaffDashboard({ title = 'Dashboard', eyebrow }) {
             <Stat to={isOps ? '/o/maintenance' : null} label="In maintenance today" value={countOf(data.aircraft_in_maintenance_today)} />
             <Stat to={isOps ? '/o/calendar' : null} label="Fleet utilisation 30d" value={data.fleet_utilisation_30d_pct != null ? `${Math.round(Number(data.fleet_utilisation_30d_pct))}%` : '—'} />
           </div>
+          {data.empty_legs && <EmptyLegsCard el={data.empty_legs} to={user.role === 'ops' ? '/o/empty-legs' : '/s/empty-legs'} />}
           <div className="card">
             <div className="card-head"><h2>Departing in the next 7 days</h2>{isOps && <Link to="/o/calendar" className="btn btn-sm">Fleet calendar</Link>}</div>
             {next7.length === 0 ? <Empty title="A quiet week">No charters depart in the next seven days.</Empty> : (
@@ -42,7 +43,7 @@ export default function StaffDashboard({ title = 'Dashboard', eyebrow }) {
                         <td className="nowrap">{route(c.legs)}</td>
                         <td>{memberName(c)}</td>
                         <td className="nowrap">{aircraftReg(c)}</td>
-                        <td className="num">{paxCount(c)}</td>
+                        <td className="num">{c.pax ?? paxCount(c)}</td>
                         <td><StatusPill status={c.status} /></td>
                       </tr>
                     ))}
@@ -60,4 +61,28 @@ export default function StaffDashboard({ title = 'Dashboard', eyebrow }) {
 function Stat({ to, label, value, hint }) {
   const inner = <><div className="label">{label}</div><div className="value">{value}</div>{hint && <div className="hint">{hint}</div>}</>;
   return to ? <Link to={to} className="stat">{inner}</Link> : <div className="stat">{inner}</div>;
+}
+
+function EmptyLegsCard({ el, to }) {
+  const pct = el.positioning_hours_sold_pct_90d;
+  const pctNum = pct != null && !isNaN(Number(pct)) ? Math.max(0, Math.min(100, Math.round(Number(pct)))) : null;
+  return (
+    <div className="card el-dash">
+      <div className="card-head">
+        <h2>Empty legs</h2>
+        <Link to={to} className="btn btn-sm">Manage empty legs</Link>
+      </div>
+      <div className="el-dash-grid">
+        <Link to={to} className="el-dash-item"><div className="label">Published</div><div className="value">{countOf(el.published)}</div></Link>
+        <Link to={`${to}?tab=requests`} className="el-dash-item">
+          <div className="label">Pending requests</div>
+          <div className="value">{countOf(el.pending_requests)}{countOf(el.pending_requests) > 0 && <span className="pill pill-amber" style={{ marginLeft: 8, verticalAlign: 'middle' }}>Action</span>}</div>
+        </Link>
+        <div className="el-dash-item"><div className="label">Revenue recovered · 90d</div><div className="value">{inr(el.revenue_recovered_90d_inr)}</div>
+          {el.booked_90d != null && <div className="hint">{countOf(el.booked_90d)} leg{countOf(el.booked_90d) === 1 ? '' : 's'} sold</div>}</div>
+        <div className="el-dash-item"><div className="label">Positioning hours sold · 90d</div><div className="value">{pctNum != null ? `${pctNum}%` : '—'}</div>
+          {pctNum != null && <div className="el-bar" role="img" aria-label={`${pctNum}% of positioning hours sold`}><span style={{ width: `${pctNum}%` }} /></div>}</div>
+      </div>
+    </div>
+  );
 }

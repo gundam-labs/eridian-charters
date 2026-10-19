@@ -31,7 +31,7 @@ export default function TripDetail() {
     <>
       <PageHead
         back={<Link to="/m/trips" className="back">← My trips</Link>}
-        eyebrow={c.charter_no}
+        eyebrow={c.empty_leg_no || c.empty_leg?.leg_no ? `${c.charter_no} · Empty-leg deal ${c.empty_leg_no || c.empty_leg.leg_no}` : c.charter_no}
         title={route(c.legs)}
         sub={<>{fmtDate(c.starts_on)}{c.ends_on && c.ends_on !== c.starts_on ? ` – ${fmtDate(c.ends_on)}` : ''} · <StatusPill status={c.status} /></>}
         actions={canCancel && <button className="btn btn-danger" onClick={() => setCancelling(true)}>Cancel trip</button>}

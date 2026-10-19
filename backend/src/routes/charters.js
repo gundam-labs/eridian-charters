@@ -5,7 +5,8 @@ const { logEvent } = require('../lib/events');
 const { conflicts, crewConflicts } = require('../lib/availability');
 const { maskId, isMasked, publicAircraft } = require('../lib/serialize');
 const { parseIST, toISTISO, isDateStr } = require('../lib/time');
-const { sendCharterConfirmed, sendCharterCancelled } = require('../lib/email');
+const { sendCharterConfirmed, sendCharterCancelled, sendEmptyLegRequestClosed, sendSourceCancelledWarning } = require('../lib/email');
+const { LEG_SELECT, staffLeg, generateForCharter, onCharterCancelled, salesRecipients } = require('../lib/emptyLegs');
 
 const router = asyncRouter();
 
@@ -14,6 +15,8 @@ const ID_TYPES = ['passport', 'aadhaar', 'driving_licence', 'voter_id', 'pan'];
 const CHARTER_SELECT = `SELECT c.*,
   m.member_no, m.contact_name AS member_name, m.company AS member_company, m.email AS member_email,
   q.quote_no, q.request_id,
+  el.leg_no AS empty_leg_no, el.source_charter_id AS empty_leg_source_charter_id,
+  CASE WHEN c.empty_leg_id IS NOT NULL THEN 'Empty leg ' || el.leg_no WHEN q.quote_no IS NOT NULL THEN 'Quote ' || q.quote_no END AS origin,
   json_build_object('id', a.id, 'registration', a.registration, 'type', a.type, 'seats', a.seats, 'home_base', a.home_base,
                     'hourly_rate_inr', a.hourly_rate_inr::float8, 'partner_name', a.partner_name, 'status', a.status) AS aircraft,
   a.registration AS aircraft_registration, a.type AS aircraft_type, a.seats AS aircraft_seats,
@@ -21,7 +24,8 @@ const CHARTER_SELECT = `SELECT c.*,
   (SELECT count(*)::int FROM passengers p WHERE p.charter_id = c.id) AS passenger_count
   FROM charters c
   JOIN members m ON m.id = c.member_id
-  JOIN quotes q ON q.id = c.quote_id
+  LEFT JOIN quotes q ON q.id = c.quote_id
+  LEFT JOIN empty_legs el ON el.id = c.empty_leg_id
   JOIN aircraft a ON a.id = c.aircraft_id
   LEFT JOIN crew_members cap ON cap.id = c.captain_id
   LEFT JOIN crew_members fo ON fo.id = c.first_officer_id
@@ -71,7 +75,23 @@ async function detail(id, user) {
        FROM events e LEFT JOIN users u ON u.id = e.actor_user_id
       WHERE (e.entity_type = 'charter' AND e.entity_id = $1) OR (e.entity_type = 'invoice' AND e.entity_id = $2)
       ORDER BY e.created_at`, [c.id, invoice?.id || '00000000-0000-0000-0000-000000000000'])).rows;
-  return { ...shapeCharter(c, user), passengers, invoice, events };
+  const out = { ...shapeCharter(c, user), passengers, invoice, events };
+  // Empty legs generated from this charter (staff only) and the empty leg this charter was sold on.
+  if (isStaff(user)) {
+    out.empty_legs = (await pool.query(`${LEG_SELECT} WHERE el.source_charter_id = $1 ORDER BY el.depart_earliest`, [c.id])).rows.map(staffLeg);
+  }
+  out.empty_leg = null;
+  if (c.empty_leg_id) {
+    const el = (await pool.query(`${LEG_SELECT} WHERE el.id = $1`, [c.empty_leg_id])).rows[0];
+    if (el) {
+      out.empty_leg = isStaff(user)
+        ? staffLeg(el)
+        : { id: el.id, leg_no: el.leg_no, from_code: el.from_code, to_code: el.to_code, from_city: el.from_city, to_city: el.to_city,
+          depart_earliest: el.depart_earliest, depart_latest: el.depart_latest, flight_hours: Number(el.flight_hours) };
+    }
+  }
+  if (!isStaff(user)) delete out.empty_leg_source_charter_id;
+  return out;
 }
 
 // ── List ────────────────────────────────────────────────────────────────────
@@ -149,6 +169,15 @@ router.post('/:id/assign', requireRole('ops'), async (req, res) => {
 router.post('/:id/confirm', requireRole('ops'), async (req, res) => {
   const c = await loadCharter(req.params.id, req.user);
   if (c.status !== 'accepted') throw new HttpError(409, `Cannot confirm a charter that is ${c.status}`);
+  // A charter sold on a generated empty leg flies with its source charter's crew unless ops assigned others.
+  if (c.empty_leg_source_charter_id && (!c.captain_id || !c.first_officer_id)) {
+    const src = (await pool.query('SELECT captain_id, first_officer_id, cabin_crew_id FROM charters WHERE id = $1', [c.empty_leg_source_charter_id])).rows[0];
+    if (src) {
+      c.captain_id = c.captain_id || src.captain_id;
+      c.first_officer_id = c.first_officer_id || src.first_officer_id;
+      c.cabin_crew_id = c.cabin_crew_id || src.cabin_crew_id;
+    }
+  }
   if (!c.captain_id || !c.first_officer_id) throw new HttpError(409, 'Assign a captain and first officer before confirming');
   if (c.aircraft.status === 'inactive') throw new HttpError(409, 'Aircraft is inactive');
   const cf = await conflicts(c.aircraft_id, c.starts_on, c.ends_on, c.id);
@@ -159,9 +188,13 @@ router.post('/:id/confirm', requireRole('ops'), async (req, res) => {
     return res.status(409).json({ error: `${x.name} is already assigned to ${x.charter_no} on these dates`, conflicts: crewBusy });
   }
   await withTransaction(async (client) => {
-    const upd = await client.query(`UPDATE charters SET status='confirmed', confirmed_at=now() WHERE id=$1 AND status='accepted' RETURNING id`, [c.id]);
+    const upd = await client.query(
+      `UPDATE charters SET status='confirmed', confirmed_at=now(), captain_id=$2, first_officer_id=$3, cabin_crew_id=$4
+        WHERE id=$1 AND status='accepted' RETURNING *`, [c.id, c.captain_id, c.first_officer_id, c.cabin_crew_id]);
     if (!upd.rows.length) throw new HttpError(409, 'Charter changed — reload and try again');
     await logEvent({ entity_type: 'charter', entity_id: c.id, action: 'confirmed', actor_user_id: req.user.id }, client);
+    // v1.1: offer the positioning flights as empty legs (draft, or published when auto-publish is on).
+    if (upd.rows[0].quote_id) await generateForCharter(upd.rows[0], req.user.id, client);
   });
   await sendCharterConfirmed({ to: c.member_email, name: c.member_name, charter: c });
   res.json(await detail(c.id, req.user));
@@ -266,16 +299,24 @@ router.post('/:id/cancel', requireRole('member', 'ops'), async (req, res) => {
   if (!['accepted', 'confirmed', 'manifest_complete'].includes(c.status)) throw new HttpError(409, `Cannot cancel a charter that is ${c.status}`);
   const reason = String(req.body?.reason || '').trim();
   if (!reason) throw new HttpError(400, 'A cancellation reason is required');
-  await withTransaction(async (client) => {
+  const cascade = await withTransaction(async (client) => {
     const upd = await client.query(
-      `UPDATE charters SET status='cancelled', cancelled_at=now(), cancel_reason=$2 WHERE id=$1 AND status IN ('accepted','confirmed','manifest_complete') RETURNING id`,
+      `UPDATE charters SET status='cancelled', cancelled_at=now(), cancel_reason=$2 WHERE id=$1 AND status IN ('accepted','confirmed','manifest_complete') RETURNING *`,
       [c.id, reason.slice(0, 1000)]);
     if (!upd.rows.length) throw new HttpError(409, 'Charter changed — reload and try again');
     await logEvent({ entity_type: 'charter', entity_id: c.id, action: 'cancelled', actor_user_id: req.user.id, detail: { reason } }, client);
     const inv = await client.query(`UPDATE invoices SET status='cancelled' WHERE charter_id=$1 AND status <> 'cancelled' RETURNING id`, [c.id]);
     for (const i of inv.rows) await logEvent({ entity_type: 'invoice', entity_id: i.id, action: 'cancelled', actor_user_id: req.user.id, detail: { reason: 'charter cancelled' } }, client);
+    return onCharterCancelled(upd.rows[0], req.user.id, client);
   });
   await sendCharterCancelled({ to: c.member_email, name: c.member_name, charter: c, reason });
+  for (const { booking, leg } of cascade.cancelledRequests) {
+    await sendEmptyLegRequestClosed({ to: booking.guest_email, name: booking.guest_name, booking, leg, reason: 'The flight has been withdrawn by the operator' });
+  }
+  if (cascade.flagged.length) {
+    const to = await salesRecipients();
+    for (const d of cascade.flagged) for (const addr of to) await sendSourceCancelledWarning({ to: addr, sourceCharterNo: c.charter_no, derived: d });
+  }
   res.json(await detail(c.id, req.user));
 });
 
