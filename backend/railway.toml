@@ -1,0 +1,9 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "node src/index.js"
+preDeployCommand = "npm run migrate"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"

@@ -1,0 +1,26 @@
+member_no,member_type,contact_name,company,city,email,phone,tier,status,member_since,past_charters
+MC-1001,Individual,Arjun Mehra,,Mumbai,arjun.mehra@example.in,+91 90000 00001,Gold,Active,2023-03,4
+MC-1002,Individual,Kavya Raghunathan,,Chennai,kavya.raghunathan@example.in,+91 90000 00002,Silver,Active,2021-02,1
+MC-1003,Individual,Rohan Bhattacharya,,Kolkata,rohan.bhattacharya@example.in,+91 90000 00003,Silver,Active,2023-10,1
+MC-1004,Individual,Meera Iyer,,Bengaluru,meera.iyer@example.in,+91 90000 00004,Gold,Active,2025-04,1
+MC-1005,Individual,Vikram Sethi,,New Delhi,vikram.sethi@example.in,+91 90000 00005,Platinum,Active,2021-07,4
+MC-1006,Individual,Ananya Kulkarni,,Pune,ananya.kulkarni@example.in,+91 90000 00006,Silver,Active,2021-04,1
+MC-1007,Individual,Siddharth Reddy,,Hyderabad,siddharth.reddy@example.in,+91 90000 00007,Gold,Active,2025-07,1
+MC-1008,Individual,Nisha Kapoor,,Chandigarh,nisha.kapoor@example.in,+91 90000 00008,Silver,Active,2025-02,2
+MC-1009,Individual,Farhan Qureshi,,Lucknow,farhan.qureshi@example.in,+91 90000 00009,Silver,Inactive,2025-01,4
+MC-1010,Individual,Devika Menon,,Kochi,devika.menon@example.in,+91 90000 00010,Gold,Active,2021-04,1
+MC-1011,Corporate,Rajiv Malhotra,Saffron Peak Industries Pvt Ltd,Mumbai,rajiv.malhotra@example.in,+91 90000 00011,Platinum,Active,2025-03,12
+MC-1012,Corporate,Priya Natarajan,Tidewater Logistics Ltd,Chennai,priya.natarajan@example.in,+91 90000 00012,Gold,Active,2024-03,6
+MC-1013,Corporate,Karan Oberoi,Northstar Realty Group,Gurugram,karan.oberoi@example.in,+91 90000 00013,Platinum,Active,2025-05,8
+MC-1014,Corporate,Lakshmi Varma,Bluegrain Pharma Pvt Ltd,Hyderabad,lakshmi.varma@example.in,+91 90000 00014,Gold,Active,2021-10,9
+MC-1015,Corporate,Aditya Joshi,Coppervale Energy Ltd,Ahmedabad,aditya.joshi@example.in,+91 90000 00015,Gold,Active,2023-02,5
+MC-1016,Corporate,Sneha Chatterjee,Riverbend Media Pvt Ltd,Kolkata,sneha.chatterjee@example.in,+91 90000 00016,Silver,Active,2025-01,9
+MC-1017,Corporate,Imran Sheikh,Monsoon Hospitality Group,Goa,imran.sheikh@example.in,+91 90000 00017,Gold,Active,2024-11,16
+MC-1018,Corporate,Pooja Agarwal,Ironleaf Steel Ltd,Jaipur,pooja.agarwal@example.in,+91 90000 00018,Silver,Active,2023-08,17
+MC-1019,Agent,Manish Gupta,Skyward Journeys Travel Pvt Ltd,New Delhi,manish.gupta@example.in,+91 90000 00019,Silver,Active,2023-05,10
+MC-1020,Agent,Rekha Pillai,Coastline Luxury Travels,Kochi,rekha.pillai@example.in,+91 90000 00020,Silver,Active,2022-12,10
+MC-1021,Agent,Harish Bansal,Royal Route Tours,Udaipur,harish.bansal@example.in,+91 90000 00021,Gold,Active,2021-10,12
+MC-1022,Agent,Tanvi Deshpande,Horizon Event Travel,Mumbai,tanvi.deshpande@example.in,+91 90000 00022,Silver,Active,2025-08,13
+MC-1023,Individual,Gaurav Saxena,,Bhopal,gaurav.saxena@example.in,+91 90000 00023,Silver,Inactive,2024-05,1
+MC-1024,Corporate,Neha Sinha,Brightpath Education Trust,Patna,neha.sinha@example.in,+91 90000 00024,Silver,Active,2021-09,16
+MC-1025,Individual,Aman Dhillon,,Amritsar,aman.dhillon@example.in,+91 90000 00025,Gold,Active,2022-06,2
