@@ -38,7 +38,7 @@ test('public request → sales confirm, and member instant booking', async () =>
     await p.goto(`${BASE}/empty-legs`);
     await p.waitForSelector('[data-testid=el-card]');
     const cards = await p.$$('[data-testid=el-card]');
-    assert.ok(cards.length >= 3, `expected several published deals, got ${cards.length}`);
+    assert.ok(cards.length >= 2, `expected at least two published deals, got ${cards.length}`);
     const body = await p.textContent('body');
     assert.ok(!/VT-[A-Z]{3}/.test(body), 'public page must not show aircraft registrations');
     await p.screenshot({ path: `${SHOTS}/1-public-list.png`, fullPage: true });

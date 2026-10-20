@@ -78,10 +78,12 @@ function sendQuoteSent({ to, name, quote, request }) {
 }
 
 function sendCharterAccepted({ to, name, charter, invoice }) {
+  const payBy = invoice.due_at ? `${fmtWindow(invoice.due_at)} IST` : invoice.due_on;
+  const tripUrl = `${APP_URL()}/m/trips/${charter.id}`;
   return sendEmail({
     to, type: 'charter_accepted', subject: `Charter ${charter.charter_no} booked`,
-    text: `Hello ${name}, charter ${charter.charter_no} is booked. Invoice ${invoice.invoice_no} for ${formatINR(invoice.total)} is due ${invoice.due_on}.`,
-    html: layout(`Charter ${charter.charter_no} booked`, `<p>Hello ${esc(name)},</p><p>Thank you — your charter <b>${esc(charter.charter_no)}</b> (${esc(charter.starts_on)} to ${esc(charter.ends_on)}) is booked.</p><p>Invoice ${esc(invoice.invoice_no)} for ${esc(formatINR(invoice.total))} is due on ${esc(invoice.due_on)}.</p><p>Please add your passenger manifest in <a href="${esc(APP_URL())}/m/trips/${esc(charter.id)}">My trips</a>.</p>`),
+    text: `Hello ${name}, charter ${charter.charter_no} is booked. Invoice ${invoice.invoice_no} for ${formatINR(invoice.total)} must be paid in full by ${payBy}, otherwise the booking is cancelled automatically. Pay: ${tripUrl}`,
+    html: layout(`Charter ${charter.charter_no} booked`, `<p>Hello ${esc(name)},</p><p>Thank you — your charter <b>${esc(charter.charter_no)}</b> (${esc(charter.starts_on)} to ${esc(charter.ends_on)}) is booked.</p><p>Invoice ${esc(invoice.invoice_no)} for ${esc(formatINR(invoice.total))} must be paid in full <b>by ${esc(payBy)}</b> (24 hours before departure); unpaid bookings are released automatically. You can pay by bank transfer, card, UPI or netbanking from <a href="${esc(tripUrl)}">My trips</a>.</p><p>Please also add your passenger manifest there.</p>`),
   });
 }
 
@@ -93,11 +95,38 @@ function sendCharterConfirmed({ to, name, charter }) {
   });
 }
 
-function sendCharterCancelled({ to, name, charter, reason }) {
+function sendCharterCancelled({ to, name, charter, reason, refund = null }) {
+  const refundLine = refund && refund.amount > 0
+    ? `A refund of ${formatINR(refund.amount)} (${refund.pct}% of the amount paid) has been initiated to your original payment method; it usually arrives within 5–7 working days.`
+    : '';
   return sendEmail({
     to, type: 'charter_cancelled', subject: `Charter ${charter.charter_no} cancelled`,
-    text: `Hello ${name}, charter ${charter.charter_no} has been cancelled. Reason: ${reason}`,
-    html: layout(`Charter ${charter.charter_no} cancelled`, `<p>Hello ${esc(name)},</p><p>Charter <b>${esc(charter.charter_no)}</b> has been cancelled.</p><p>Reason: ${esc(reason)}</p>`),
+    text: `Hello ${name}, charter ${charter.charter_no} has been cancelled. Reason: ${reason}. ${refundLine}`.trim(),
+    html: layout(`Charter ${charter.charter_no} cancelled`, `<p>Hello ${esc(name)},</p><p>Charter <b>${esc(charter.charter_no)}</b> has been cancelled.</p><p>Reason: ${esc(reason)}</p>${refundLine ? `<p>${esc(refundLine)}</p>` : ''}`),
+  });
+}
+
+// ── Payments (v1.2) ──────────────────────────────────────────────────────────
+const METHOD_LABEL = { card: 'Card', upi: 'UPI', netbanking: 'Netbanking', wallet: 'Wallet', bank_transfer: 'Bank transfer', emi: 'EMI', other: 'Other' };
+
+function sendPaymentReceipt({ to, name, receipt: r }) {
+  const balance = Math.max(0, Number(r.total) - Number(r.amount_paid));
+  const statusLine = r.status === 'paid' ? `Invoice ${r.invoice_no} is now paid in full.` : `Remaining balance: ${formatINR(balance)}${r.due_at ? `, due by ${fmtWindow(r.due_at)} IST` : ''}.`;
+  return sendEmail({
+    to, type: 'payment_receipt', subject: `Payment received — ${r.invoice_no}`,
+    text: `Hello ${name}, we received ${formatINR(r.amount)} (${METHOD_LABEL[r.method] || r.method}, ref ${r.provider_payment_id}) for invoice ${r.invoice_no} / charter ${r.charter_no}. ${statusLine}`,
+    html: layout('Payment received', `<p>Hello ${esc(name)},</p><p>Thank you — we received <b>${esc(formatINR(r.amount))}</b> by ${esc(METHOD_LABEL[r.method] || r.method)} (reference ${esc(r.provider_payment_id)}) for invoice <b>${esc(r.invoice_no)}</b>, charter ${esc(r.charter_no)}.</p><p>${esc(statusLine)}</p>`),
+  });
+}
+
+function sendPaymentReminder({ to, name, invoice, kind }) {
+  const balance = Math.max(0, Number(invoice.total) - Number(invoice.amount_paid || 0));
+  const url = `${APP_URL()}/m/trips/${invoice.charter_id}`;
+  const by = `${fmtWindow(invoice.due_at)} IST`;
+  return sendEmail({
+    to, type: `payment_reminder_${kind}`, subject: `${kind === '6h' ? 'Final reminder' : 'Reminder'}: pay ${invoice.invoice_no} by ${by}`,
+    text: `Hello ${name}, ${formatINR(balance)} is due on invoice ${invoice.invoice_no} (charter ${invoice.charter_no}) by ${by}. Unpaid charters are cancelled automatically at the deadline. Pay: ${url}`,
+    html: layout('Payment reminder', `<p>Hello ${esc(name)},</p><p><b>${esc(formatINR(balance))}</b> is due on invoice ${esc(invoice.invoice_no)} for charter ${esc(invoice.charter_no)} <b>by ${esc(by)}</b>.</p><p>Charters not paid in full by the deadline are cancelled automatically and the aircraft is released.</p><p><a href="${esc(url)}">Pay now</a></p>`),
   });
 }
 
@@ -109,12 +138,15 @@ function fmtWindow(d) {
     .format(new Date(d));
 }
 
+const PAY_NOTE = 'Once confirmed, payment in full is due 24 hours before departure — for late bookings, within 2 hours of confirmation.';
+
 function sendEmptyLegRequestAck({ to, name, booking, leg }) {
   return sendEmail({
     to, type: 'empty_leg_request', subject: `We received your empty-leg request ${booking.booking_no}`,
-    text: `Hello ${name}, thank you for your request ${booking.booking_no} for ${legRoute(leg)} departing ${legWindow(leg)}. Our team will confirm availability shortly. The booking is confirmed only when Meridian Charters confirms it.`,
+    text: `Hello ${name}, thank you for your request ${booking.booking_no} for ${legRoute(leg)} departing ${legWindow(leg)}. Our team will confirm availability shortly. The booking is confirmed only when Meridian Charters confirms it. ${PAY_NOTE}`,
     html: layout('Request received', `<p>Hello ${esc(name)},</p><p>Thank you — we have received your request <b>${esc(booking.booking_no)}</b> for the empty leg <b>${esc(legRoute(leg))}</b>, departing ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
-      <p>Our charter team will review it and get back to you shortly. Empty legs depend on the operator's main charter and may be retimed or withdrawn; the booking is confirmed only when Meridian Charters confirms it.</p>`),
+      <p>Our charter team will review it and get back to you shortly. Empty legs depend on the operator's main charter and may be retimed or withdrawn; the booking is confirmed only when Meridian Charters confirms it.</p>
+      <p>${esc(PAY_NOTE)}</p>`),
   });
 }
 
@@ -131,11 +163,14 @@ function sendEmptyLegSalesNotice({ to, booking, leg }) {
 
 function sendEmptyLegBooked({ to, name, booking, leg, charter, invoice, inviteUrl = null }) {
   const tripUrl = `${APP_URL()}/m/trips/${charter.id}`;
+  const payBy = invoice.due_at ? `${fmtWindow(invoice.due_at)} IST` : invoice.due_on;
+  const late = invoice.due_at && new Date(invoice.due_at).getTime() - Date.now() <= 2.5 * 3600 * 1000;
+  const payLine = `Payment in full is due by ${payBy}${late ? ' — this is a late booking, so please pay within 2 hours' : ''}; unpaid bookings are released automatically.`;
   return sendEmail({
     to, type: 'empty_leg_booked', subject: `Empty leg confirmed — charter ${charter.charter_no}`,
-    text: `Hello ${name}, your empty-leg booking ${booking.booking_no} (${legRoute(leg)}, ${legWindow(leg)}) is confirmed as charter ${charter.charter_no}. Invoice ${invoice.invoice_no} for ${formatINR(invoice.total)} is due ${invoice.due_on}.${inviteUrl ? ` Set your password to manage the trip: ${inviteUrl} (valid 72 hours)` : ` Add your passengers: ${tripUrl}`}`,
+    text: `Hello ${name}, your empty-leg booking ${booking.booking_no} (${legRoute(leg)}, ${legWindow(leg)}) is confirmed as charter ${charter.charter_no}. Invoice ${invoice.invoice_no} for ${formatINR(invoice.total)}. ${payLine}${inviteUrl ? ` Set your password to manage the trip: ${inviteUrl} (valid 72 hours)` : ` Add your passengers: ${tripUrl}`}`,
     html: layout(`Charter ${charter.charter_no} confirmed`, `<p>Hello ${esc(name)},</p><p>Your empty-leg booking <b>${esc(booking.booking_no)}</b> — ${esc(legRoute(leg))}, departing ${esc(legWindow(leg))} — is confirmed as charter <b>${esc(charter.charter_no)}</b>.</p>
-      <p>Invoice ${esc(invoice.invoice_no)} for ${esc(formatINR(invoice.total))} (incl. GST) is due on ${esc(invoice.due_on)}.</p>
+      <p>Invoice ${esc(invoice.invoice_no)} for ${esc(formatINR(invoice.total))} (incl. GST). ${esc(payLine)}</p>
       ${inviteUrl ? `<p>We have created a Meridian Charters account for you. Set your password (link valid 72 hours) to add your passenger manifest:</p>
       <p style="text-align:center;margin:28px 0"><a href="${esc(inviteUrl)}" style="background:#c9a24a;color:#0b1b33;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:bold">Set password</a></p>
       <p style="font-size:12px;color:#64748b">${esc(inviteUrl)}</p>` : `<p>Please add your passenger manifest in <a href="${esc(tripUrl)}">My trips</a>.</p>`}
@@ -164,4 +199,4 @@ function formatINR(n) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(n) || 0);
 }
 
-module.exports = { sendEmail, sendInvite, sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendEmptyLegBooked, sendEmptyLegRequestClosed, sendSourceCancelledWarning, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };
+module.exports = { sendEmail, sendInvite, sendPaymentReceipt, sendPaymentReminder, sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendEmptyLegBooked, sendEmptyLegRequestClosed, sendSourceCancelledWarning, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };

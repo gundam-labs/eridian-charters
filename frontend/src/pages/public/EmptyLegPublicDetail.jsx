@@ -162,6 +162,7 @@ function Success({ bookingNo, leg }) {
           <li>We’ve emailed you an acknowledgement with your reference.</li>
           <li>Our charter desk checks the flight against the main charter and confirms by email — usually within a few hours.</li>
           <li>Once confirmed you receive the GST invoice ({inr(leg.price_inr)} + GST) and a link to set up your Meridian account, where you add passenger details.</li>
+          <li>Pay from your account by bank transfer, card, UPI or netbanking. Payment is due 24 hours before departure — if the flight leaves sooner, within 2 hours of confirmation.</li>
         </ol>
         <Link to="/empty-legs" className="btn btn-block" style={{ marginTop: 16 }}>Browse more flights</Link>
       </div>

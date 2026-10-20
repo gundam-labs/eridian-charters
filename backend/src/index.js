@@ -18,6 +18,13 @@ if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32 && !DEV_ENV) {
   process.exit(1);
 }
 
+// v1.2 payments: refuse to start with an unusable provider configuration (e.g. razorpay without keys).
+const { configError: paymentsConfigError, providerName } = require('./lib/payments');
+if (paymentsConfigError()) {
+  console.error(`FATAL: ${paymentsConfigError()}. Refusing to start.`);
+  process.exit(1);
+}
+
 const { pool } = require('./db');
 const { authenticate } = require('./middleware/auth');
 
@@ -45,6 +52,8 @@ app.use(cors({
   exposedHeaders: ['Content-Disposition'],
 }));
 
+// Razorpay webhooks are verified against the RAW body, so this path gets express.raw BEFORE express.json.
+app.use('/api/payments/webhook', express.raw({ type: 'application/json', limit: '1mb' }));
 app.use(express.json({ limit: '1mb' }));
 
 // Keyed by IP + email: behind the Vercel /api rewrite many users can share an
@@ -117,6 +126,10 @@ app.post('/api/public/empty-legs/:id/request', publicRequestLimiter);
 app.use('/api/public', publicReadLimiter);
 app.use('/api/public/empty-legs', require('./routes/publicEmptyLegs'));
 
+// Payment provider webhooks (no auth; HMAC-verified raw body)
+const paymentsRoutes = require('./routes/payments');
+app.post('/api/payments/webhook/razorpay', paymentsRoutes.webhookHandler);
+
 // Everything else requires a valid JWT
 const ref = require('./routes/reference');
 const mount = (path, router) => app.use(path, authenticate, router);
@@ -134,6 +147,7 @@ mount('/api/pilot', require('./routes/pilot'));
 mount('/api/invoices', require('./routes/invoices'));
 mount('/api/dashboard', require('./routes/dashboard'));
 mount('/api/empty-legs', require('./routes/emptyLegs'));
+mount('/api/payments', paymentsRoutes);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 
@@ -148,7 +162,9 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`Meridian Charters API v${APP_VERSION} listening on :${PORT}`));
+  app.listen(PORT, () => console.log(`Meridian Charters API v${APP_VERSION} listening on :${PORT} (payments: ${providerName()})`));
+  // v1.2: payment deadlines + reminders every 5 minutes (idempotent; safe with several instances).
+  require('./lib/payments/deadlines').startDeadlineJob();
 }
 
 module.exports = app;

@@ -5,8 +5,10 @@ const { logEvent } = require('../lib/events');
 const { conflicts, crewConflicts } = require('../lib/availability');
 const { maskId, isMasked, publicAircraft } = require('../lib/serialize');
 const { parseIST, toISTISO, isDateStr } = require('../lib/time');
-const { sendCharterConfirmed, sendCharterCancelled, sendEmptyLegRequestClosed, sendSourceCancelledWarning } = require('../lib/email');
-const { LEG_SELECT, staffLeg, generateForCharter, onCharterCancelled, salesRecipients } = require('../lib/emptyLegs');
+const { sendCharterConfirmed } = require('../lib/email');
+const { LEG_SELECT, staffLeg, generateForCharter } = require('../lib/emptyLegs');
+const { cancelCharter, cancellationQuote, CANCELLABLE } = require('../lib/cancellation');
+const { runDeadlinesThrottled } = require('../lib/payments/deadlines');
 
 const router = asyncRouter();
 
@@ -21,8 +23,10 @@ const CHARTER_SELECT = `SELECT c.*,
                     'hourly_rate_inr', a.hourly_rate_inr::float8, 'partner_name', a.partner_name, 'status', a.status) AS aircraft,
   a.registration AS aircraft_registration, a.type AS aircraft_type, a.seats AS aircraft_seats,
   cap.name AS captain_name, fo.name AS first_officer_name, cc.name AS cabin_crew_name,
-  (SELECT count(*)::int FROM passengers p WHERE p.charter_id = c.id) AS passenger_count
+  (SELECT count(*)::int FROM passengers p WHERE p.charter_id = c.id) AS passenger_count,
+  COALESCE(pinv.status, 'unpaid') AS payment_status, pinv.due_at AS payment_due_at
   FROM charters c
+  LEFT JOIN invoices pinv ON pinv.charter_id = c.id
   JOIN members m ON m.id = c.member_id
   LEFT JOIN quotes q ON q.id = c.quote_id
   LEFT JOIN empty_legs el ON el.id = c.empty_leg_id
@@ -69,7 +73,9 @@ async function passengersFor(charterId, user, db = pool) {
 async function detail(id, user) {
   const c = await loadCharter(id, user);
   const passengers = await passengersFor(c.id, user);
-  const invoice = user.role === 'pilot' ? null : (await pool.query('SELECT * FROM invoices WHERE charter_id = $1', [c.id])).rows[0] || null;
+  const invoice = user.role === 'pilot' ? null : (await pool.query(
+    `SELECT i.*, CASE WHEN i.status IN ('unpaid','partially_paid') THEN GREATEST(i.total - i.amount_paid, 0) ELSE 0 END::float8 AS balance
+       FROM invoices i WHERE i.charter_id = $1`, [c.id])).rows[0] || null;
   const events = (await pool.query(
     `SELECT e.id, e.entity_type, e.action, e.detail, e.created_at, u.name AS actor_name, u.role AS actor_role
        FROM events e LEFT JOIN users u ON u.id = e.actor_user_id
@@ -96,6 +102,7 @@ async function detail(id, user) {
 
 // ── List ────────────────────────────────────────────────────────────────────
 router.get('/', requireRole('member', 'pilot', 'sales', 'ops'), async (req, res) => {
+  await runDeadlinesThrottled();
   const params = [];
   const where = [];
   if (req.user.role === 'member') { params.push(req.user.member_id); where.push(`c.member_id = $${params.length}`); }
@@ -115,6 +122,7 @@ router.get('/', requireRole('member', 'pilot', 'sales', 'ops'), async (req, res)
 });
 
 router.get('/:id', requireRole('member', 'pilot', 'sales', 'ops'), async (req, res) => {
+  await runDeadlinesThrottled();
   res.json(await detail(req.params.id, req.user));
 });
 
@@ -277,7 +285,11 @@ router.post('/:id/flight-log', requireRole('pilot', 'ops'), async (req, res) => 
   const missing = legs.findIndex((l) => !l.block_off || !l.block_on);
   if (missing !== -1) throw new HttpError(400, `Leg ${missing + 1}: block_off and block_on are required`);
   const defects = req.body?.defects ? String(req.body.defects).slice(0, 4000) : null;
+  // v1.2: everyone pays before flying (checked again under lock below).
+  if (c.payment_status !== 'paid') throw new HttpError(409, 'Charter not paid');
   await withTransaction(async (client) => {
+    const paidNow = (await client.query(`SELECT status FROM invoices WHERE charter_id = $1 FOR SHARE`, [c.id])).rows[0];
+    if (paidNow?.status !== 'paid') throw new HttpError(409, 'Charter not paid');
     const upd = await client.query(
       `UPDATE charters SET legs=$2, defects=$3, status='flown', flown_at=now() WHERE id=$1 AND status='manifest_complete' RETURNING id`,
       [c.id, JSON.stringify(legs), defects]);
@@ -293,31 +305,23 @@ router.post('/:id/flight-log', requireRole('pilot', 'ops'), async (req, res) => 
   res.json(await detail(c.id, req.user));
 });
 
-// ── Cancel ──────────────────────────────────────────────────────────────────
+// ── Cancel (v1.2 refund policy) ─────────────────────────────────────────────
+// Member: 100% > 7 days before first departure, 50% from 48h to 7 days, 0% inside 48h. Ops/admin: refund_pct (default 100).
+router.get('/:id/cancellation-quote', requireRole('member', 'ops'), async (req, res) => {
+  const c = await loadCharter(req.params.id, req.user);
+  if (!CANCELLABLE.includes(c.status)) throw new HttpError(409, `Cannot cancel a charter that is ${c.status}`);
+  const byMember = req.user.role === 'member';
+  res.json(await cancellationQuote(c, { byMember, requestedPct: byMember ? undefined : req.query.refund_pct }));
+});
+
 router.post('/:id/cancel', requireRole('member', 'ops'), async (req, res) => {
   const c = await loadCharter(req.params.id, req.user);
-  if (!['accepted', 'confirmed', 'manifest_complete'].includes(c.status)) throw new HttpError(409, `Cannot cancel a charter that is ${c.status}`);
+  if (!CANCELLABLE.includes(c.status)) throw new HttpError(409, `Cannot cancel a charter that is ${c.status}`);
   const reason = String(req.body?.reason || '').trim();
   if (!reason) throw new HttpError(400, 'A cancellation reason is required');
-  const cascade = await withTransaction(async (client) => {
-    const upd = await client.query(
-      `UPDATE charters SET status='cancelled', cancelled_at=now(), cancel_reason=$2 WHERE id=$1 AND status IN ('accepted','confirmed','manifest_complete') RETURNING *`,
-      [c.id, reason.slice(0, 1000)]);
-    if (!upd.rows.length) throw new HttpError(409, 'Charter changed — reload and try again');
-    await logEvent({ entity_type: 'charter', entity_id: c.id, action: 'cancelled', actor_user_id: req.user.id, detail: { reason } }, client);
-    const inv = await client.query(`UPDATE invoices SET status='cancelled' WHERE charter_id=$1 AND status <> 'cancelled' RETURNING id`, [c.id]);
-    for (const i of inv.rows) await logEvent({ entity_type: 'invoice', entity_id: i.id, action: 'cancelled', actor_user_id: req.user.id, detail: { reason: 'charter cancelled' } }, client);
-    return onCharterCancelled(upd.rows[0], req.user.id, client);
-  });
-  await sendCharterCancelled({ to: c.member_email, name: c.member_name, charter: c, reason });
-  for (const { booking, leg } of cascade.cancelledRequests) {
-    await sendEmptyLegRequestClosed({ to: booking.guest_email, name: booking.guest_name, booking, leg, reason: 'The flight has been withdrawn by the operator' });
-  }
-  if (cascade.flagged.length) {
-    const to = await salesRecipients();
-    for (const d of cascade.flagged) for (const addr of to) await sendSourceCancelledWarning({ to: addr, sourceCharterNo: c.charter_no, derived: d });
-  }
-  res.json(await detail(c.id, req.user));
+  const byMember = req.user.role === 'member';
+  const out = await cancelCharter({ charterId: c.id, reason, actorUserId: req.user.id, byMember, requestedPct: byMember ? undefined : req.body?.refund_pct });
+  res.json({ ...(await detail(c.id, req.user)), refund: { pct: out.refund.pct, amount: out.refund.amount } });
 });
 
 module.exports = router;

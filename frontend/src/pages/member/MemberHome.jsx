@@ -4,14 +4,21 @@ import { useFetch } from '../../lib/useFetch';
 import { ErrorAlert, Empty, Loading } from '../../components/ui';
 import TripCard from '../../components/TripCard';
 import { countOf, inr } from '../../lib/format';
+import { invoiceMoney, isPayable, dueInfo } from '../../lib/payments';
 
 export default function MemberHome() {
   const { user } = useAuth();
   const { data, error, loading } = useFetch('/api/dashboard/member');
   const upcoming = Array.isArray(data?.upcoming_charters) ? data.upcoming_charters : null;
   const unpaid = data?.unpaid_invoices;
-  const unpaidCount = Array.isArray(unpaid) ? unpaid.length : Number(unpaid?.count ?? unpaid ?? 0);
-  const unpaidTotal = Array.isArray(unpaid) ? unpaid.reduce((s, i) => s + Number(i.total || 0), 0) : Number(unpaid?.total || 0);
+  // Balances and deadlines come from the invoices themselves (part payments make dashboard totals approximate).
+  const invs = useFetch('/api/invoices');
+  const payable = Array.isArray(invs.data) ? invs.data.filter(isPayable) : null;
+  const unpaidCount = payable ? payable.length : Number(unpaid?.count ?? (Array.isArray(unpaid) ? unpaid.length : unpaid) ?? 0);
+  const unpaidTotal = payable ? payable.reduce((s, i) => s + invoiceMoney(i).balance, 0) : Number(unpaid?.balance ?? unpaid?.total ?? 0);
+  const nextDue = (payable || []).filter(i => i.due_at && new Date(i.due_at) > Date.now())
+    .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))[0];
+  const nextDueInfo = nextDue ? dueInfo(nextDue) : null;
   const toReview = countOf(data?.quotes_awaiting_decision);
 
   return (
@@ -30,10 +37,16 @@ export default function MemberHome() {
             <Link to="/m/requests" className="stat"><div className="label">Open requests</div><div className="value">{countOf(data.open_requests)}</div></Link>
             <Link to="/m/requests" className="stat"><div className="label">Quotes to review</div><div className="value">{countOf(data.quotes_awaiting_decision)}</div></Link>
             <Link to="/m/invoices" className="stat">
-              <div className="label">Unpaid invoices</div><div className="value">{unpaidCount}</div>
+              <div className="label">Payments due</div><div className="value">{unpaidCount}</div>
               {unpaidTotal ? <div className="hint">{inr(unpaidTotal)} outstanding</div> : null}
             </Link>
           </div>
+          {nextDueInfo && (
+            <div className={`alert ${nextDueInfo.urgency === 'ok' ? 'alert-info' : 'alert-warn'}`} data-testid="home-pay-due">
+              <strong>{inr(invoiceMoney(nextDue).balance)}</strong> due by {nextDueInfo.label} ({nextDueInfo.left}){nextDue.charter_no ? ` for ${nextDue.charter_no}` : ''}.{' '}
+              <Link to={nextDue.charter_id ? `/m/trips/${nextDue.charter_id}` : '/m/invoices'}>Pay now →</Link>
+            </div>
+          )}
           {toReview > 0 && (
             <div className="alert alert-info">
               You have {toReview} quote{toReview > 1 ? 's' : ''} awaiting your decision.{' '}

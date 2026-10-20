@@ -11,9 +11,12 @@ const bcrypt = require('bcryptjs');
 const { pool, initDB, getSettings, withTransaction } = require('./index');
 const { priceQuote } = require('../lib/pricing');
 const { nextNumber } = require('../lib/numbers');
-const { todayIST, addDays, parseIST, toISTISO } = require('../lib/time');
+const { todayIST, addDays, parseIST, toISTISO, istDate } = require('../lib/time');
 const { generateForCharter, bookLegTx, findOrCreateMemberForBooking } = require('../lib/emptyLegs');
 const { priceEmptyLeg } = require('../lib/pricing');
+const { applyPayment, toPaise } = require('../lib/payments/service');
+const { mockFee } = require('../lib/payments/mock');
+const { getOrCreateVirtualAccount } = require('../lib/payments/virtualAccounts');
 
 if (process.env.SEED_DEMO !== 'true' && process.env.NODE_ENV !== 'development') {
   console.error('Refusing to seed: set SEED_DEMO=true or NODE_ENV=development');
@@ -301,12 +304,16 @@ async function createCharter(c, key, { memberNo, legs, pax, reg, status, crew, p
   if (['flown', 'closed'].includes(status)) await ev('flown');
   const invoice_no = await nextNumber('INV');
   const issued = addDays(todayIST(), issuedOffset);
+  // v1.2: payment due 24h before the first passenger departure.
+  const dueAt = new Date(Date.parse(quote.legs[0].depart_at) - 24 * 3600 * 1000);
   const inv = (await pool.query(
-    `INSERT INTO invoices (invoice_no, charter_id, member_id, subtotal, gst_rate_pct, gst_amount, total, issued_on, due_on, status, paid_on, payment_ref)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
+    `INSERT INTO invoices (invoice_no, charter_id, member_id, subtotal, gst_rate_pct, gst_amount, total, issued_on, due_on, status, paid_on, payment_ref,
+       due_at, amount_paid)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`,
     [invoice_no, ch.id, quote.member_id, quote.subtotal, quote.gst_rate_pct, quote.gst_amount, quote.total, issued,
-      addDays(issued, Number(c.settings.invoice_due_days) || 7), status === 'cancelled' ? 'cancelled' : invoiceStatus,
-      invoiceStatus === 'paid' ? addDays(issued, 2) : null, invoiceStatus === 'paid' ? 'NEFT-DEMO-0001' : null])).rows[0];
+      istDate(dueAt), status === 'cancelled' ? 'cancelled' : invoiceStatus,
+      invoiceStatus === 'paid' ? addDays(issued, 2) : null, invoiceStatus === 'paid' ? 'NEFT-DEMO-0001' : null,
+      dueAt, invoiceStatus === 'paid' ? quote.total : 0])).rows[0];
   await pool.query(`INSERT INTO events (entity_type, entity_id, action, actor_user_id, detail) VALUES ('invoice',$1,'issued',$2,$3)`,
     [inv.id, ops, JSON.stringify({ invoice_no, seed: true })]);
   if (invoiceStatus === 'paid') {
@@ -668,6 +675,87 @@ async function seedHistory() {
   return made;
 }
 
+// ── v1.2: payments ──────────────────────────────────────────────────────────
+// Idempotent: only invoices without any payments row are touched; decisions are deterministic per invoice number.
+const hashNo = (str) => { let h = 2166136261; for (const ch of String(str)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0; return h; };
+/** ~70% bank transfer, 20% card, 10% UPI. */
+const seedMethod = (invoiceNo) => { const b = hashNo(`m:${invoiceNo}`) % 10; return b < 7 ? 'bank_transfer' : b < 9 ? 'card' : 'upi'; };
+const atIST = (date, hhmm) => parseIST(`${date}T${hhmm}`);
+const seedEntity = (inv, amountRupees, method) => {
+  const amount = toPaise(amountRupees);
+  const { fee, tax } = mockFee(amount, method);
+  return { id: `pay_seed_${inv.invoice_no.replace(/[^A-Za-z0-9]/g, '')}_${hashNo(`${inv.id}:${amount}`).toString(36)}`, entity: 'payment', amount, currency: 'INR', method, fee, tax, status: 'captured' };
+};
+
+async function seedPayments() {
+  const sales = (await pool.query(`SELECT id FROM users WHERE email = 'sales@meridian.test'`)).rows[0]?.id || null;
+  const now = Date.now();
+  let backfilled = 0; let paid = 0; let partial = 0;
+
+  // 1. Invoices already marked paid (closed charters) but with no payments row: record how they were paid.
+  const paidRows = (await pool.query(
+    `SELECT i.* FROM invoices i WHERE i.status = 'paid' AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.invoice_id = i.id)`)).rows;
+  for (const inv of paidRows) {
+    const method = seedMethod(inv.invoice_no);
+    const e = seedEntity(inv, inv.total, method);
+    const captured = atIST(inv.paid_on || inv.issued_on, '11:00');
+    await pool.query(
+      `INSERT INTO payments (invoice_id, provider, provider_payment_id, method, amount, fee, status, captured_at, raw, created_by)
+       VALUES ($1,'mock',$2,$3,$4,$5,'captured',$6,$7,$8) ON CONFLICT (provider_payment_id) DO NOTHING`,
+      [inv.id, e.id, method, inv.total, e.fee / 100, captured, JSON.stringify({ ...e, seed: true }), sales]);
+    await pool.query('UPDATE invoices SET amount_paid = total WHERE id = $1 AND amount_paid < total', [inv.id]);
+    backfilled++;
+  }
+
+  // 2. Open invoices with no payments yet.
+  const open = (await pool.query(
+    `SELECT i.*, c.status AS charter_status, c.charter_no, c.legs FROM invoices i JOIN charters c ON c.id = i.charter_id
+      WHERE i.status = 'unpaid' AND c.status IN ('flown','accepted','confirmed','manifest_complete')
+        AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.invoice_id = i.id)
+      ORDER BY c.starts_on`)).rows;
+  const hasPartial = (await pool.query(`SELECT 1 FROM invoices WHERE status = 'partially_paid' LIMIT 1`)).rows.length > 0;
+  let partialDone = hasPartial;
+  const upcomingUnpaid = [];
+  for (const inv of open) {
+    const dep = Date.parse(inv.legs[0].depart_at);
+    let amount = null;
+    let captured;
+    if (inv.charter_status === 'flown') {
+      // Everyone pays before flying (v1.2): flown charters were paid before departure → they close.
+      amount = Number(inv.total);
+      captured = new Date(Math.min(dep - 26 * 3600 * 1000, now));
+    } else if (!inv.due_at || Date.parse(inv.due_at) < now + 72 * 3600 * 1000) {
+      // Near-term trips are paid so the demo is not auto-cancelled by the deadline job.
+      amount = Number(inv.total);
+      captured = new Date(Math.min(atIST(inv.issued_on, '15:00').getTime() + 86400000, now - 3600 * 1000));
+    } else if (hashNo(`p:${inv.charter_no}`) % 100 < 45) {
+      amount = Number(inv.total);
+      captured = new Date(Math.min(atIST(inv.issued_on, '15:00').getTime() + 86400000, now - 3600 * 1000));
+    } else {
+      upcomingUnpaid.push(inv);
+      continue;
+    }
+    const e = seedEntity(inv, amount, seedMethod(inv.invoice_no));
+    await withTransaction((client) => applyPayment(client, { invoiceId: inv.id, providerName: 'mock', entity: e, actorUserId: null, capturedAt: captured, paidOn: istDate(captured) }));
+    paid++;
+  }
+  // Exactly one part-paid upcoming invoice (a 40% advance by bank transfer), unless one already exists.
+  if (!partialDone && upcomingUnpaid.length) {
+    const inv = upcomingUnpaid[upcomingUnpaid.length - 1];
+    const e = seedEntity(inv, Math.round(Number(inv.total) * 0.4), 'bank_transfer');
+    await withTransaction((client) => applyPayment(client, { invoiceId: inv.id, providerName: 'mock', entity: e, capturedAt: new Date(now - 2 * 3600 * 1000) }));
+    partial++; partialDone = true;
+  }
+
+  // 3. Bank-transfer accounts for the two demo members.
+  for (const no of ['MC-1001', 'MC-1011']) {
+    const m = (await pool.query('SELECT id FROM members WHERE member_no = $1', [no])).rows[0];
+    if (!m) continue;
+    try { await getOrCreateVirtualAccount(m.id, sales); } catch (err) { console.warn(`  [seed] virtual account ${no}: ${err.message}`); }
+  }
+  return { backfilled, paid, partial, left_unpaid: upcomingUnpaid.length - partial };
+}
+
 async function main() {
   console.log('Meridian Charters — demo seed');
   await initDB(); // also inserts default settings if missing
@@ -679,12 +767,14 @@ async function main() {
   await seedFlows();
   await seedRichFlows();
   await seedHistory();
+  console.log('Payments:', await seedPayments());
   const counts = (await pool.query(`SELECT
     (SELECT count(*) FROM airports) airports, (SELECT count(*) FROM aircraft) aircraft, (SELECT count(*) FROM crew_members) crew,
     (SELECT count(*) FROM members) members, (SELECT count(*) FROM users) users, (SELECT count(*) FROM quote_requests) requests,
     (SELECT count(*) FROM quotes) quotes, (SELECT count(*) FROM charters) charters, (SELECT count(*) FROM invoices) invoices,
     (SELECT count(*) FROM maintenance_blocks) maintenance, (SELECT count(*) FROM empty_legs) empty_legs,
-    (SELECT count(*) FROM empty_leg_bookings) empty_leg_bookings`)).rows[0];
+    (SELECT count(*) FROM empty_leg_bookings) empty_leg_bookings, (SELECT count(*) FROM payments) payments,
+    (SELECT count(*) FROM virtual_accounts) virtual_accounts`)).rows[0];
   console.log(`CSV members: ${n}`);
   console.log('Totals:', counts);
   console.log(`Demo password for all seeded users: ${PASSWORD}`);

@@ -290,6 +290,23 @@ test('charter lifecycle through the UI', { timeout: 240_000 }, async (t) => {
     assertClean('step 5');
   });
 
+  await step('5b. member pays the invoice in test mode', async () => {
+    const { page } = ctx.member;
+    await page.goto(`/m/trips/${ctx.charterId}`);
+    const card = page.getByTestId('payment-card');
+    await card.waitFor();
+    await card.getByRole('tab', { name: /Card, UPI or netbanking/ }).click();
+    await card.getByTestId('pay-online').click();
+    await page.getByTestId('mock-checkout').waitFor();
+    await shot(page, 'member-pay-test-mode');
+    await page.getByTestId('mock-pay').click();
+    await page.getByText('Payment received').waitFor();
+    const ch = await apiGet('ops', `/api/charters/${ctx.charterId}`);
+    assert.equal(ch.invoice?.status ?? ch.payment_status, 'paid');
+    await shot(page, 'member-paid');
+    assertClean('step 5b');
+  });
+
   await step('6. pilot logs block times on a phone-width screen', async () => {
     const { context, page } = await session('pilot', 'pilot', { width: 390, height: 844 });
     ctx.pilot = { context, page };
@@ -315,33 +332,26 @@ test('charter lifecycle through the UI', { timeout: 240_000 }, async (t) => {
     await page.getByRole('button', { name: 'Submit flight log' }).click();
     await page.getByText('Flight log submitted').waitFor();
     const ch = await apiGet('ops', `/api/charters/${ctx.charterId}`);
-    assert.equal(ch.status, 'flown');
+    assert.equal(ch.status, 'closed', 'paid in advance, so the trip closes on landing');
     assert.equal(ch.legs[0].block_off.slice(0, 16), `${outDate}T09:05`);
     assert.equal(ch.legs[1].block_on.slice(0, 16), `${retDate}T19:25`);
     await shot(page, 'pilot-flight-logged');
     assertClean('step 6');
   });
 
-  await step('7. sales marks the invoice paid → charter closed', async () => {
+  await step('7. sales sees the online payment; charter closed', async () => {
     const { page } = ctx.sales;
     const ch0 = await apiGet('ops', `/api/charters/${ctx.charterId}`);
     const invNo = ch0.invoice.invoice_no;
     await page.goto('/s/invoices');
     const row = page.locator(`[data-testid="invoice-row"][data-invoice-no="${invNo}"]`);
-    await row.getByRole('button', { name: 'Mark paid' }).click();
-    const dlg = page.getByRole('dialog');
-    await dlg.getByPlaceholder('UTR / NEFT ref').fill(`UTR-E2E-${Date.now()}`);
-    await dlg.getByRole('button', { name: 'Mark paid' }).click();
-    await dlg.waitFor({ state: 'detached' });
     await row.getByText('Paid', { exact: true }).waitFor();
     await shot(page, 'sales-invoice-paid');
     await page.goto(`/o/charters/${ctx.charterId}`);
     await page.locator('.page-head .pill', { hasText: 'Closed' }).waitFor();
     await shot(page, 'sales-charter-closed');
-    const ch = await apiGet('ops', `/api/charters/${ctx.charterId}`);
-    assert.equal(ch.status, 'closed');
-    assert.equal(ch.invoice.status, 'paid');
-    // Member sees it closed too
+    assert.equal(ch0.status, 'closed');
+    assert.equal(ch0.invoice.status, 'paid');
     await ctx.member.page.goto(`/m/trips/${ctx.charterId}`);
     await ctx.member.page.locator('.page-head .pill', { hasText: 'Closed' }).waitFor();
     assertClean('step 7');

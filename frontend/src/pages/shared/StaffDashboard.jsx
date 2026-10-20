@@ -28,6 +28,7 @@ export default function StaffDashboard({ title = 'Dashboard', eyebrow }) {
             <Stat to={isOps ? '/o/maintenance' : null} label="In maintenance today" value={countOf(data.aircraft_in_maintenance_today)} />
             <Stat to={isOps ? '/o/calendar' : null} label="Fleet utilisation 30d" value={data.fleet_utilisation_30d_pct != null ? `${Math.round(Number(data.fleet_utilisation_30d_pct))}%` : '—'} />
           </div>
+          {data.payments && <PaymentsCard p={data.payments} canSeePayments={isSales} />}
           {data.empty_legs && <EmptyLegsCard el={data.empty_legs} to={user.role === 'ops' ? '/o/empty-legs' : '/s/empty-legs'} />}
           <div className="card">
             <div className="card-head"><h2>Departing in the next 7 days</h2>{isOps && <Link to="/o/calendar" className="btn btn-sm">Fleet calendar</Link>}</div>
@@ -82,6 +83,33 @@ function EmptyLegsCard({ el, to }) {
           {el.booked_90d != null && <div className="hint">{countOf(el.booked_90d)} leg{countOf(el.booked_90d) === 1 ? '' : 's'} sold</div>}</div>
         <div className="el-dash-item"><div className="label">Positioning hours sold · 90d</div><div className="value">{pctNum != null ? `${pctNum}%` : '—'}</div>
           {pctNum != null && <div className="el-bar" role="img" aria-label={`${pctNum}% of positioning hours sold`}><span style={{ width: `${pctNum}%` }} /></div>}</div>
+      </div>
+    </div>
+  );
+}
+
+function PaymentsCard({ p, canSeePayments }) {
+  const dueCount = countOf(p.unpaid_due_48h_count);
+  const collected = Number(p.collected_30d || 0);
+  const fees = Number(p.fees_30d || 0);
+  const Item = ({ to, children }) => (to ? <Link to={to} className="el-dash-item">{children}</Link> : <div className="el-dash-item">{children}</div>);
+  return (
+    <div className="card el-dash" data-testid="dash-payments">
+      <div className="card-head">
+        <h2>Payments</h2>
+        {canSeePayments && <Link to="/s/payments" className="btn btn-sm">All payments</Link>}
+      </div>
+      <div className="el-dash-grid three">
+        <Item to={canSeePayments ? '/s/payments' : null}><div className="label">Collected · 30d</div><div className="value">{inr(collected)}</div></Item>
+        <Item to={canSeePayments ? '/s/payments' : null}>
+          <div className="label">Gateway fees absorbed · 30d</div><div className="value">{inr(fees)}</div>
+          <div className="hint">{collected ? `${((fees / collected) * 100).toFixed(2)}% of collected` : 'No card or UPI payments yet'}</div>
+        </Item>
+        <Item to="/s/invoices?status=unpaid">
+          <div className="label">Unpaid, due within 48 h</div>
+          <div className="value">{dueCount}{dueCount > 0 && <span className="pill pill-amber" style={{ marginLeft: 8, verticalAlign: 'middle' }}>Chase</span>}</div>
+          <div className="hint">{dueCount ? `${inr(p.unpaid_due_48h_amount)} outstanding — released automatically if unpaid` : 'Nothing at risk'}</div>
+        </Item>
       </div>
     </div>
   );

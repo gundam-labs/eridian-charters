@@ -5,6 +5,7 @@ const { nextMemberNo } = require('../lib/numbers');
 const { logEvent } = require('../lib/events');
 const { sendInvite, APP_URL } = require('../lib/email');
 const { issueInvite } = require('./auth');
+const { getOrCreateVirtualAccount, bankTransferDetails } = require('../lib/payments/virtualAccounts');
 
 const router = asyncRouter();
 
@@ -63,6 +64,17 @@ router.get('/', requireRole('sales', 'ops'), async (req, res) => {
     params
   );
   res.json(rows);
+});
+
+// ── Bank transfer details (v1.2): the member's own virtual account, created on first call ──
+router.get('/me/bank-transfer', async (req, res) => {
+  if (req.user.role !== 'member') throw new HttpError(403, 'Members only — staff use /members/:id/bank-transfer');
+  res.json(bankTransferDetails(await getOrCreateVirtualAccount(req.user.member_id, req.user.id)));
+});
+
+router.get('/:id/bank-transfer', requireRole('sales', 'ops'), async (req, res) => {
+  if (!isUuid(req.params.id)) throw new HttpError(404, 'Member not found');
+  res.json(bankTransferDetails(await getOrCreateVirtualAccount(req.params.id, req.user.id)));
 });
 
 router.get('/:id', requireRole('sales', 'ops'), async (req, res) => {

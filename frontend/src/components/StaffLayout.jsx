@@ -13,6 +13,7 @@ const SECTIONS = [
       { to: '/s/empty-legs', label: 'Empty legs' },
       { to: '/s/members', label: 'Members' },
       { to: '/s/invoices', label: 'Invoices' },
+      { to: '/s/payments', label: 'Payments' },
     ],
   },
   {

@@ -9,6 +9,7 @@ const { nextNumber, nextMemberNo } = require('./numbers');
 const { logEvent } = require('./events');
 const { conflicts } = require('./availability');
 const { istDate, toISTISO, todayIST, addDays } = require('./time');
+const { computeDueAt } = require('./payments/service');
 
 const HOUR_MS = 3600 * 1000;
 const MIN_MS = 60 * 1000;
@@ -227,11 +228,12 @@ async function bookLegTx(client, { legId, member, pax, channel, actorUserId, boo
   const gst_amount = Math.round(subtotal * gst_rate_pct / 100);
   const today = todayIST();
   const invoice_no = await nextNumber('INV', client);
+  // v1.2: due min(departure − 24h, booking + 2h); late bookings pay within 2h.
+  const due_at = computeDueAt(legs[0].depart_at, settings, { emptyLeg: true });
   const invoice = (await client.query(
-    `INSERT INTO invoices (invoice_no, charter_id, member_id, subtotal, gst_rate_pct, gst_amount, total, issued_on, due_on, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'unpaid') RETURNING *`,
-    [invoice_no, charter.id, member.id, subtotal, gst_rate_pct, gst_amount, subtotal + gst_amount, today,
-      addDays(today, Number(settings.invoice_due_days) || 7)])).rows[0];
+    `INSERT INTO invoices (invoice_no, charter_id, member_id, subtotal, gst_rate_pct, gst_amount, total, issued_on, due_on, due_at, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'unpaid') RETURNING *`,
+    [invoice_no, charter.id, member.id, subtotal, gst_rate_pct, gst_amount, subtotal + gst_amount, today, istDate(due_at), due_at])).rows[0];
   await logEvent({ entity_type: 'invoice', entity_id: invoice.id, action: 'issued', actor_user_id: actorUserId, detail: { invoice_no, total: invoice.total } }, client);
 
   let booking;

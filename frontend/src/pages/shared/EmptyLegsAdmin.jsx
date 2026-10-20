@@ -368,6 +368,7 @@ function ConfirmModal({ booking: b, onClose, onChanged }) {
           <div className="alert alert-ok">
             {charter?.charter_no || 'Charter'} created{invoice?.invoice_no ? ` with invoice ${invoice.invoice_no}` : ''}.
             {member?.member_no ? ` Member ${member.member_no}.` : ''} Confirmation emailed to {b.email || 'the customer'}.
+            {' '}Payment is due 24 hours before departure — within 2 hours for late bookings — or the flight is released.
           </div>
           {result.invite_url && (
             <div className="field" style={{ marginTop: 6 }}>

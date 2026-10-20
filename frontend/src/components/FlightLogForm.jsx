@@ -4,7 +4,7 @@ import { ErrorAlert } from './ui';
 import { toIstInput, istInputToIso } from '../lib/format';
 
 /** Flight log entry: block off/on per passenger leg + defects. */
-export default function FlightLogForm({ charter, onDone, compact }) {
+export default function FlightLogForm({ charter, onDone, compact, awaitingPayment }) {
   const legs = charter.legs || [];
   const [rows, setRows] = useState(() => legs.map(l => ({
     block_off: toIstInput(l.block_off || l.depart_at),
@@ -37,6 +37,11 @@ export default function FlightLogForm({ charter, onDone, compact }) {
 
   return (
     <form onSubmit={submit}>
+      {awaitingPayment && (
+        <div className="alert alert-warn" data-testid="awaiting-payment">
+          <strong>Awaiting payment.</strong> The flight log can be submitted once the member’s invoice is paid in full.
+        </div>
+      )}
       {legs.map((l, i) => (
         <div className="pilot-leg" key={i}>
           <div className="hdr">
@@ -61,7 +66,9 @@ export default function FlightLogForm({ charter, onDone, compact }) {
       </div>
       <div style={{ marginTop: 14 }}><ErrorAlert error={error} /></div>
       <div className="form-actions">
-        <button className="btn btn-primary btn-block" disabled={saving}>{saving ? 'Submitting…' : 'Submit flight log'}</button>
+        <button className="btn btn-primary btn-block" disabled={saving || awaitingPayment} title={awaitingPayment ? 'Charter not paid' : undefined}>
+          {awaitingPayment ? 'Awaiting payment' : saving ? 'Submitting…' : 'Submit flight log'}
+        </button>
       </div>
     </form>
   );
