@@ -7,6 +7,7 @@ Members-only, quote-based charter booking and operations system for a licensed I
 - **Ops desk** runs the fleet calendar, assigns aircraft and crew, confirms charters and blocks aircraft for maintenance.
 - **Pilots** see their assigned flights and log block times and defects from a phone.
 - **Admin** manages users, airports and settings (GST rate, night-halt fee, quote validity and so on).
+- **Charter operators** — admin and sales browse the DGCA list of non-scheduled operators (139 operators, 471 aircraft as on 31 Aug 2026), loaded automatically on deploy by `npm run import:operators`. Lister sign-ups are matched against it by permit number.
 - **Listers** — charter operators, travel agents and private flyers — sign up at `/register`, post empty legs on their own aircraft and confirm requests from the public. Sales or admin verify each lister at **Listers** before their flights can go live.
 
 The full contract between frontend and backend is in [SPEC.md](SPEC.md).
@@ -48,6 +49,7 @@ Demo users (password `Meridian@2026`): `admin@meridian.test`, `sales@meridian.te
 ```bash
 cd backend && npm test                      # pricing unit tests
 cd backend && npm run test:lifecycle        # full lifecycle through the API (server must be running)
+cd backend && npm run test:operators        # DGCA directory data checks and API (server running, list imported)
 cd backend && npm run test:listers          # lister sign-up, approval, listings and requests (server running)
 npm run test:e2e                            # browser test through the UI (both servers running)
 npm run test:e2e:listers                    # lister sign-up → approval → publish → request → confirm in the browser

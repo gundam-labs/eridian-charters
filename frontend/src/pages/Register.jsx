@@ -114,7 +114,7 @@ export default function Register() {
               {f.lister_type === 'operator' && (
                 <div className="field span-2">
                   <label htmlFor="r-nsop">DGCA NSOP permit number</label>
-                  <input id="r-nsop" className="input" required value={f.nsop_permit_no} onChange={set('nsop_permit_no')} placeholder="e.g. NSOP-07/2019" />
+                  <input id="r-nsop" className="input" required value={f.nsop_permit_no} onChange={set('nsop_permit_no')} placeholder="e.g. 07/2019, as on your AOP" />
                   <span className="hint">We check it against the DGCA list of non-scheduled operators.</span>
                 </div>
               )}

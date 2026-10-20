@@ -487,11 +487,60 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 `;
 
+// v1.4 — Charter operator directory: the DGCA list of non-scheduled operators (NSOP holders) and their
+// registered aircraft, imported from the published list. Enrichment columns are ours and never overwritten.
+const SCHEMA_V14 = `
+CREATE TABLE IF NOT EXISTS charter_operators (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  aop_no          TEXT UNIQUE NOT NULL,
+  name            TEXT NOT NULL,
+  address         TEXT,
+  pincode         TEXT,
+  phone           TEXT,
+  fax             TEXT,
+  emails          TEXT[] NOT NULL DEFAULT '{}',
+  aop_valid_until DATE,
+  fleet_type      TEXT CHECK (fleet_type IN ('fixed_wing','rotary_wing','mixed','hot_air_balloon')),
+  aircraft_count  INT NOT NULL DEFAULT 0,
+  source          TEXT NOT NULL DEFAULT 'dgca_nsop',
+  source_as_of    DATE,
+  source_sno      INT,
+  in_latest_list  BOOLEAN NOT NULL DEFAULT true,
+  -- enrichment (filled in later by our team; the import never touches these)
+  website         TEXT,
+  notes           TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_charter_operators_name ON charter_operators(lower(name));
+
+CREATE TABLE IF NOT EXISTS operator_aircraft (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  operator_id   UUID NOT NULL REFERENCES charter_operators(id) ON DELETE CASCADE,
+  registration  TEXT UNIQUE NOT NULL,
+  kind          TEXT NOT NULL CHECK (kind IN ('fixed_wing','rotary_wing','hot_air_balloon')),
+  model         TEXT NOT NULL,
+  seats         INT,
+  role          TEXT NOT NULL DEFAULT 'passenger' CHECK (role IN ('passenger','aerial_work','cargo')),
+  seats_raw     TEXT,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_operator_aircraft_operator ON operator_aircraft(operator_id);
+
+CREATE TABLE IF NOT EXISTS data_imports (
+  name        TEXT PRIMARY KEY,
+  version     TEXT NOT NULL,
+  detail      JSONB,
+  imported_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+`;
+
 async function initDB() {
   await pool.query(SCHEMA);
   await pool.query(SCHEMA_V11);
   await pool.query(SCHEMA_V12);
   await pool.query(SCHEMA_V13);
+  await pool.query(SCHEMA_V14);
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await pool.query('INSERT INTO settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING', [key, value]);
   }

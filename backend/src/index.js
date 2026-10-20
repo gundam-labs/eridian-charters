@@ -159,6 +159,7 @@ mount('/api/dashboard', require('./routes/dashboard'));
 mount('/api/empty-legs', require('./routes/emptyLegs'));
 mount('/api/lister', require('./routes/lister'));
 mount('/api/listers', require('./routes/listers'));
+mount('/api/operators', require('./routes/operators'));
 mount('/api/payments', paymentsRoutes);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));

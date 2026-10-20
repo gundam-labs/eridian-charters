@@ -830,3 +830,8 @@ a.el-dash-item:hover { background: var(--gold-050); color: inherit; }
 .reg-points li::before { content: '✦'; color: var(--gold-400); margin-right: 10px; }
 .el-op { font-size: var(--fs-xs); color: var(--accent-ink); font-weight: 600; }
 .center { text-align: center; }
+
+/* ───────────────────────── v1.4 Charter operator directory ───────────────────────── */
+.row-link { cursor: pointer; }
+.row-link:hover td { background: var(--surface-2); }
+.op-models { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
