@@ -760,18 +760,20 @@ async function seedPayments() {
 async function seedListers() {
   const hash = await bcrypt.hash(PASSWORD, 10);
   const LISTERS = [
-    // email, name, type, company, phone, city, nsop, status
-    ['ops@skyhopaviation.example.in', 'Farhan Qureshi', 'operator', 'SkyHop Aviation Pvt Ltd', '+91 98200 44112', 'Mumbai', 'NSOP-98/2019', 'approved'],
-    ['desk@wanderlusttravels.example.in', 'Neha Bhatt', 'agent', 'Wanderlust Luxury Travels', '+91 98450 33221', 'Bengaluru', null, 'pending'],
+    // email, name, type, company, phone, city, nsop, status, pan, tan (fictional identifiers)
+    ['ops@skyhopaviation.example.in', 'Farhan Qureshi', 'operator', 'SkyHop Aviation Pvt Ltd', '+91 98200 44112', 'Mumbai', 'NSOP-98/2019', 'approved', 'AAKCS4821Q', 'MUMS48210K'],
+    ['desk@wanderlusttravels.example.in', 'Neha Bhatt', 'agent', 'Wanderlust Luxury Travels', '+91 98450 33221', 'Bengaluru', null, 'pending', 'AAJFW7314M', null],
   ];
   const ids = {};
-  for (const [email, name, type, company, phone, city, nsop, status] of LISTERS) {
+  for (const [email, name, type, company, phone, city, nsop, status, pan, tan] of LISTERS) {
     await pool.query(`INSERT INTO users (email, name, role, password_hash) VALUES ($1,$2,'lister',$3) ON CONFLICT (email) DO NOTHING`, [email, name, hash]);
     const u = (await pool.query('SELECT id FROM users WHERE email = $1', [email])).rows[0];
     await pool.query(
-      `INSERT INTO listers (user_id, lister_type, company, phone, city, nsop_permit_no, status, decided_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7, CASE WHEN $7 = 'approved' THEN now() END) ON CONFLICT (user_id) DO NOTHING`,
-      [u.id, type, company, phone, city, nsop, status]);
+      `INSERT INTO listers (user_id, lister_type, company, phone, city, nsop_permit_no, status, decided_at, pan, tan)
+       VALUES ($1,$2,$3,$4,$5,$6,$7, CASE WHEN $7 = 'approved' THEN now() END, $8, $9) ON CONFLICT (user_id) DO NOTHING`,
+      [u.id, type, company, phone, city, nsop, status, pan, tan]);
+    // Demo listers created before PAN/TAN existed get them too (only when still empty).
+    await pool.query('UPDATE listers SET pan = COALESCE(pan, $2), tan = COALESCE(tan, $3) WHERE user_id = $1', [u.id, pan, tan]);
     ids[email] = (await pool.query('SELECT id FROM listers WHERE user_id = $1', [u.id])).rows[0].id;
   }
   // Two live marketplace legs from the approved operator.

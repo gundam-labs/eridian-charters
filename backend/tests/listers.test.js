@@ -32,7 +32,8 @@ const istDay = (n) => {
 
 const signup = (over = {}) => ({
   name: 'Test Operator', email: `op-${run}@example.in`, password: 'Sup3rSecret!x', lister_type: 'operator',
-  company: 'Test Air Pvt Ltd', phone: '+91 98765 43210', city: 'Mumbai', nsop_permit_no: 'NSOP-99/2024', accept_terms: true, ...over,
+  company: 'Test Air Pvt Ltd', phone: '+91 98765 43210', city: 'Mumbai', nsop_permit_no: 'NSOP-99/2024', pan: 'aaach 1234k', tan: 'MUMT12345A',
+  accept_terms: true, ...over,
 });
 
 const listing = (over = {}) => ({
@@ -49,11 +50,17 @@ test('listers: sign-up, approval, listing, requests and isolation', async () => 
   assert.equal((await api(null, 'POST', '/auth/register', signup({ password: 'short' }))).status, 400);
   assert.equal((await api(null, 'POST', '/auth/register', signup({ accept_terms: false }))).status, 400);
   assert.equal((await api(null, 'POST', '/auth/register', signup({ gstin: 'NOT-A-GSTIN' }))).status, 400);
+  // PAN / TAN
+  assert.equal((await api(null, 'POST', '/auth/register', signup({ pan: '' }))).status, 400, 'operator needs PAN');
+  assert.equal((await api(null, 'POST', '/auth/register', signup({ lister_type: 'agent', nsop_permit_no: '', pan: '' }))).status, 400, 'agent needs PAN');
+  assert.equal((await api(null, 'POST', '/auth/register', signup({ pan: 'ABCDE12345' }))).status, 400, 'bad PAN format');
+  assert.equal((await api(null, 'POST', '/auth/register', signup({ tan: 'ABC123' }))).status, 400, 'bad TAN format');
+  assert.equal((await api(null, 'POST', '/auth/register', signup({ gstin: '27ZZZCH1234K1Z5' }))).status, 400, 'GSTIN must embed the PAN');
   const hp = await api(null, 'POST', '/auth/register', signup({ email: `bot-${run}@example.in`, website: 'http://spam' }));
   assert.equal(hp.status, 202);
   assert.equal((await api(null, 'POST', '/auth/login', { email: `bot-${run}@example.in`, password: 'Sup3rSecret!x' })).status, 401, 'honeypot creates nothing');
 
-  const reg = ok(await api(null, 'POST', '/auth/register', signup()), 201);
+  const reg = ok(await api(null, 'POST', '/auth/register', signup({ gstin: '27AAACH1234K1Z5' })), 201);
   assert.equal(reg.user.role, 'lister');
   assert.equal(reg.user.lister_status, 'pending');
   const op = reg.token;
@@ -61,7 +68,7 @@ test('listers: sign-up, approval, listing, requests and isolation', async () => 
   assert.equal((await api(null, 'POST', '/auth/register', signup({ email: 'sales@meridian.test' }))).status, 409, 'staff email taken');
 
   // Flyer needs neither company nor permit.
-  const flyer = ok(await api(null, 'POST', '/auth/register', signup({ email: `flyer-${run}@example.in`, lister_type: 'flyer', company: '', nsop_permit_no: '' })), 201).token;
+  const flyer = ok(await api(null, 'POST', '/auth/register', signup({ email: `flyer-${run}@example.in`, lister_type: 'flyer', company: '', nsop_permit_no: '', pan: '', tan: '' })), 201).token;
 
   // ── Pending: can draft, cannot publish ──
   const draft = ok(await api(op, 'POST', '/lister/empty-legs', listing()), 201);
@@ -92,6 +99,11 @@ test('listers: sign-up, approval, listing, requests and isolation', async () => 
   const pending = ok(await api(sales, 'GET', '/listers?status=pending'));
   const me = pending.find((l) => l.email === `op-${run}@example.in`);
   assert.ok(me, 'new lister in the pending queue');
+  assert.equal(me.pan, 'AAACH1234K', 'PAN normalised (spaces removed, upper case)');
+  assert.equal(me.tan, 'MUMT12345A');
+  assert.equal(ok(await api(op, 'GET', '/lister/me')).pan, 'AAACH1234K');
+  assert.equal((await api(op, 'PATCH', '/lister/me', { pan: 'AAACZ9999Z' })).status, 400, 'PAN change must still match the GSTIN');
+  assert.equal((await api(op, 'PATCH', '/lister/me', { pan: '' })).status, 400, 'operator cannot remove PAN');
   assert.equal((await api(sales, 'POST', `/listers/${me.id}/reject`, {})).status, 400, 'reject needs a reason');
   assert.equal(ok(await api(sales, 'POST', `/listers/${me.id}/approve`)).status, 'approved');
   assert.equal((await api(sales, 'POST', `/listers/${me.id}/approve`)).status, 409);

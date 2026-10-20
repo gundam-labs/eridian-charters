@@ -29,7 +29,7 @@ router.use((req, res, next) => {
   next();
 });
 
-const PROFILE_SELECT = `SELECT l.id, l.lister_type, l.company, l.phone, l.city, l.gstin, l.nsop_permit_no, l.about, l.status,
+const PROFILE_SELECT = `SELECT l.id, l.lister_type, l.company, l.phone, l.city, l.gstin, l.pan, l.tan, l.nsop_permit_no, l.about, l.status,
   l.decided_at, l.decision_reason, l.created_at, u.name, u.email
   FROM listers l JOIN users u ON u.id = l.user_id`;
 
@@ -46,7 +46,7 @@ router.patch('/me', async (req, res) => {
   const cur = await loadProfile(req.user.lister_id);
   if (cur.status === 'suspended') throw new HttpError(409, 'Your account is suspended — contact us to resolve it');
   const b = req.body || {};
-  const fields = listerProfile(b, { partial: true, type: cur.lister_type });
+  const fields = listerProfile(b, { partial: true, type: cur.lister_type, current: cur });
   const name = b.name !== undefined ? String(b.name).trim().slice(0, 120) : undefined;
   if (name !== undefined && name.length < 2) throw new HttpError(400, 'Please enter your full name');
   if (!Object.keys(fields).length && name === undefined) throw new HttpError(400, 'Nothing to update');

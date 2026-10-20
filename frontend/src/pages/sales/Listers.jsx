@@ -106,6 +106,8 @@ function ReviewModal({ lister: l, onClose, onApproved, onReject }) {
             <Link to={`/admin/operators?op=${l.dgca_operator.id}`}>{l.dgca_operator.name}</Link>
             <span className="muted small"> · AOP {l.dgca_operator.aop_no}, valid to {fmtDate(l.dgca_operator.aop_valid_until)}</span></>
           : <><span className="pill pill-amber">No match</span> <span className="muted small">No operator in the DGCA list has this permit number.</span></>}</dd></>}
+        <dt>PAN</dt><dd>{l.pan || <span className="muted">Not given</span>}</dd>
+        {l.tan && <><dt>TAN</dt><dd>{l.tan}</dd></>}
         {l.gstin && <><dt>GSTIN</dt><dd>{l.gstin}</dd></>}
         {l.about && <><dt>About</dt><dd>{l.about}</dd></>}
         <dt>Registered</dt><dd>{fmtDateTime(l.created_at)}</dd>

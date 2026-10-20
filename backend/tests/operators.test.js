@@ -76,7 +76,7 @@ test('directory API: access, search, detail and lister match', async () => {
   const run = Date.now().toString(36);
   ok(await api(null, 'POST', '/auth/register', {
     name: 'Zest Ops', email: `zest-${run}@example.in`, password: 'Sup3rSecret!x', lister_type: 'operator', company: 'Zest Aviation',
-    phone: '+91 98765 11111', nsop_permit_no: 'NSOP 7/2012', accept_terms: true,
+    phone: '+91 98765 11111', nsop_permit_no: 'NSOP 7/2012', pan: 'AAACZ1234Z', accept_terms: true,
   }), 201);
   const pend = ok(await api(admin, 'GET', '/listers?status=pending')).find((l) => l.email === `zest-${run}@example.in`);
   assert.equal(pend.dgca_operator?.name, 'Zest Aviation Pvt. Ltd.');

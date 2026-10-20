@@ -535,12 +535,19 @@ CREATE TABLE IF NOT EXISTS data_imports (
 );
 `;
 
+// v1.5 — Lister tax identifiers: PAN (required for operators and agents) and TAN (optional).
+const SCHEMA_V15 = `
+ALTER TABLE listers ADD COLUMN IF NOT EXISTS pan TEXT;
+ALTER TABLE listers ADD COLUMN IF NOT EXISTS tan TEXT;
+`;
+
 async function initDB() {
   await pool.query(SCHEMA);
   await pool.query(SCHEMA_V11);
   await pool.query(SCHEMA_V12);
   await pool.query(SCHEMA_V13);
   await pool.query(SCHEMA_V14);
+  await pool.query(SCHEMA_V15);
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await pool.query('INSERT INTO settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING', [key, value]);
   }
