@@ -1,7 +1,8 @@
 /**
  * End-to-end lifecycle against a running API (BASE_URL, default http://localhost:4000) with seeded demo data.
- * member requests → sales quotes & sends → member accepts → ops assigns + confirms → member manifest → pilot logs flight
- * → sales marks invoice paid → charter closed. Plus visibility checks (other member, pilot masking).
+ * member requests → sales quotes & sends → member accepts → ops assigns + confirms → member manifest
+ * → flight log refused while unpaid → member pays (mock provider, signed webhook path) → pilot logs flight → charter closed.
+ * Plus visibility checks (other member, pilot masking).
  */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -199,14 +200,28 @@ test('full charter lifecycle', async (t) => {
   });
   // block_on before block_off rejected
   assert.equal((await api(pilot.token, 'POST', `/charters/${charter.id}/flight-log`, { legs: [{ index: 0, block_off: legs[0].block_on, block_on: legs[0].block_off }] })).status, 400);
-  const flown = ok(await api(pilot.token, 'POST', `/charters/${charter.id}/flight-log`, { legs, defects: 'None' }));
-  assert.equal(flown.status, 'flown');
-  assert.ok(flown.legs.every((l) => l.block_off && l.block_on));
+  // v1.2: no flying before payment
+  const unpaidLog = await api(pilot.token, 'POST', `/charters/${charter.id}/flight-log`, { legs, defects: 'None' });
+  assert.equal(unpaidLog.status, 409);
+  assert.equal(unpaidLog.data.error, 'Charter not paid');
+  assert.equal(pilotView.payment_status, 'unpaid');
 
-  // 7. Sales marks invoice paid → charter closed
+  // 7. Member pays the balance online (mock provider → signed payment.captured webhook) → invoice paid
   assert.equal((await api(arjun.token, 'POST', `/invoices/${invoice.id}/mark-paid`, {})).status, 403);
-  const paid = ok(await api(sales.token, 'POST', `/invoices/${invoice.id}/mark-paid`, { paid_on: istToday(), payment_ref: 'NEFT-TEST-1' }));
-  assert.equal(paid.status, 'paid');
+  const order = ok(await api(arjun.token, 'POST', `/invoices/${invoice.id}/pay`));
+  assert.equal(order.amount_paise, Math.round(invoice.total * 100));
+  const done = ok(await api(arjun.token, 'POST', '/payments/mock/complete', { order_id: order.order_id, method: 'upi' }));
+  assert.equal(done.invoice.status, 'paid');
+  assert.equal(done.invoice.balance, 0);
+
+  // 8. Pilot logs the flight → flown, and with the invoice already paid the charter closes
+  const flown = ok(await api(pilot.token, 'POST', `/charters/${charter.id}/flight-log`, { legs, defects: 'None' }));
+  assert.equal(flown.status, 'closed');
+  assert.ok(flown.legs.every((l) => l.block_off && l.block_on));
+  assert.ok(flown.events.some((e) => e.action === 'flown'));
+
+  // Already paid: manual mark-paid is a conflict
+  assert.equal((await api(sales.token, 'POST', `/invoices/${invoice.id}/mark-paid`, { paid_on: istToday(), payment_ref: 'NEFT-TEST-1' })).status, 409);
 
   const final = ok(await api(arjun.token, 'GET', `/charters/${charter.id}`));
   assert.equal(final.status, 'closed');

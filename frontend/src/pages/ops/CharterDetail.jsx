@@ -10,6 +10,8 @@ import LegsTable from '../../components/LegsTable';
 import ManifestEditor from '../../components/ManifestEditor';
 import FlightLogForm from '../../components/FlightLogForm';
 import CancelModal from '../../components/CancelModal';
+import PaymentCard from '../../components/PaymentCard';
+import { charterPaymentStatus } from '../../lib/payments';
 import { fmtDate, fmtDateTime, inr, route, memberName, aircraftReg, aircraftType, humanize } from '../../lib/format';
 import { normLeg, legRoute, legWindow, emptyLegsPath } from '../../lib/emptyLegs';
 
@@ -40,13 +42,15 @@ export default function CharterDetail() {
   const inv = c.invoice;
   const derived = c.empty_leg || data?.empty_leg || (c.empty_leg_no ? { leg_no: c.empty_leg_no } : null);
   const emptyLegs = c.empty_legs || data?.empty_legs;
+  const payStatus = charterPaymentStatus(c);
+  const awaitingPayment = !!payStatus && payStatus !== 'paid';
 
   return (
     <>
       <PageHead back={<Link to="/o/charters" className="back">← Charters</Link>}
         eyebrow={<>{c.charter_no}{derived && <span className="el-badge" title="This charter was sold from an empty leg">Empty-leg booking {derived.leg_no || ''}</span>}</>}
         title={route(c.legs)}
-        sub={<>{memberName(c)}{c.member_no ? ` (${c.member_no})` : ''} · {fmtDate(c.starts_on)}{c.ends_on !== c.starts_on ? ` – ${fmtDate(c.ends_on)}` : ''} · {c.pax} pax · <StatusPill status={c.status} /></>}
+        sub={<>{memberName(c)}{c.member_no ? ` (${c.member_no})` : ''} · {fmtDate(c.starts_on)}{c.ends_on !== c.starts_on ? ` – ${fmtDate(c.ends_on)}` : ''} · {c.pax} pax · <StatusPill status={c.status} />{payStatus && <span className="pay-badge" data-testid="charter-pay-badge"><StatusPill status={payStatus} /></span>}</>}
         actions={isOps && <>
           {c.status === 'accepted' && (
             <button className="btn btn-gold" onClick={confirm} disabled={!!busy || !hasCrew} title={hasCrew ? '' : 'Assign captain and first officer first'}>
@@ -75,8 +79,8 @@ export default function CharterDetail() {
 
           {isOps && c.status === 'manifest_complete' && (
             <div className="card">
-              <div className="card-head"><h2>Flight log</h2><span className="muted xs">Enter block times for every passenger leg</span></div>
-              <div className="card-body"><FlightLogForm charter={c} onDone={() => { setOk('Flight log recorded — charter marked flown.'); reload(); }} /></div>
+              <div className="card-head"><h2>Flight log</h2>{awaitingPayment ? <StatusPill status={payStatus} label="Awaiting payment" /> : <span className="muted xs">Enter block times for every passenger leg</span>}</div>
+              <div className="card-body"><FlightLogForm charter={c} awaitingPayment={awaitingPayment} onDone={() => { setOk('Flight log recorded — charter marked flown.'); reload(); }} /></div>
             </div>
           )}
 
@@ -116,13 +120,14 @@ export default function CharterDetail() {
             <EmptyLegsPanel charter={c} legs={emptyLegs} canGenerate={['sales', 'ops', 'admin'].includes(user.role)}
               listPath={emptyLegsPath(user.role)} onGenerated={(n) => { setOk(n ? `${n} empty leg${n > 1 ? 's' : ''} generated as draft.` : 'No positioning legs to generate.'); reload(); }} />
           )}
-          {inv && <InvoiceCard inv={inv} />}
+          {inv && <InvoiceCard inv={inv} canPay={['sales', 'admin'].includes(user.role) && c.status !== 'cancelled'} onChanged={reload} />}
           {c.ops_notes && <div className="card card-pad"><h3 style={{ marginBottom: 8 }}>Ops notes</h3><p className="small">{c.ops_notes}</p></div>}
         </div>
       </div>
 
       {cancelling && (
         <CancelModal path={`/api/charters/${id}/cancel`} warning="The aircraft and crew are released and the invoice is cancelled. The member is notified."
+          refundQuotePath={`/api/charters/${id}/cancellation-quote`} operator doneLabel="Charter cancelled"
           onClose={() => setCancelling(false)} onDone={() => { setCancelling(false); reload(); }} />
       )}
     </>
@@ -203,25 +208,14 @@ function AssignPanel({ charter: c, onSaved }) {
   );
 }
 
-function InvoiceCard({ inv }) {
+function InvoiceCard({ inv, canPay, onChanged }) {
   const [err, setErr] = useState('');
   return (
-    <div className="card card-pad">
-      <h3 style={{ marginBottom: 12 }}>Invoice</h3>
-      <dl className="dl">
-        <dt>Number</dt><dd>{inv.invoice_no}</dd>
-        <dt>Total</dt><dd>{inr(inv.total)}</dd>
-        <dt>Issued</dt><dd>{fmtDate(inv.issued_on, { year: false })}</dd>
-        <dt>Due</dt><dd>{fmtDate(inv.due_on, { year: false })}</dd>
-        <dt>Status</dt><dd><StatusPill status={inv.status} /></dd>
-        {inv.paid_on && <><dt>Paid</dt><dd>{fmtDate(inv.paid_on, { year: false })} {inv.payment_ref ? `· ${inv.payment_ref}` : ''}</dd></>}
-      </dl>
-      <div className="actions" style={{ marginTop: 14 }}>
-        <button className="btn btn-sm" onClick={async () => { setErr(''); try { await openPdf(`/api/invoices/${inv.id}/pdf`); } catch (e) { setErr(e.message); } }}>Invoice PDF</button>
-        <Link to="/s/invoices" className="btn btn-sm btn-ghost">All invoices</Link>
-      </div>
+    <PaymentCard key={inv.id} invoice={inv} canPay={canPay} onChanged={onChanged} title="Invoice & payment">
+      <button className="btn btn-sm" onClick={async () => { setErr(''); try { await openPdf(`/api/invoices/${inv.id}/pdf`); } catch (e) { setErr(e.message); } }}>Invoice PDF</button>
+      <Link to="/s/invoices" className="btn btn-sm btn-ghost">All invoices</Link>
       <ErrorAlert error={err} />
-    </div>
+    </PaymentCard>
   );
 }
 

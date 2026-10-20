@@ -6,7 +6,8 @@ const { logEvent } = require('../lib/events');
 const { conflicts } = require('../lib/availability');
 const { expireStaleQuotes, priceForRequest } = require('../lib/quotes');
 const { publicAircraft } = require('../lib/serialize');
-const { todayIST, addDays, fmtIST } = require('../lib/time');
+const { todayIST, addDays, fmtIST, istDate } = require('../lib/time');
+const { computeDueAt } = require('../lib/payments/service');
 const { sendQuoteSent, sendCharterAccepted } = require('../lib/email');
 const { quotePdf } = require('../lib/pdf');
 
@@ -249,10 +250,12 @@ router.post('/:id/accept', requireRole('member', 'sales'), async (req, res) => {
 
     const invoice_no = await nextNumber('INV', client);
     const today = todayIST();
+    // v1.2: full payment due 24h before the first passenger departure (late bookings: within 2h).
+    const due_at = computeDueAt(q.legs[0].depart_at, settings);
     const invoice = (await client.query(
-      `INSERT INTO invoices (invoice_no, charter_id, member_id, subtotal, gst_rate_pct, gst_amount, total, issued_on, due_on, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'unpaid') RETURNING *`,
-      [invoice_no, charter.id, q.member_id, q.subtotal, q.gst_rate_pct, q.gst_amount, q.total, today, addDays(today, Number(settings.invoice_due_days) || 7)])).rows[0];
+      `INSERT INTO invoices (invoice_no, charter_id, member_id, subtotal, gst_rate_pct, gst_amount, total, issued_on, due_on, due_at, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'unpaid') RETURNING *`,
+      [invoice_no, charter.id, q.member_id, q.subtotal, q.gst_rate_pct, q.gst_amount, q.total, today, istDate(due_at), due_at])).rows[0];
     await logEvent({ entity_type: 'invoice', entity_id: invoice.id, action: 'issued', actor_user_id: req.user.id, detail: { invoice_no, total: invoice.total } }, client);
     return { charter, invoice };
   });

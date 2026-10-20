@@ -27,6 +27,7 @@ import SalesRequestDetail from './pages/sales/RequestDetail';
 import Quotes from './pages/sales/Quotes';
 import Members from './pages/sales/Members';
 import MemberDetail from './pages/sales/MemberDetail';
+import Payments from './pages/sales/Payments';
 
 import FleetCalendar from './pages/ops/FleetCalendar';
 import Charters from './pages/ops/Charters';
@@ -94,6 +95,7 @@ export default function App() {
         <Route path="/s/members" element={guard(STAFF, <Members />)} />
         <Route path="/s/members/:id" element={guard(STAFF, <MemberDetail />)} />
         <Route path="/s/invoices" element={guard(STAFF, <Invoices />)} />
+        <Route path="/s/payments" element={guard(['sales', 'admin'], <Payments />)} />
         <Route path="/s/empty-legs" element={guard(STAFF, <EmptyLegsAdmin />)} />
 
         <Route path="/o" element={guard(['ops', 'admin'], <StaffDashboard title="Operations dashboard" />)} />

@@ -8,8 +8,9 @@ const STATUS_COLOURS = {
   draft: 'grey', sent: 'blue', accepted: 'green', declined: 'red', expired: 'amber', withdrawn: 'grey',
   // charters
   confirmed: 'teal', manifest_complete: 'violet', flown: 'navy', cancelled: 'red',
-  // invoices
-  unpaid: 'amber', paid: 'green',
+  // invoices & payments
+  unpaid: 'amber', partially_paid: 'blue', paid: 'green', refunded: 'violet',
+  captured: 'green', partially_refunded: 'blue', processed: 'green', pending: 'amber',
   // members/users
   active: 'green', inactive: 'grey', invited: 'amber', none: 'grey',
   // calendar
@@ -22,10 +23,12 @@ const STATUS_COLOURS = {
   requested: 'amber', rejected: 'red',
 };
 
+const STATUS_LABELS = { partially_paid: 'Part paid', partially_refunded: 'Part refunded' };
+
 export function StatusPill({ status, label }) {
   if (!status) return null;
   const c = STATUS_COLOURS[status] || 'grey';
-  return <span className={`pill pill-${c}`}>{label || humanize(status)}</span>;
+  return <span className={`pill pill-${c}`}>{label || STATUS_LABELS[status] || humanize(status)}</span>;
 }
 
 export function TierPill({ tier }) {
@@ -82,14 +85,29 @@ export function Modal({ title, onClose, children, wide }) {
   );
 }
 
+async function copyText(value) {
+  try { await navigator.clipboard.writeText(value); }
+  catch {
+    const t = document.createElement('textarea'); t.value = value; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); t.remove();
+  }
+}
+
+/** Small copy button for inline values (account numbers, IFSC…). */
+export function CopyButton({ value, label = 'Copy', what }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button type="button" className="btn btn-sm" aria-label={what ? `Copy ${what}` : label}
+      onClick={async () => { await copyText(String(value ?? '')); setCopied(true); setTimeout(() => setCopied(false), 1800); }}>
+      {copied ? 'Copied ✓' : label}
+    </button>
+  );
+}
+
 export function CopyField({ value }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
-    try { await navigator.clipboard.writeText(value); }
-    catch {
-      const t = document.createElement('textarea'); t.value = value; document.body.appendChild(t); t.select();
-      document.execCommand('copy'); t.remove();
-    }
+    await copyText(value);
     setCopied(true); setTimeout(() => setCopied(false), 1800);
   };
   return (

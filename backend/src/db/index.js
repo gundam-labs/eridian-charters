@@ -43,6 +43,11 @@ const DEFAULT_SETTINGS = {
   empty_leg_discount_pct: '60',
   empty_leg_auto_publish: 'false',
   empty_leg_min_notice_hours: '6',
+  payment_due_hours_before_departure: '24',
+  refund_full_days: '7',
+  refund_half_hours: '48',
+  refund_half_pct: '50',
+  empty_leg_payment_window_hours: '2',
 };
 
 // Idempotent schema. Safe to run on every deploy.
@@ -334,9 +339,113 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 `;
 
+// v1.2 — Payments (Razorpay). Upgrades a v1.1 database in place; every statement is idempotent.
+const SCHEMA_V12 = `
+CREATE TABLE IF NOT EXISTS payment_orders (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  invoice_id        UUID NOT NULL REFERENCES invoices(id),
+  provider          TEXT NOT NULL CHECK (provider IN ('razorpay','mock')),
+  provider_order_id TEXT UNIQUE NOT NULL,
+  amount            NUMERIC(14,2) NOT NULL CHECK (amount > 0),
+  status            TEXT NOT NULL DEFAULT 'created' CHECK (status IN ('created','paid','expired','failed')),
+  created_by        UUID REFERENCES users(id),
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_payment_orders_invoice ON payment_orders(invoice_id, status);
+
+CREATE TABLE IF NOT EXISTS virtual_accounts (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  member_id      UUID UNIQUE NOT NULL REFERENCES members(id),
+  provider       TEXT NOT NULL CHECK (provider IN ('razorpay','mock')),
+  provider_va_id TEXT UNIQUE NOT NULL,
+  account_number TEXT NOT NULL,
+  ifsc           TEXT NOT NULL,
+  bank_name      TEXT,
+  account_name   TEXT,
+  status         TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','closed')),
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  invoice_id          UUID NOT NULL REFERENCES invoices(id),
+  provider            TEXT NOT NULL CHECK (provider IN ('razorpay','mock','manual')),
+  provider_payment_id TEXT UNIQUE NOT NULL,
+  provider_order_id   TEXT,
+  virtual_account_id  UUID REFERENCES virtual_accounts(id),
+  method              TEXT NOT NULL CHECK (method IN ('card','upi','netbanking','wallet','bank_transfer','emi','other')),
+  amount              NUMERIC(14,2) NOT NULL CHECK (amount > 0),
+  fee                 NUMERIC(14,2) NOT NULL DEFAULT 0,
+  status              TEXT NOT NULL DEFAULT 'captured' CHECK (status IN ('captured','refunded','partially_refunded')),
+  captured_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+  raw                 JSONB,
+  created_by          UUID REFERENCES users(id),
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_payments_invoice ON payments(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_payments_captured ON payments(captured_at);
+
+CREATE TABLE IF NOT EXISTS refunds (
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  payment_id         UUID NOT NULL REFERENCES payments(id),
+  provider_refund_id TEXT UNIQUE,
+  amount             NUMERIC(14,2) NOT NULL CHECK (amount > 0),
+  reason             TEXT,
+  policy_pct         NUMERIC(5,2),
+  status             TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','processed','failed')),
+  error              TEXT,
+  created_by         UUID REFERENCES users(id),
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_refunds_payment ON refunds(payment_id);
+
+CREATE TABLE IF NOT EXISTS webhook_events (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider     TEXT NOT NULL,
+  event_id     TEXT UNIQUE NOT NULL,
+  event_type   TEXT,
+  received_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  processed_at TIMESTAMPTZ,
+  error        TEXT,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS amount_paid NUMERIC(14,2) NOT NULL DEFAULT 0;
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS due_at TIMESTAMPTZ;
+CREATE INDEX IF NOT EXISTS idx_invoices_due ON invoices(status, due_at);
+
+-- Extend the status CHECK only when the current definition lacks the new states (no rewrite on reruns).
+DO $$
+DECLARE def TEXT;
+BEGIN
+  SELECT pg_get_constraintdef(oid) INTO def FROM pg_constraint
+   WHERE conrelid = 'invoices'::regclass AND conname = 'invoices_status_check';
+  IF def IS NULL OR def NOT LIKE '%partially_paid%' OR def NOT LIKE '%refunded%' THEN
+    ALTER TABLE invoices DROP CONSTRAINT IF EXISTS invoices_status_check;
+    ALTER TABLE invoices ADD CONSTRAINT invoices_status_check
+      CHECK (status IN ('unpaid','partially_paid','paid','cancelled','refunded'));
+  END IF;
+END $$;
+
+-- Back-fill: invoices already paid (manual mark-paid before v1.2) were paid in full.
+UPDATE invoices SET amount_paid = total WHERE status = 'paid' AND amount_paid = 0;
+
+-- Back-fill due_at = first passenger departure − 24h. Open invoices whose deadline would already have
+-- passed at upgrade time get a grace deadline (24h from now, but never after departure) instead of being
+-- auto-cancelled by the first run of the deadline job.
+UPDATE invoices i SET due_at = CASE
+    WHEN i.status IN ('unpaid','partially_paid') AND (c.legs->0->>'depart_at')::timestamptz - interval '24 hours' <= now()
+      THEN LEAST(now() + interval '24 hours', (c.legs->0->>'depart_at')::timestamptz)
+    ELSE (c.legs->0->>'depart_at')::timestamptz - interval '24 hours'
+  END
+  FROM charters c
+ WHERE c.id = i.charter_id AND i.due_at IS NULL AND c.legs->0->>'depart_at' IS NOT NULL;
+`;
+
 async function initDB() {
   await pool.query(SCHEMA);
   await pool.query(SCHEMA_V11);
+  await pool.query(SCHEMA_V12);
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await pool.query('INSERT INTO settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING', [key, value]);
   }

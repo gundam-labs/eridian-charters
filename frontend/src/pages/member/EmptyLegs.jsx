@@ -51,7 +51,7 @@ function BookModal({ leg, onClose }) {
     try {
       const r = await api.post(`/api/empty-legs/${leg.id}/book`, { pax: Number(pax) });
       const cid = r.data?.charter?.id || r.data?.charter_id;
-      nav(cid ? `/m/trips/${cid}` : '/m/trips');
+      nav(cid ? `/m/trips/${cid}?booked=1` : '/m/trips');
     } catch (err) { setError(errText(err)); setSaving(false); }
   };
 
@@ -76,7 +76,8 @@ function BookModal({ leg, onClose }) {
           <input type="checkbox" checked={agree} onChange={e => setAgree(e.target.checked)} />
           <span>{TERMS_TEXT}</span>
         </label>
-        <p className="hint" style={{ marginTop: 10 }}>Booking creates your trip and a GST invoice immediately. Add passenger details from the trip page.</p>
+        <p className="hint" style={{ marginTop: 10 }}>Booking creates your trip and a GST invoice immediately. Add passenger details from the trip page.
+          Payment is due 24 hours before departure — for flights leaving sooner, within 2 hours of booking, or the flight is released.</p>
         <div style={{ marginTop: 12 }}><ErrorAlert error={error} /></div>
         <div className="form-actions">
           <button type="button" className="btn" onClick={onClose}>Back</button>

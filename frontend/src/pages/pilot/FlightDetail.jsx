@@ -4,6 +4,7 @@ import { useFetch } from '../../lib/useFetch';
 import { normCharter, crewName } from '../../lib/normalize';
 import { PageHead, ErrorAlert, Loading, Empty, StatusPill, OkAlert } from '../../components/ui';
 import FlightLogForm from '../../components/FlightLogForm';
+import { charterPaymentStatus } from '../../lib/payments';
 import { fmtDateTime, fmtTime, hours, route, aircraftReg, aircraftType, paxCount } from '../../lib/format';
 
 export default function FlightDetail() {
@@ -16,12 +17,14 @@ export default function FlightDetail() {
   if (error) return <ErrorAlert error={error} />;
   if (!c) return null;
 
+  const payStatus = charterPaymentStatus(c);
+  const awaitingPayment = !!payStatus && payStatus !== 'paid';
   const crew = [['Captain', crewName(c, 'captain')], ['First officer', crewName(c, 'first_officer')], ['Cabin', crewName(c, 'cabin_crew')]].filter(([, n]) => n);
 
   return (
     <>
       <PageHead back={<Link to="/p" className="back">← My flights</Link>} eyebrow={c.charter_no} title={route(c.legs)}
-        sub={<>{aircraftReg(c)} · {aircraftType(c)} · {paxCount(c)} pax · <StatusPill status={c.status} /></>} />
+        sub={<>{aircraftReg(c)} · {aircraftType(c)} · {paxCount(c)} pax · <StatusPill status={c.status} />{payStatus && <span className="pay-badge"><StatusPill status={payStatus} label={payStatus === 'paid' ? 'Paid' : 'Awaiting payment'} /></span>}</>} />
       <OkAlert>{ok}</OkAlert>
 
       <div className="stack">
@@ -61,7 +64,7 @@ export default function FlightDetail() {
           <div className="card card-pad">
             <h3 style={{ marginBottom: 4 }}>Flight log</h3>
             <p className="muted small">Enter block off and block on for each leg (IST).</p>
-            <FlightLogForm charter={c} compact onDone={() => { setOk('Flight log submitted. Thank you, Captain.'); reload(); }} />
+            <FlightLogForm charter={c} compact awaitingPayment={awaitingPayment} onDone={() => { setOk('Flight log submitted. Thank you, Captain.'); reload(); }} />
           </div>
         ) : ['accepted', 'confirmed'].includes(c.status) ? (
           <div className="alert alert-info">The flight log opens once the passenger manifest is complete.</div>
