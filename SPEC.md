@@ -203,3 +203,62 @@ Authenticated:
 
 ## Seed additions (idempotent)
 - For the seeded confirmed charter(s) with positioning: generated empty legs; publish them so the public page is never empty. Plus 2 manual published legs on popular routes (e.g. DEL→JAI, BOM→GOI) 1–3 weeks out, 1 draft leg, and 1 public pending request from a fictional person (example.in email) on a published leg.
+
+---
+
+# v1.2 — Payments (Razorpay)
+
+Decided by Krishna, 20 Oct 2026: Razorpay; full payment due **24 hours before the first departure**; Meridian **absorbs** gateway fees (no surcharge); refunds on cancellation by the member: **100% if more than 7 days before first departure, 50% from 48 hours to 7 days, 0% inside 48 hours**; **no corporate credit** (everyone pays before flying).
+
+## Principles
+- The **server** sets every amount (from the invoice balance). Money is in **paise** (integer) at the provider boundary and in rupees (NUMERIC(14,2)) in our tables.
+- A payment counts only when the **provider confirms it server-side**: a verified webhook (HMAC-SHA256 of the RAW body with the webhook secret, header `X-Razorpay-Signature`) or a verified Checkout signature (HMAC-SHA256 of `order_id + "|" + payment_id` with the key secret) followed by fetching the payment from the API and checking `status = captured` and amount. Browser "success" alone never marks anything paid.
+- **Idempotent**: webhook events stored by `x-razorpay-event-id` (unique); payments unique by provider payment id. Replays are no-ops.
+- Meridian never sees or stores card data.
+- Secrets only from env: `PAYMENTS_PROVIDER` (`razorpay` | `mock`, default `mock`), `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`. With `PAYMENTS_PROVIDER=razorpay` the server refuses to start unless all three are set.
+
+## Provider abstraction (`src/lib/payments/`)
+`index.js` exports `provider()` returning one of:
+- **razorpay.js** — calls `https://api.razorpay.com/v1` with Basic auth (`key_id:key_secret`) using `fetch` (no SDK): `createOrder({amount_paise, receipt, notes})` → `POST /orders` (`currency:'INR'`, `payment_capture: 1`); `fetchPayment(id)` → `GET /payments/:id` (returns `amount`, `status`, `method`, `fee`, `tax`, `order_id`); `createVirtualAccount({name, notes})` → `POST /virtual_accounts` with `receivers:{types:['bank_account']}` (response `receivers[]` entity `bank_account`: `account_number`, `ifsc`, `name`, `bank_name`); `refund(payment_id, amount_paise, notes)` → `POST /payments/:id/refund`; `verifyWebhook(rawBody, signature)`; `verifyCheckout(order_id, payment_id, signature)`. All HTTP errors → our `HttpError(502, 'Payment provider error: …')` without leaking secrets.
+- **mock.js** — same interface, no network, for local dev, tests and the live demo until Razorpay keys exist: ids like `order_mock_…`, `pay_mock_…`, `va_mock_…`; virtual account numbers `2223330` + 9 digits, IFSC `RATN0VAAPIS`; fees computed as 2% + 18% GST of the fee for card/UPI/netbanking, 0 for bank transfer; webhook secret `mock_webhook_secret` (or env) and the same HMAC verification as Razorpay so the webhook path is exercised for real. Mock checkout = an in-app simulated payment screen (frontend) that calls `POST /api/payments/mock/complete` (only when provider is mock) which builds a Razorpay-shaped `payment.captured` event, signs it, and feeds it through the SAME webhook handler. Likewise `POST /api/payments/mock/bank-transfer {invoice_id, amount}` (admin/sales only, mock only) simulates a `virtual_account.credited` event.
+
+## Data model (idempotent migration, like v1.1)
+- **payment_orders**: invoice_id, provider, provider_order_id UNIQUE, amount (₹), status (created|paid|expired|failed), created_by, created_at.
+- **payments**: invoice_id, provider, provider_payment_id UNIQUE, provider_order_id NULL, virtual_account_id NULL, method (card|upi|netbanking|wallet|bank_transfer|emi|other), amount (₹), fee (₹, provider fee incl. GST, absorbed by Meridian), status (captured|refunded|partially_refunded), captured_at, raw JSONB (provider entity, minus anything card-sensitive — keep id, method, amount, fee, tax, status, bank/vpa reference only).
+- **refunds**: payment_id FK, provider_refund_id UNIQUE, amount (₹), reason, policy_pct, status (pending|processed|failed), created_by, created_at.
+- **webhook_events**: provider, event_id UNIQUE, event_type, received_at, processed_at, error NULL.
+- **virtual_accounts**: member_id UNIQUE, provider, provider_va_id UNIQUE, account_number, ifsc, bank_name, account_name, status (active|closed), created_at.
+- **invoices**: add `amount_paid NUMERIC(14,2) NOT NULL DEFAULT 0`, `due_at TIMESTAMPTZ` (= first departure − 24h, from the charter legs), extend status CHECK to (unpaid|partially_paid|paid|cancelled|refunded). Existing `paid_on`/`payment_ref` stay; manual "mark paid" by sales still works (records a `payments` row with method `bank_transfer`, provider `manual`).
+- **charters**: add `payment_status` is NOT stored — derive from the invoice.
+- settings defaults: `payment_due_hours_before_departure`=`24`, `refund_full_days`=`7`, `refund_half_hours`=`48`, `refund_half_pct`=`50`, `empty_leg_payment_window_hours`=`2`.
+
+## Rules
+- **Invoice due_at** = first departure (positioning included? NO — first PASSENGER departure) − 24h. Set when the invoice is created (quote accept, empty-leg booking/confirm). Migration back-fills existing unpaid invoices.
+- **Empty legs**: due_at = min(first departure − 24h, booking time + 2h); if first departure − 24h is already in the past at booking, due_at = booking time + 2h (late bookings must pay within 2 hours).
+- **Payment applied** (webhook `payment.captured` or `order.paid`, or `virtual_account.credited`): find the invoice via order notes `invoice_id` (orders) or via the virtual account's member → oldest unpaid/partially_paid invoice of that member (bank transfers); insert payment (idempotent), add to `amount_paid`; status → `partially_paid` or `paid` (paid when amount_paid ≥ total − ₹1); set paid_on; log events; email the member a receipt; if the charter is `flown` and invoice paid → close the charter (existing rule). Over-payment: record it, status paid, flag an event `overpaid` for sales.
+- **Deadline enforcement**: a job every 5 minutes (setInterval in the server, plus on charter/invoice reads) auto-cancels charters in accepted|confirmed|manifest_complete whose invoice is not fully paid and `due_at` has passed: charter → cancelled (`cancel_reason` "Not paid by the deadline"), aircraft released (existing cancel side-effects, including empty-leg cascade), any part payment refunded in full, member emailed. Reminder emails at due_at − 48h and due_at − 6h (once each; track in events).
+- **Pilot flight log** and **ops confirm**: ops may confirm crew before payment; the **flight log submit is refused (409) unless the invoice is paid** ("Charter not paid"). Charter detail shows payment status for all roles.
+- **Cancellation refunds** (on `POST /charters/:id/cancel`): hours = first passenger departure − now. Cancelled by the **member**: pct = 100 if hours > 7×24, 50 if hours ≥ 48, else 0. Cancelled by **ops/admin**: pass `refund_pct` (0–100, default 100 — operator cancellation refunds in full). Refund = pct × amount_paid, split across payments newest first, via provider refunds; invoice status → `refunded` (pct>0) or `cancelled`; refunds rows; email. The cancel endpoint's response includes `{refund: {pct, amount}}`; add `GET /api/charters/:id/cancellation-quote` returning `{pct, refund_amount, amount_paid}` so the UI can show it BEFORE confirming.
+- Fees are absorbed: record `fee` per payment; dashboard shows payment fees.
+
+## API
+- `GET /api/payments/config` (auth) → `{provider:'razorpay'|'mock', key_id}` (key_id only for razorpay; never the secret).
+- `POST /api/invoices/:id/pay` (member owner; sales/admin may too) → creates a provider order for the outstanding balance (reuse an existing `created` order with the same amount made < 30 min ago) → `{order_id, amount_paise, currency:'INR', key_id, provider, invoice_no, prefill:{name,email,contact}, description}`. 409 if invoice paid/cancelled or due_at passed.
+- `POST /api/payments/verify` `{razorpay_order_id, razorpay_payment_id, razorpay_signature}` (auth) → verifies the Checkout signature, fetches the payment, applies it (same idempotent function as the webhook) → `{invoice}`. (Speeds up UX; the webhook is still the source of truth.)
+- `POST /api/payments/webhook/razorpay` — NO auth, raw body (`express.raw({type:'application/json'})` mounted BEFORE `express.json`), verifies signature (401 on mismatch), dedupes by `x-razorpay-event-id`, handles `payment.captured`, `order.paid`, `virtual_account.credited`, `refund.processed`, `refund.failed`; always 200 after a verified, stored event (errors stored in `webhook_events.error`, never retried forever).
+- `GET /api/members/me/bank-transfer` (member) → creates the member's virtual account on first call → `{account_name, account_number, ifsc, bank_name}`; staff: `GET /api/members/:id/bank-transfer`.
+- `GET /api/invoices/:id` adds `amount_paid`, `balance`, `due_at`, `payments[]` (method, amount, captured_at; fee only for staff), `refunds[]`.
+- `GET /api/payments?from=&to=` (sales/admin) → payments with invoice/member, fee; totals.
+- Mock-only: `POST /api/payments/mock/complete {order_id, method:'card'|'upi'|'netbanking'}` (the order's owner or staff), `POST /api/payments/mock/bank-transfer {member_id, amount}` (sales/admin).
+- Dashboard (staff) adds `payments: {collected_30d, fees_30d, unpaid_due_48h_count, unpaid_due_48h_amount}`.
+
+## Frontend
+- **Member trip / invoices**: a payment card on the trip page and invoice list: total, paid, balance, **"Pay by … (date, IST)"** countdown, status pill (Unpaid / Part paid / Paid / Refunded). Two tabs: **Bank transfer (recommended for amounts above ₹5 lakh)** showing the member's account name, number, IFSC with copy buttons and the line "Transfers are matched automatically, usually within minutes"; **Card, UPI or netbanking** → `POST /invoices/:id/pay` → Razorpay Checkout (load `https://checkout.razorpay.com/v1/checkout.js` on demand; options key, amount, currency, order_id, name "Meridian Charters", description, prefill, theme color `#171032`; handler → `POST /payments/verify` → refresh) — or, when provider is `mock`, an in-app "Test payment" modal (clearly labelled TEST MODE) with method choice that calls `/payments/mock/complete`. Note UPI's ₹5 lakh per-payment travel limit in the UI when balance > ₹5 lakh.
+- **Cancellation dialog** (member and ops): fetch `cancellation-quote` and show "You will receive ₹X back (N%)" before confirming; ops/admin can choose the refund % (default 100).
+- **Sales**: a **Payments** page (`/s/payments`) listing payments with method, amount, fee, invoice, member; a "Simulate bank transfer" action in mock mode on a member's page; invoices list gains Paid/Balance/Due columns.
+- **Ops charter detail**: payment status badge; pilot flight-log button disabled with "Awaiting payment" when unpaid.
+- **Dashboard**: a payments card (collected 30 days, fees absorbed, unpaid due within 48 h).
+- **Public empty-leg confirmation emails/pages** mention payment within 2 hours for late bookings (text only).
+
+## Seed (idempotent)
+Back-fill: closed/flown charters' invoices paid via seeded `payments` (method mix: ~70% bank_transfer, 20% card, 10% upi; fees per mock rules); future charters: some paid, some unpaid with due_at in the future; one partially paid. Virtual accounts for the two demo members.
