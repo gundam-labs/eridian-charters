@@ -35,7 +35,7 @@ meridian-charters/
 - Every state change writes an `events` row.
 
 ## Roles
-`admin`, `sales`, `ops`, `pilot`, `member`. Admin can do everything staff can. A `member` user is linked to one `members` row and only ever sees that member's records.
+`admin`, `sales`, `ops`, `pilot`, `member`, `lister` (v1.3). Admin can do everything staff can. A `member` user is linked to one `members` row and only ever sees that member's records. A `lister` user is linked to one `listers` row and only ever sees that lister's flights and requests.
 
 ## Data model (Postgres, all ids UUID `gen_random_uuid()`, all tables have created_at TIMESTAMPTZ DEFAULT now())
 - **members**: member_no TEXT UNIQUE (`MC-1001`…, from sequence), member_type (individual|corporate|agent), contact_name, company NULL, city, email UNIQUE, phone, gstin NULL, tier (silver|gold|platinum), status (active|inactive), member_since TEXT (`YYYY-MM`), past_charters INT DEFAULT 0, notes.
@@ -262,3 +262,43 @@ Decided by Krishna, 20 Oct 2026: Razorpay; full payment due **24 hours before th
 
 ## Seed (idempotent)
 Back-fill: closed/flown charters' invoices paid via seeded `payments` (method mix: ~70% bank_transfer, 20% card, 10% upi; fees per mock rules); future charters: some paid, some unpaid with due_at in the future; one partially paid. Virtual accounts for the two demo members.
+
+# v1.3 — Listers (empty-leg marketplace)
+
+Charter operators, travel agents and private flyers sign up themselves and post empty legs on aircraft **outside** the Meridian fleet. The public searches and requests them on the existing deals page; the lister confirms. Meridian's own fleet legs work exactly as in v1.1.
+
+## Principles
+- **No Meridian charter, invoice or payment for a lister leg.** The lister (or their operator) flies the aircraft and takes payment; the platform introduces the customer. `bookLegTx` refuses lister legs.
+- **Verified before live.** A new lister is `pending`: they can sign in and save drafts but cannot publish or confirm until sales/admin approve them.
+- **Contact after commitment.** Before confirming, a lister sees the traveller's name, company, party size and message — not their email or phone. Confirming reveals both sides' contact details.
+- **Isolation.** Every lister query is scoped to `req.user.lister_id`; listers cannot reach any staff or member endpoint.
+
+## Data model (idempotent migration, like v1.1)
+- `users.role` CHECK gains `lister` (constraint rewritten only when it lacks it).
+- `listers`: user_id (unique, → users), lister_type `operator|agent|flyer`, company (required for operator/agent), phone, city, gstin (optional, validated), nsop_permit_no (required for operators), about, status `pending|approved|rejected|suspended`, decided_by, decided_at, decision_reason.
+- `empty_legs`: `aircraft_id` becomes nullable; adds `lister_id` (→ listers), `ext_aircraft_type`, `ext_registration` (never public), `operator_name`. CHECK `num_nonnulls(aircraft_id, lister_id) = 1`.
+
+## Rules
+- Lister legs: route from the airports table; window ≤ 24 h and in the future; seats 1–30; price > 0; optional "usual charter price" (list) — when absent, list = price so no saving is claimed. Flight time given by the lister or estimated at 400 kts + taxi allowance.
+- Publish requires an approved lister and the usual minimum notice; expiry is the same lazy expiry as fleet legs.
+- Confirm (lister, approved only): locks the leg, marks the booking `confirmed` and the leg `booked`, rejects other pending requests. Emails the customer the operator's contact details.
+- Suspend (sales/admin): withdraws the lister's draft/published/expired legs and cancels their pending requests. A rejected lister who edits their profile returns to `pending`.
+- Staff can see and withdraw lister legs (the lister is emailed) and reject requests on them, but cannot edit, publish or confirm them.
+- Public and member shapes gain `operated_by` (lister's operator name or company; "Meridian Charters" for fleet legs) and `marketplace`. Members get `can_book: false, request_only: true` on lister legs.
+
+## API
+- `POST /auth/register` (public, 5/hour/IP, honeypot `website`): {name, email, password ≥10, lister_type, company, phone, city, gstin, nsop_permit_no, about, accept_terms:true} → 201 {token, user}. 409 on an existing email. Emails the lister and `LISTER_REVIEW_EMAIL` (or all admin/sales).
+- `/auth/login` and `/auth/me` include `lister_id, lister_type, lister_status, lister_company` for listers.
+- Lister (`role=lister`): `GET|PATCH /lister/me`, `GET /lister/airports`, `GET|POST /lister/empty-legs`, `GET|PATCH /lister/empty-legs/:id`, `POST /lister/empty-legs/:id/publish|withdraw`, `GET /lister/bookings?status=`, `POST /lister/bookings/:id/confirm|reject`.
+- Review (sales, admin): `GET /listers?status=`, `GET /listers/:id`, `POST /listers/:id/approve|reject|suspend` (reason required for reject/suspend).
+- `GET /empty-legs?source=fleet|listers` (staff filter). Public request on a lister leg notifies the lister instead of sales.
+
+## Frontend
+- `/register` — "List your empty legs" sign-up (type picker; company and NSOP fields appear by type). Linked from the login page and the public header/footer.
+- `/l` lister portal (top nav): **My empty legs** (status banner, stats, post/edit/publish/withdraw), **Requests** (confirm/decline; contact shown after confirming), **Profile**.
+- `/s/listers` (sales, admin): review queue with approve/reject/suspend/reinstate.
+- Staff empty-legs page: source filter, "Listed by …" on lister legs, no edit/publish/confirm for them.
+- Public card and detail show "Operated by …" and marketplace terms on lister legs; member page links lister legs to the public request form.
+
+## Seed (idempotent)
+Approved operator `ops@skyhopaviation.example.in` (SkyHop Aviation) with two published legs; pending travel agent `desk@wanderlusttravels.example.in`.

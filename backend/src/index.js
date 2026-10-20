@@ -75,6 +75,15 @@ const inviteLimiter = rateLimit({
   legacyHeaders: false,
   skip: isDevLike,
 });
+// Lister self sign-up: 5 per hour per IP (v1.3).
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many sign-ups from this network. Please try again in an hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: isDevLike,
+});
 // Public empty-leg booking requests: 5 per hour per IP + email (SPEC v1.1).
 const publicRequestLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -119,6 +128,7 @@ const authRoutes = require('./routes/auth');
 app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth/accept-invite', inviteLimiter);
 app.use('/api/auth/invite', inviteLimiter);
+app.post('/api/auth/register', registerLimiter);
 app.use('/api/auth', authRoutes);
 
 // Public empty-leg deals (no auth; whitelisted fields only)
@@ -147,6 +157,8 @@ mount('/api/pilot', require('./routes/pilot'));
 mount('/api/invoices', require('./routes/invoices'));
 mount('/api/dashboard', require('./routes/dashboard'));
 mount('/api/empty-legs', require('./routes/emptyLegs'));
+mount('/api/lister', require('./routes/lister'));
+mount('/api/listers', require('./routes/listers'));
 mount('/api/payments', paymentsRoutes);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));

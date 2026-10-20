@@ -50,8 +50,8 @@ router.patch('/:id', async (req, res) => {
     vals.push(String(name).trim()); sets.push(`name = $${vals.length}`);
   }
   if (role !== undefined) {
-    if (cur.role === 'member' && role !== 'member') throw new HttpError(400, 'Member users cannot be given a staff role');
-    if (cur.role !== 'member' && !STAFF_ROLES.includes(role)) throw new HttpError(400, `role must be one of ${STAFF_ROLES.join(', ')}`);
+    if (['member', 'lister'].includes(cur.role) && role !== cur.role) throw new HttpError(400, `${cur.role === 'member' ? 'Member' : 'Lister'} users cannot be given a staff role`);
+    if (!['member', 'lister'].includes(cur.role) && !STAFF_ROLES.includes(role)) throw new HttpError(400, `role must be one of ${STAFF_ROLES.join(', ')}`);
     if (cur.id === req.user.id && role !== 'admin') throw new HttpError(409, 'You cannot remove your own admin role');
     vals.push(role); sets.push(`role = $${vals.length}`);
   }

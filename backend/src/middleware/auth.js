@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || (['development', 'test'].includes(p
 const TOKEN_TTL = '12h';
 
 const STAFF = ['admin', 'sales', 'ops'];
-const ROLES = ['admin', 'sales', 'ops', 'pilot', 'member'];
+const ROLES = ['admin', 'sales', 'ops', 'pilot', 'member', 'lister'];
 
 const signToken = (user) => jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: TOKEN_TTL });
 
@@ -21,15 +21,17 @@ async function authenticate(req, res, next) {
   }
   try {
     const { rows } = await pool.query(
-      `SELECT u.id, u.email, u.name, u.role, u.member_id, u.is_active, m.member_no
-         FROM users u LEFT JOIN members m ON m.id = u.member_id
+      `SELECT u.id, u.email, u.name, u.role, u.member_id, u.is_active, m.member_no, l.id AS lister_id, l.status AS lister_status
+         FROM users u LEFT JOIN members m ON m.id = u.member_id LEFT JOIN listers l ON l.user_id = u.id
         WHERE u.id = $1`,
       [decoded.id]
     );
     const u = rows[0];
     if (!u || !u.is_active) return res.status(401).json({ error: 'User not found or inactive' });
     if (u.role === 'member' && !u.member_id) return res.status(401).json({ error: 'Member account not linked' });
-    req.user = { id: u.id, email: u.email, name: u.name, role: u.role, member_id: u.member_id, member_no: u.member_no || undefined };
+    if (u.role === 'lister' && !u.lister_id) return res.status(401).json({ error: 'Lister account not linked' });
+    req.user = { id: u.id, email: u.email, name: u.name, role: u.role, member_id: u.member_id, member_no: u.member_no || undefined,
+      lister_id: u.lister_id || undefined, lister_status: u.lister_status || undefined };
     next();
   } catch (err) {
     next(err);

@@ -11,6 +11,7 @@ export default function PublicLayout({ children }) {
           <Link to="/empty-legs" aria-label="Meridian Charters — empty-leg deals"><Wordmark sub={false} /></Link>
           <nav className="pub-nav-links">
             <Link to="/empty-legs" className="hide-xs">Empty legs</Link>
+            {!user && <Link to="/register" className="hide-xs">List your empty leg</Link>}
             {user
               ? <Link to={homeFor(user.role)} className="btn btn-sm pub-signin">Your account</Link>
               : <Link to="/login" className="btn btn-sm pub-signin">Member sign in</Link>}
@@ -29,6 +30,7 @@ export default function PublicLayout({ children }) {
           <div className="small pub-foot-links">
             <Link to="/empty-legs">Empty-leg deals</Link>
             <Link to="/login">Member sign in</Link>
+            <Link to="/register">Operators &amp; agents: list your empty legs</Link>
             <span>Prices in INR, exclusive of GST. All times IST.</span>
           </div>
         </div>

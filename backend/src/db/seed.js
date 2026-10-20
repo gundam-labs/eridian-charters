@@ -756,6 +756,49 @@ async function seedPayments() {
   return { backfilled, paid, partial, left_unpaid: upcomingUnpaid.length - partial };
 }
 
+// ── v1.3 listers (idempotent by email / notes marker) ───────────────────────
+async function seedListers() {
+  const hash = await bcrypt.hash(PASSWORD, 10);
+  const LISTERS = [
+    // email, name, type, company, phone, city, nsop, status
+    ['ops@skyhopaviation.example.in', 'Farhan Qureshi', 'operator', 'SkyHop Aviation Pvt Ltd', '+91 98200 44112', 'Mumbai', 'NSOP-07/2019', 'approved'],
+    ['desk@wanderlusttravels.example.in', 'Neha Bhatt', 'agent', 'Wanderlust Luxury Travels', '+91 98450 33221', 'Bengaluru', null, 'pending'],
+  ];
+  const ids = {};
+  for (const [email, name, type, company, phone, city, nsop, status] of LISTERS) {
+    await pool.query(`INSERT INTO users (email, name, role, password_hash) VALUES ($1,$2,'lister',$3) ON CONFLICT (email) DO NOTHING`, [email, name, hash]);
+    const u = (await pool.query('SELECT id FROM users WHERE email = $1', [email])).rows[0];
+    await pool.query(
+      `INSERT INTO listers (user_id, lister_type, company, phone, city, nsop_permit_no, status, decided_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7, CASE WHEN $7 = 'approved' THEN now() END) ON CONFLICT (user_id) DO NOTHING`,
+      [u.id, type, company, phone, city, nsop, status]);
+    ids[email] = (await pool.query('SELECT id FROM listers WHERE user_id = $1', [u.id])).rows[0].id;
+  }
+  // Two live marketplace legs from the approved operator.
+  const skyhop = ids['ops@skyhopaviation.example.in'];
+  const legs = [
+    ['seed:lister-bom-goi', 'BOM', 'GOI', 3, '10:00', '13:00', 'Citation XLS', 'VT-SKH', 8, 1.2, 145000, 390000],
+    ['seed:lister-blr-cok', 'BLR', 'COK', 6, '16:00', '18:00', 'Phenom 300', 'VT-SKP', 6, 1.0, 120000, 310000],
+  ];
+  const today = todayIST();
+  for (const [marker, from, to, dayOffset, t1, t2, type, reg, seats, hours, price, list] of legs) {
+    const exists = await pool.query('SELECT 1 FROM empty_legs WHERE notes = $1', [marker]);
+    if (exists.rows.length) continue;
+    const day = addDays(today, dayOffset);
+    const ap = (await pool.query('SELECT code, lat, lon FROM airports WHERE code = ANY($1)', [[from, to]])).rows;
+    const a = ap.find((x) => x.code === from);
+    const z = ap.find((x) => x.code === to);
+    const { haversineNm } = require('../lib/pricing');
+    const nm = Math.round(haversineNm({ lat: Number(a.lat), lon: Number(a.lon) }, { lat: Number(z.lat), lon: Number(z.lon) }));
+    const leg_no = await nextNumber('EL');
+    await pool.query(
+      `INSERT INTO empty_legs (leg_no, lister_id, ext_aircraft_type, ext_registration, operator_name, from_code, to_code, depart_earliest, depart_latest,
+         flight_hours, distance_nm, seats, list_price_inr, price_inr, status, published_at, notes)
+       VALUES ($1,$2,$3,$4,'SkyHop Aviation',$5,$6,$7,$8,$9,$10,$11,$12,$13,'published', now(), $14)`,
+      [leg_no, skyhop, type, reg, from, to, parseIST(`${day}T${t1}`), parseIST(`${day}T${t2}`), hours, nm, seats, list, price, marker]);
+  }
+}
+
 async function main() {
   console.log('Meridian Charters — demo seed');
   await initDB(); // also inserts default settings if missing
@@ -768,6 +811,7 @@ async function main() {
   await seedRichFlows();
   await seedHistory();
   console.log('Payments:', await seedPayments());
+  await seedListers();
   const counts = (await pool.query(`SELECT
     (SELECT count(*) FROM airports) airports, (SELECT count(*) FROM aircraft) aircraft, (SELECT count(*) FROM crew_members) crew,
     (SELECT count(*) FROM members) members, (SELECT count(*) FROM users) users, (SELECT count(*) FROM quote_requests) requests,

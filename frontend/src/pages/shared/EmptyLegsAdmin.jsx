@@ -37,7 +37,9 @@ export default function EmptyLegsAdmin() {
 
 function Listings() {
   const [status, setStatus] = useState('');
-  const { data, error, loading, reload } = useFetch(`/api/empty-legs${status ? `?status=${status}` : ''}`);
+  const [source, setSource] = useState('');
+  const qs = new URLSearchParams(Object.entries({ status, source }).filter(([, v]) => v)).toString();
+  const { data, error, loading, reload } = useFetch(`/api/empty-legs${qs ? `?${qs}` : ''}`);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState('');
   const [withdrawing, setWithdrawing] = useState(null);
@@ -60,6 +62,11 @@ function Listings() {
           <option value="">All statuses</option>
           {['draft', 'published', 'booked', 'withdrawn', 'expired'].map(s => <option key={s} value={s}>{humanize(s)}</option>)}
         </select>
+        <select className="select" value={source} onChange={e => setSource(e.target.value)} aria-label="Source">
+          <option value="">Fleet and listers</option>
+          <option value="fleet">Meridian fleet</option>
+          <option value="listers">Independent listers</option>
+        </select>
         <span style={{ flex: 1 }} />
         <button className="btn btn-primary" onClick={() => setCreating(true)}>New empty leg</button>
       </div>
@@ -77,14 +84,18 @@ function Listings() {
             <tbody>
               {list.map(l => {
                 const w = legWindow(l);
-                const editable = ['draft', 'published'].includes(l.status);
+                const lister = Boolean(l.lister_id);
+                const editable = ['draft', 'published'].includes(l.status) && !lister;
+                const withdrawable = ['draft', 'published'].includes(l.status);
                 return (
                   <Fragment key={l.id}>
                     <tr className={editing === l.id ? 'editing' : ''}>
                       <td className="nowrap"><span className="strong">{l.leg_no}</span>
-                        <div className="xs">{l.source_charter_id
-                          ? <Link to={`/o/charters/${l.source_charter_id}`}>from {l.source_charter_no || 'charter'}</Link>
-                          : <span className="muted">Manual</span>}</div></td>
+                        <div className="xs">{lister
+                          ? <Link to="/s/listers">Listed by {l.lister_company || l.lister_name}</Link>
+                          : l.source_charter_id
+                            ? <Link to={`/o/charters/${l.source_charter_id}`}>from {l.source_charter_no || 'charter'}</Link>
+                            : <span className="muted">Manual</span>}</div></td>
                       <td className="nowrap"><strong>{legRoute(l)}</strong><div className="muted xs">{flightTime(l.flight_hours)}</div></td>
                       <td className="nowrap">{w.day}<div className="muted xs">{w.range}</div></td>
                       <td className="nowrap">{l.registration || '—'}<div className="muted xs">{l.seats} seats</div></td>
@@ -96,9 +107,9 @@ function Listings() {
                           : <span className="muted">{l.bookings_count ? `${l.bookings_count} booking${l.bookings_count > 1 ? 's' : ''}` : 'No requests'}</span>}</div></td>
                       <td className="right nowrap">
                         <div className="actions" style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
-                          {l.status === 'draft' && <button className="btn btn-sm btn-gold" disabled={busy === l.id} onClick={() => publish(l)}>{busy === l.id ? 'Publishing…' : 'Publish'}</button>}
+                          {l.status === 'draft' && !lister && <button className="btn btn-sm btn-gold" disabled={busy === l.id} onClick={() => publish(l)}>{busy === l.id ? 'Publishing…' : 'Publish'}</button>}
                           {editable && <button className="btn btn-sm" onClick={() => setEditing(editing === l.id ? '' : l.id)}>{editing === l.id ? 'Close' : 'Edit'}</button>}
-                          {editable && <button className="btn btn-sm btn-danger" onClick={() => setWithdrawing(l)}>Withdraw</button>}
+                          {withdrawable && <button className="btn btn-sm btn-danger" onClick={() => setWithdrawing(l)}>Withdraw</button>}
                         </div>
                       </td>
                     </tr>
@@ -117,7 +128,9 @@ function Listings() {
       {creating && <NewLegModal onClose={() => setCreating(false)} onDone={(l) => { setCreating(false); setToast(`${l?.leg_no || 'Empty leg'} created as draft`); reload(); }} />}
       {withdrawing && (
         <CancelModal title={`Withdraw ${withdrawing.leg_no}`} confirmLabel="Withdraw" path={`/api/empty-legs/${withdrawing.id}/withdraw`}
-          warning="The flight is removed from the public page and the member list. Pending requests on it should be rejected."
+          warning={withdrawing.lister_id
+            ? `The flight is removed from the public page and pending requests are cancelled. ${withdrawing.lister_company || 'The lister'} is emailed your reason.`
+            : 'The flight is removed from the public page and the member list. Pending requests on it should be rejected.'}
           onClose={() => setWithdrawing(null)} onDone={() => { setWithdrawing(null); setToast('Empty leg withdrawn'); reload(); }} />
       )}
       <Toast message={toast} onDone={() => setToast('')} />
@@ -283,7 +296,8 @@ function Requests({ canDecide, onChanged }) {
                 return (
                   <tr key={b.id}>
                     <td className="nowrap"><span className="strong">{b.booking_no}</span>
-                      <div style={{ marginTop: 4 }}><span className={`pill ${b.channel === 'member' ? 'pill-gold' : 'pill-blue'}`}>{b.channel === 'member' ? 'Member' : 'Public'}</span></div>
+                      <div style={{ marginTop: 4 }}><span className={`pill ${b.channel === 'member' ? 'pill-gold' : 'pill-blue'}`}>{b.channel === 'member' ? 'Member' : 'Public'}</span>
+                        {b.marketplace && <span className="pill pill-violet" style={{ marginLeft: 4 }}>Lister</span>}</div>
                       <div className="muted xs" style={{ marginTop: 4 }}>{fmtDateTime(b.created_at)}</div>
                       {b.charter_id && <div className="xs"><Link to={`/o/charters/${b.charter_id}`}>View charter</Link></div>}</td>
                     <td className="nowrap"><strong>{legRoute(b.leg)}</strong> <span className="muted xs">{b.leg.leg_no}</span>
@@ -298,7 +312,13 @@ function Requests({ canDecide, onChanged }) {
                     <td><StatusPill status={b.status} /></td>
                     {canDecide && (
                       <td className="right nowrap">
-                        {b.status === 'requested' && (
+                        {b.status === 'requested' && b.marketplace && (
+                          <div>
+                            <div className="muted xs">{b.leg.operator_name || b.leg.lister_company || 'The lister'} decides</div>
+                            <button className="btn btn-sm btn-danger" style={{ marginTop: 4 }} onClick={() => setRejecting(b)}>Reject</button>
+                          </div>
+                        )}
+                        {b.status === 'requested' && !b.marketplace && (
                           <div className="actions" style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                             <button className="btn btn-sm btn-gold" onClick={() => setConfirming(b)}>Confirm</button>
                             <button className="btn btn-sm btn-danger" onClick={() => setRejecting(b)}>Reject</button>

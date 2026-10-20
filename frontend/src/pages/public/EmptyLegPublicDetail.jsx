@@ -8,6 +8,10 @@ import { normLeg, legWindow, flightTime, useDocumentTitle } from '../../lib/empt
 import { inr } from '../../lib/format';
 
 export const TERMS_TEXT = 'Empty legs depend on the operator’s main charter and may be retimed or withdrawn; the booking is confirmed only when Meridian Charters confirms it.';
+/** Terms for a flight posted by an independent lister: they confirm it and the customer pays them directly. */
+export const termsFor = (leg) => (leg?.marketplace
+  ? `This flight is listed and operated by ${leg.operated_by || 'an independent operator'}, not Meridian Charters. Empty legs may be retimed or withdrawn; the booking is confirmed only when the operator confirms it, and payment is arranged directly with them.`
+  : TERMS_TEXT);
 
 export default function EmptyLegPublicDetail() {
   const { id } = useParams();
@@ -64,12 +68,13 @@ export default function EmptyLegPublicDetail() {
                   <dt>To</dt><dd>{leg.to_city} ({leg.to_code}){leg.to_name ? ` · ${leg.to_name}` : ''}</dd>
                   <dt>Departure</dt><dd>{w.day}, between {w.range} IST</dd>
                   <dt>Aircraft</dt><dd>{leg.aircraft_type || 'Private jet'} · up to {leg.seats} passengers</dd>
+                  <dt>Operated by</dt><dd>{leg.operated_by || 'Meridian Charters'}{leg.marketplace ? <span className="muted"> · independent listing</span> : null}</dd>
                   <dt>Flight time</dt><dd>{flightTime(leg.flight_hours)}</dd>
                   <dt>Price</dt><dd>{inr(leg.price_inr)} + GST for the whole aircraft</dd>
                   {leg.list_price_inr != null && <><dt>Normal charter</dt><dd><s className="muted">{inr(leg.list_price_inr)}</s></dd></>}
                 </dl>
                 <p className="small muted" style={{ marginTop: 16, marginBottom: 0 }}>
-                  The exact departure time is fixed within the window once the main charter is finalised. We’ll confirm it with you directly.
+                  The exact departure time is fixed within the window once the main charter is finalised. {leg.marketplace ? 'The operator confirms' : 'We’ll confirm'} it with you directly.
                 </p>
               </div>
             </div>
@@ -137,7 +142,7 @@ function RequestForm({ leg, onDone }) {
         </div>
         <label className="check el-terms">
           <input type="checkbox" checked={terms} onChange={e => setTerms(e.target.checked)} required />
-          <span>{TERMS_TEXT}</span>
+          <span>{termsFor(leg)}</span>
         </label>
         <div style={{ marginTop: 12 }}><ErrorAlert error={error} /></div>
         <button className="btn btn-gold btn-block el-submit" disabled={saving}>
@@ -158,12 +163,20 @@ function Success({ bookingNo, leg }) {
         <h2 style={{ margin: '6px 0 8px' }}>Thank you — we’re on it.</h2>
         {bookingNo !== 'received' && <p className="small">Your reference is <strong className="mono">{bookingNo}</strong>.</p>}
         <h3 style={{ margin: '18px 0 8px', fontSize: '1.05rem' }}>What happens next</h3>
+        {leg.marketplace ? (
+          <ol className="el-next">
+            <li>We’ve emailed you an acknowledgement with your reference.</li>
+            <li>{leg.operated_by || 'The operator'} reviews your request and confirms by email.</li>
+            <li>Once confirmed, you and the operator receive each other’s contact details to arrange payment, passenger details and the exact departure time.</li>
+          </ol>
+        ) : (
         <ol className="el-next">
           <li>We’ve emailed you an acknowledgement with your reference.</li>
           <li>Our charter desk checks the flight against the main charter and confirms by email — usually within a few hours.</li>
           <li>Once confirmed you receive the GST invoice ({inr(leg.price_inr)} + GST) and a link to set up your Meridian account, where you add passenger details.</li>
           <li>Pay from your account by bank transfer, card, UPI or netbanking. Payment is due 24 hours before departure — if the flight leaves sooner, within 2 hours of confirmation.</li>
         </ol>
+        )}
         <Link to="/empty-legs" className="btn btn-block" style={{ marginTop: 16 }}>Browse more flights</Link>
       </div>
     </div>

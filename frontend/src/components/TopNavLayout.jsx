@@ -14,6 +14,12 @@ const NAVS = {
   pilot: [
     { to: '/p', label: 'My flights', end: true },
   ],
+  lister: [
+    { to: '/l', label: 'My empty legs', end: true },
+    { to: '/l/requests', label: 'Requests' },
+    { to: '/l/profile', label: 'Profile' },
+    { to: '/empty-legs', label: 'Deals page ↗', external: true },
+  ],
 };
 
 export default function TopNavLayout({ kind }) {
@@ -23,12 +29,14 @@ export default function TopNavLayout({ kind }) {
     <div className="tshell">
       <header className="tnav">
         <div className="tnav-inner">
-          <Link to={kind === 'pilot' ? '/p' : '/m'}><Wordmark sub={false} /></Link>
+          <Link to={{ pilot: '/p', lister: '/l' }[kind] || '/m'}><Wordmark sub={false} /></Link>
           <nav className="tnav-links">
-            {links.map(l => <NavLink key={l.to} to={l.to} end={l.end}>{l.label}</NavLink>)}
+            {links.map(l => l.external
+              ? <a key={l.to} href={l.to} target="_blank" rel="noreferrer">{l.label}</a>
+              : <NavLink key={l.to} to={l.to} end={l.end}>{l.label}</NavLink>)}
           </nav>
           <div className="tnav-user">
-            <span className="name">{user?.name}{user?.member_no ? ` · ${user.member_no}` : ''}</span>
+            <span className="name">{user?.name}{user?.member_no ? ` · ${user.member_no}` : ''}{user?.lister_company ? ` · ${user.lister_company}` : ''}</span>
             <button className="icon-btn" onClick={logout}>Sign out</button>
           </div>
         </div>

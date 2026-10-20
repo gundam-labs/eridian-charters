@@ -13,6 +13,8 @@ const DEMO = [
   ['pilot2@meridian.test', 'Pilot'],
   ['arjun.mehra@example.in', 'Member · MC-1001'],
   ['rajiv.malhotra@example.in', 'Member · MC-1011'],
+  ['ops@skyhopaviation.example.in', 'Lister · operator'],
+  ['desk@wanderlusttravels.example.in', 'Lister · pending'],
 ];
 const DEMO_PASSWORD = 'Meridian@2026';
 const SHOW_DEMO = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_ACCOUNTS === 'true';
@@ -66,7 +68,7 @@ export default function Login() {
       <AuthArt />
       <div className="auth-panel">
         <div className="auth-card">
-          <div className="eyebrow">Members &amp; staff</div>
+          <div className="eyebrow">Members, listers &amp; staff</div>
           <h1>Sign in</h1>
           <p className="muted small">Use the email address registered with Meridian Charters.</p>
           {params.get('expired') && <div className="alert alert-warn">Your session has ended. Please sign in again.</div>}
@@ -85,6 +87,10 @@ export default function Login() {
           <Link to="/empty-legs" className="login-el">
             <span className="eyebrow">Not a member?</span>
             <span className="t">Empty-leg deals — no membership needed <span aria-hidden="true">→</span></span>
+          </Link>
+          <Link to="/register" className="login-el">
+            <span className="eyebrow">Operator, agent or flyer?</span>
+            <span className="t">List your empty legs — free <span aria-hidden="true">→</span></span>
           </Link>
           {SHOW_DEMO && (
             <details className="demo">

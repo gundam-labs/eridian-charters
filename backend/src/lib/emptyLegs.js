@@ -53,7 +53,10 @@ const savingsPct = (l) => (Number(l.list_price_inr) > 0 ? Math.round((1 - Number
 // ── SQL ─────────────────────────────────────────────────────────────────────
 const LEG_SELECT = `SELECT el.*,
   fa.city AS from_city, fa.name AS from_name, ta.city AS to_city, ta.name AS to_name,
-  a.registration AS aircraft_registration, a.type AS aircraft_type, a.home_base AS aircraft_home_base,
+  COALESCE(a.registration, el.ext_registration) AS aircraft_registration, COALESCE(a.type, el.ext_aircraft_type) AS aircraft_type,
+  a.home_base AS aircraft_home_base,
+  lst.lister_type, lst.company AS lister_company, lst.phone AS lister_phone, lst.status AS lister_status,
+  lu.name AS lister_name, lu.email AS lister_email,
   sc.charter_no AS source_charter_no, sc.status AS source_charter_status,
   (SELECT count(*)::int FROM empty_leg_bookings b WHERE b.empty_leg_id = el.id) AS bookings_count,
   (SELECT count(*)::int FROM empty_leg_bookings b WHERE b.empty_leg_id = el.id AND b.status = 'requested') AS pending_requests_count,
@@ -62,8 +65,16 @@ const LEG_SELECT = `SELECT el.*,
   FROM empty_legs el
   JOIN airports fa ON fa.code = el.from_code
   JOIN airports ta ON ta.code = el.to_code
-  JOIN aircraft a ON a.id = el.aircraft_id
+  LEFT JOIN aircraft a ON a.id = el.aircraft_id
+  LEFT JOIN listers lst ON lst.id = el.lister_id
+  LEFT JOIN users lu ON lu.id = lst.user_id
   LEFT JOIN charters sc ON sc.id = el.source_charter_id`;
+
+/** True for a leg posted by an outside lister (operator, agent or flyer) rather than flown by the Meridian fleet. */
+const isListerLeg = (l) => Boolean(l && l.lister_id);
+
+/** Public name of whoever operates the flight. Meridian legs never reveal the partner who owns the jet. */
+const operatedBy = (l) => (isListerLeg(l) ? (l.operator_name || l.lister_company || 'Independent operator') : 'Meridian Charters');
 
 /**
  * Public/member-safe shape. Whitelist only — never registration, partner, hourly rate, aircraft id,
@@ -87,12 +98,14 @@ function publicLeg(l) {
     price_inr: Number(l.price_inr),
     list_price_inr: Number(l.list_price_inr),
     savings_pct: savingsPct(l),
+    operated_by: operatedBy(l),
+    marketplace: isListerLeg(l),
   };
 }
 
 /** Staff shape: everything, plus savings_pct. */
 function staffLeg(l) {
-  return { ...l, flight_hours: Number(l.flight_hours), savings_pct: savingsPct(l) };
+  return { ...l, flight_hours: Number(l.flight_hours), savings_pct: savingsPct(l), operated_by: operatedBy(l), marketplace: isListerLeg(l) };
 }
 
 // ── Generation ──────────────────────────────────────────────────────────────
@@ -186,6 +199,8 @@ async function bookLegTx(client, { legId, member, pax, channel, actorUserId, boo
   const settings = await getSettings(client);
   const leg = (await client.query('SELECT * FROM empty_legs WHERE id = $1 FOR UPDATE', [legId])).rows[0];
   if (!leg) throw new HttpError(404, 'Empty leg not found');
+  // Lister legs are not flown by Meridian: no Meridian charter or GST invoice may be created for them.
+  if (isListerLeg(leg)) throw new HttpError(409, 'This flight is listed by an independent operator — send a booking request and they will confirm it');
   if (leg.status === 'booked') throw new HttpError(409, 'This empty leg has already been booked');
   if (leg.status !== 'published') throw new HttpError(409, `This empty leg is ${leg.status} and cannot be booked`);
   if (!isBookable(leg, settings)) {
@@ -344,6 +359,6 @@ async function salesRecipients(db = pool) {
 }
 
 module.exports = {
-  LEG_SELECT, LEG_STATUSES, BOOKING_STATUSES, publicLeg, staffLeg, savingsPct, isBookable, minNoticeHours,
+  LEG_SELECT, LEG_STATUSES, BOOKING_STATUSES, publicLeg, staffLeg, savingsPct, isBookable, minNoticeHours, isListerLeg, operatedBy,
   expireStaleLegs, generateForCharter, generatedBounds, positioningFor, bookLegTx, onCharterCancelled, salesRecipients, findOrCreateMemberForBooking,
 };

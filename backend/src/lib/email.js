@@ -141,12 +141,17 @@ function fmtWindow(d) {
 const PAY_NOTE = 'Once confirmed, payment in full is due 24 hours before departure — for late bookings, within 2 hours of confirmation.';
 
 function sendEmptyLegRequestAck({ to, name, booking, leg }) {
+  // Marketplace legs (posted by an outside lister) are confirmed by that operator, not by Meridian.
+  const who = leg.lister_id ? (leg.operator_name || leg.lister_company || 'the operator') : 'Meridian Charters';
+  const payNote = leg.lister_id
+    ? `${who} will confirm the price, payment terms and exact departure time with you directly.`
+    : PAY_NOTE;
   return sendEmail({
     to, type: 'empty_leg_request', subject: `We received your empty-leg request ${booking.booking_no}`,
-    text: `Hello ${name}, thank you for your request ${booking.booking_no} for ${legRoute(leg)} departing ${legWindow(leg)}. Our team will confirm availability shortly. The booking is confirmed only when Meridian Charters confirms it. ${PAY_NOTE}`,
+    text: `Hello ${name}, thank you for your request ${booking.booking_no} for ${legRoute(leg)} departing ${legWindow(leg)}. The booking is confirmed only when ${who} confirms it. ${payNote}`,
     html: layout('Request received', `<p>Hello ${esc(name)},</p><p>Thank you — we have received your request <b>${esc(booking.booking_no)}</b> for the empty leg <b>${esc(legRoute(leg))}</b>, departing ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
-      <p>Our charter team will review it and get back to you shortly. Empty legs depend on the operator's main charter and may be retimed or withdrawn; the booking is confirmed only when Meridian Charters confirms it.</p>
-      <p>${esc(PAY_NOTE)}</p>`),
+      <p>Empty legs depend on the operator's main charter and may be retimed or withdrawn; the booking is confirmed only when ${esc(who)} confirms it.</p>
+      <p>${esc(payNote)}</p>`),
   });
 }
 
@@ -199,4 +204,74 @@ function formatINR(n) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(n) || 0);
 }
 
-module.exports = { sendEmail, sendInvite, sendPaymentReceipt, sendPaymentReminder, sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendEmptyLegBooked, sendEmptyLegRequestClosed, sendSourceCancelledWarning, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };
+// ── Listers (operators, agents, private flyers who post their own empty legs) ──
+const LISTER_TYPE_LABELS = { operator: 'Charter operator', agent: 'Travel agent', flyer: 'Private flyer' };
+
+function sendListerWelcome({ to, name }) {
+  return sendEmail({
+    to, type: 'lister_welcome', subject: 'Your empty-leg lister account is under review',
+    text: `Hello ${name}, thank you for registering to list empty legs. Our team will verify your details, usually within one working day. You can already sign in and prepare draft listings; they go live once your account is approved. ${APP_URL()}/l`,
+    html: layout('Thanks for registering', `<p>Hello ${esc(name)},</p><p>Thank you for registering to list empty legs. Our team will verify your details, usually within one working day.</p>
+      <p>You can already sign in and prepare draft listings; they go live as soon as your account is approved.</p>
+      <p><a href="${esc(APP_URL())}/l">Open your lister account</a></p>`),
+  });
+}
+
+function sendListerAdminNotice({ to, lister }) {
+  const url = `${APP_URL()}/s/listers`;
+  return sendEmail({
+    to, type: 'lister_signup', subject: `New lister to verify — ${lister.company || lister.name}`,
+    text: `${lister.name} <${lister.email}>, ${lister.phone} registered as ${LISTER_TYPE_LABELS[lister.lister_type] || lister.lister_type}${lister.company ? ` (${lister.company})` : ''}. Review: ${url}`,
+    html: layout('New lister registration', `<p><b>${esc(lister.name)}</b>${lister.company ? ` (${esc(lister.company)})` : ''} — ${esc(lister.email)}, ${esc(lister.phone)}</p>
+      <p>Type: ${esc(LISTER_TYPE_LABELS[lister.lister_type] || lister.lister_type)}${lister.nsop_permit_no ? ` · NSOP permit ${esc(lister.nsop_permit_no)}` : ''}</p>
+      <p><a href="${esc(url)}">Review listers</a></p>`),
+  });
+}
+
+function sendListerDecision({ to, name, status, reason }) {
+  const titles = { approved: 'Your lister account is approved', rejected: 'About your lister registration', suspended: 'Your lister account is suspended' };
+  const body = {
+    approved: 'Your account is approved. You can now publish empty legs; they appear on the public deals page straight away.',
+    rejected: `We could not approve your registration${reason ? `: ${reason}` : '.'} You can update your details from your account and we will review them again.`,
+    suspended: `Your account has been suspended${reason ? `: ${reason}` : '.'} Your listings have been taken down. Reply to this email if you think this is a mistake.`,
+  }[status];
+  return sendEmail({
+    to, type: `lister_${status}`, subject: titles[status],
+    text: `Hello ${name}, ${body} ${APP_URL()}/l`,
+    html: layout(titles[status], `<p>Hello ${esc(name)},</p><p>${esc(body)}</p><p><a href="${esc(APP_URL())}/l">Open your lister account</a></p>`),
+  });
+}
+
+function sendListerRequestNotice({ to, booking, leg }) {
+  const url = `${APP_URL()}/l/requests`;
+  return sendEmail({
+    to, type: 'lister_request', subject: `New booking request ${booking.booking_no} — ${leg.leg_no}`,
+    text: `${booking.guest_name} requested your empty leg ${leg.leg_no} ${legRoute(leg)} for ${booking.pax} pax. Confirm or decline: ${url}`,
+    html: layout(`New request on ${leg.leg_no}`, `<p><b>${esc(booking.guest_name)}</b>${booking.guest_company ? ` (${esc(booking.guest_company)})` : ''} requested your empty leg <b>${esc(legRoute(leg))}</b>, ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
+      ${booking.message ? `<p>Message: ${esc(booking.message)}</p>` : ''}
+      <p>Their contact details are shared with you when you confirm.</p><p><a href="${esc(url)}">Confirm or decline</a></p>`),
+  });
+}
+
+function sendListerBookingConfirmed({ to, name, booking, leg, lister }) {
+  const who = leg.operator_name || lister.company || lister.name;
+  const contact = [lister.name, lister.phone, lister.email].filter(Boolean).join(' · ');
+  return sendEmail({
+    to, type: 'empty_leg_booked_lister', subject: `Empty leg confirmed — ${booking.booking_no}`,
+    text: `Hello ${name}, ${who} has confirmed your empty-leg booking ${booking.booking_no} (${legRoute(leg)}, ${legWindow(leg)}). They will contact you to arrange payment, passenger details and the exact departure time. Contact: ${contact}`,
+    html: layout('Your empty leg is confirmed', `<p>Hello ${esc(name)},</p><p><b>${esc(who)}</b> has confirmed your booking <b>${esc(booking.booking_no)}</b> — ${esc(legRoute(leg))}, departing ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
+      <p>They will contact you to arrange payment, passenger details and the exact departure time.</p>
+      <p>Operator contact: ${esc(contact)}</p>
+      <p style="font-size:12px;color:#64748b">This flight is operated by ${esc(who)}, not by Meridian Charters. Payment and the flight itself are arranged directly with them.</p>`),
+  });
+}
+
+function sendListerLegWithdrawn({ to, name, leg, reason }) {
+  return sendEmail({
+    to, type: 'lister_leg_withdrawn', subject: `Your listing ${leg.leg_no} was taken down`,
+    text: `Hello ${name}, our team withdrew your empty leg ${leg.leg_no} (${legRoute(leg)}). Reason: ${reason}`,
+    html: layout('Listing withdrawn', `<p>Hello ${esc(name)},</p><p>Our team withdrew your empty leg <b>${esc(leg.leg_no)}</b> (${esc(legRoute(leg))}).</p><p>Reason: ${esc(reason)}</p>`),
+  });
+}
+
+module.exports = { sendListerWelcome, sendListerAdminNotice, sendListerDecision, sendListerRequestNotice, sendListerBookingConfirmed, sendListerLegWithdrawn, LISTER_TYPE_LABELS, sendEmail, sendInvite, sendPaymentReceipt, sendPaymentReminder, sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendEmptyLegBooked, sendEmptyLegRequestClosed, sendSourceCancelledWarning, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };

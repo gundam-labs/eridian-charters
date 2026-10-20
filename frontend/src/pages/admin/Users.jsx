@@ -35,7 +35,7 @@ export default function Users() {
       <PageHead eyebrow="Administration" title="Users" actions={<button className="btn btn-primary" onClick={() => setEditing({})}>Add staff user</button>} />
       <div className="filters">
         <select className="select" value={role} onChange={e => setRole(e.target.value)}>
-          <option value="">All roles</option>{[...STAFF_ROLES, 'member'].map(r => <option key={r} value={r}>{r}</option>)}
+          <option value="">All roles</option>{[...STAFF_ROLES, 'member', 'lister'].map(r => <option key={r} value={r}>{r}</option>)}
         </select>
       </div>
       <ErrorAlert error={error || actErr} />
@@ -55,7 +55,7 @@ export default function Users() {
                   <td><StatusPill status={u.is_active === false ? 'inactive' : 'active'} /></td>
                   <td className="right nowrap">
                     <div className="actions" style={{ justifyContent: 'flex-end' }}>
-                      {u.role !== 'member' && <button className="btn btn-sm" onClick={() => setEditing(u)}>Edit</button>}
+                      {!['member', 'lister'].includes(u.role) && <button className="btn btn-sm" onClick={() => setEditing(u)}>Edit</button>}
                       <button className="btn btn-sm" onClick={() => reinvite(u)} disabled={busy === u.id}>Invite link</button>
                       {u.id !== me.id && <button className={`btn btn-sm ${u.is_active === false ? '' : 'btn-danger'}`} onClick={() => toggle(u)} disabled={busy === u.id}>{u.is_active === false ? 'Reactivate' : 'Deactivate'}</button>}
                     </div>

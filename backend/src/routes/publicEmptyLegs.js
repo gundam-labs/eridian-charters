@@ -7,7 +7,7 @@ const { asyncRouter, HttpError, isUuid } = require('../lib/http');
 const { logEvent } = require('../lib/events');
 const { nextNumber } = require('../lib/numbers');
 const { LEG_SELECT, publicLeg, isBookable, minNoticeHours, expireStaleLegs, salesRecipients } = require('../lib/emptyLegs');
-const { sendEmptyLegRequestAck, sendEmptyLegSalesNotice } = require('../lib/email');
+const { sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendListerRequestNotice } = require('../lib/email');
 
 const router = asyncRouter();
 
@@ -96,7 +96,12 @@ router.post('/:id/request', async (req, res) => {
     return row;
   });
   await sendEmptyLegRequestAck({ to: email, name, booking, leg: leg0 });
-  for (const to of await salesRecipients()) await sendEmptyLegSalesNotice({ to, booking, leg: leg0 });
+  // Marketplace legs: the lister who posted the flight decides; Meridian's own legs go to sales.
+  if (leg0.lister_id) {
+    if (leg0.lister_email) await sendListerRequestNotice({ to: leg0.lister_email, booking, leg: leg0 });
+  } else {
+    for (const to of await salesRecipients()) await sendEmptyLegSalesNotice({ to, booking, leg: leg0 });
+  }
   res.status(201).json({ booking_no: booking.booking_no });
 });
 
