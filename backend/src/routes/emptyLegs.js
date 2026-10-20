@@ -7,10 +7,10 @@ const { conflicts } = require('../lib/availability');
 const { priceEmptyLeg } = require('../lib/pricing');
 const { parseIST, istDate } = require('../lib/time');
 const {
-  LEG_SELECT, LEG_STATUSES, BOOKING_STATUSES, publicLeg, staffLeg, isBookable, minNoticeHours,
+  LEG_SELECT, LEG_STATUSES, BOOKING_STATUSES, publicLeg, staffLeg, isBookable, minNoticeHours, isListerLeg,
   expireStaleLegs, generateForCharter, generatedBounds, bookLegTx, findOrCreateMemberForBooking,
 } = require('../lib/emptyLegs');
-const { sendEmptyLegBooked, sendEmptyLegRequestClosed, APP_URL } = require('../lib/email');
+const { sendEmptyLegBooked, sendEmptyLegRequestClosed, sendListerLegWithdrawn, APP_URL } = require('../lib/email');
 const { issueInvite } = require('./auth');
 
 const router = asyncRouter();
@@ -21,24 +21,28 @@ const MAX_WINDOW_HOURS = 24;
 const BOOKING_SELECT = `SELECT b.*,
   el.leg_no, el.from_code, el.to_code, el.depart_earliest, el.depart_latest, el.flight_hours::float8 AS flight_hours,
   el.price_inr::float8 AS price_inr, el.list_price_inr::float8 AS list_price_inr, el.seats, el.status AS leg_status,
-  fa.city AS from_city, ta.city AS to_city, a.registration AS aircraft_registration, a.type AS aircraft_type,
+  el.lister_id, lst.company AS lister_company, el.operator_name,
+  fa.city AS from_city, ta.city AS to_city, COALESCE(a.registration, el.ext_registration) AS aircraft_registration,
+  COALESCE(a.type, el.ext_aircraft_type) AS aircraft_type,
   m.member_no, m.contact_name AS member_name, c.charter_no, u.name AS decided_by_name
   FROM empty_leg_bookings b
   JOIN empty_legs el ON el.id = b.empty_leg_id
   JOIN airports fa ON fa.code = el.from_code
   JOIN airports ta ON ta.code = el.to_code
-  JOIN aircraft a ON a.id = el.aircraft_id
+  LEFT JOIN aircraft a ON a.id = el.aircraft_id
+  LEFT JOIN listers lst ON lst.id = el.lister_id
   LEFT JOIN members m ON m.id = b.member_id
   LEFT JOIN charters c ON c.id = b.charter_id
   LEFT JOIN users u ON u.id = b.decided_by`;
 
 function shapeBooking(b) {
   const { leg_no, from_code, to_code, from_city, to_city, depart_earliest, depart_latest, flight_hours, price_inr, list_price_inr, seats, leg_status,
-    aircraft_registration, aircraft_type, ...rest } = b;
+    aircraft_registration, aircraft_type, lister_id, lister_company, operator_name, ...rest } = b;
   return {
     ...rest,
+    marketplace: Boolean(lister_id),
     leg: { id: b.empty_leg_id, leg_no, from_code, to_code, from_city, to_city, depart_earliest, depart_latest, flight_hours, price_inr, list_price_inr, seats,
-      status: leg_status, aircraft_registration, aircraft_type },
+      status: leg_status, aircraft_registration, aircraft_type, lister_id, lister_company, operator_name },
   };
 }
 
@@ -83,7 +87,8 @@ router.get('/', requireRole('member', 'sales', 'ops'), async (req, res) => {
     const { rows } = await pool.query(
       `${LEG_SELECT} WHERE el.status = 'published' AND el.depart_latest >= now() + make_interval(mins => $1::int)
        ORDER BY el.depart_earliest`, [Math.round(minNoticeHours(settings) * 60)]);
-    return res.json(rows.map((l) => ({ ...publicLeg(l), status: l.status, can_book: isBookable(l, settings) })));
+    // Lister legs are booked by request (the lister confirms), never instantly on the Meridian fleet.
+    return res.json(rows.map((l) => ({ ...publicLeg(l), status: l.status, can_book: isBookable(l, settings) && !isListerLeg(l), request_only: isListerLeg(l) })));
   }
   const params = [];
   const where = [];
@@ -92,6 +97,8 @@ router.get('/', requireRole('member', 'sales', 'ops'), async (req, res) => {
     if (st.some((s) => !LEG_STATUSES.includes(s))) throw new HttpError(400, `status must be one of ${LEG_STATUSES.join(', ')}`);
     params.push(st); where.push(`el.status = ANY($${params.length})`);
   }
+  if (req.query.source === 'fleet') where.push('el.lister_id IS NULL');
+  else if (req.query.source === 'listers') where.push('el.lister_id IS NOT NULL');
   if (req.query.source_charter_id) {
     if (!isUuid(req.query.source_charter_id)) throw new HttpError(400, 'Invalid source_charter_id');
     params.push(req.query.source_charter_id); where.push(`el.source_charter_id = $${params.length}`);
@@ -132,6 +139,7 @@ router.post('/bookings/:id/confirm', requireRole('sales'), async (req, res) => {
   await expireStaleLegs();
   const b0 = await loadBooking(req.params.id);
   if (b0.status !== 'requested') throw new HttpError(409, `Cannot confirm a booking that is ${b0.status}`);
+  if (b0.lister_id) throw new HttpError(409, `This flight is listed by ${b0.operator_name || b0.lister_company || 'an independent operator'} — they confirm or reject requests for it`);
   const result = await withTransaction(async (client) => {
     // Lock the booking first, then (inside bookLegTx) the leg.
     const b = (await client.query('SELECT * FROM empty_leg_bookings WHERE id = $1 FOR UPDATE', [b0.id])).rows[0];
@@ -248,7 +256,7 @@ router.get('/:id', requireRole('member', 'sales', 'ops'), async (req, res) => {
     const settings = await getSettings();
     const l = await loadLeg(req.params.id);
     if (!isBookable(l, settings)) throw new HttpError(404, 'Empty leg not found');
-    return res.json({ ...publicLeg(l), status: l.status, can_book: true });
+    return res.json({ ...publicLeg(l), status: l.status, can_book: !isListerLeg(l), request_only: isListerLeg(l) });
   }
   res.json(await legDetailForStaff(req.params.id));
 });
@@ -257,6 +265,7 @@ router.get('/:id', requireRole('member', 'sales', 'ops'), async (req, res) => {
 router.patch('/:id', requireRole('sales', 'ops'), async (req, res) => {
   await expireStaleLegs();
   const l = await loadLeg(req.params.id);
+  if (isListerLeg(l)) throw new HttpError(409, 'Only the lister who posted this flight can edit it — you can withdraw it');
   if (!['draft', 'published'].includes(l.status)) throw new HttpError(409, `Cannot edit an empty leg that is ${l.status}`);
   const b = req.body || {};
   const sets = {};
@@ -291,6 +300,7 @@ router.patch('/:id', requireRole('sales', 'ops'), async (req, res) => {
 // ── Publish / withdraw ──────────────────────────────────────────────────────
 router.post('/:id/publish', requireRole('sales', 'ops'), async (req, res) => {
   const l = await loadLeg(req.params.id);
+  if (isListerLeg(l)) throw new HttpError(409, 'Only the lister who posted this flight can publish it');
   if (l.status !== 'draft') throw new HttpError(409, `Only draft empty legs can be published (this one is ${l.status})`);
   const settings = await getSettings();
   if (!isBookable({ ...l, status: 'published' }, settings)) throw new HttpError(409, `Departure is less than ${minNoticeHours(settings)} hours away — too late to publish`);
@@ -318,6 +328,7 @@ router.post('/:id/withdraw', requireRole('sales', 'ops'), async (req, res) => {
     return rows;
   });
   for (const r of cancelled) await sendEmptyLegRequestClosed({ to: r.guest_email, name: r.guest_name, booking: r, leg: l, reason: 'The flight has been withdrawn by the operator' });
+  if (isListerLeg(l) && l.lister_email) await sendListerLegWithdrawn({ to: l.lister_email, name: l.lister_name, leg: l, reason });
   res.json(await legDetailForStaff(l.id));
 });
 

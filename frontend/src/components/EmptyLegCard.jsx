@@ -51,6 +51,7 @@ export default function EmptyLegCard({ leg, to, action }) {
         <div className="el-specs">
           <span className="ac">{leg.aircraft_type || 'Private jet'}</span>
           <span>Up to {leg.seats} seats · <span className="nowrap">{flightTime(leg.flight_hours)}</span></span>
+          {leg.marketplace && leg.operated_by && <span className="el-op">Operated by {leg.operated_by}</span>}
         </div>
         <PriceBlock leg={leg} />
       </div>

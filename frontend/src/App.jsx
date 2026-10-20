@@ -7,6 +7,7 @@ import { Loading } from './components/ui';
 
 import Login from './pages/Login';
 import Invite from './pages/Invite';
+import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 
 import MemberHome from './pages/member/MemberHome';
@@ -39,6 +40,11 @@ import Aircraft from './pages/ops/Aircraft';
 import MyFlights from './pages/pilot/MyFlights';
 import FlightDetail from './pages/pilot/FlightDetail';
 
+import ListerListings from './pages/lister/ListerListings';
+import ListerRequests from './pages/lister/ListerRequests';
+import ListerProfile from './pages/lister/ListerProfile';
+import Listers from './pages/sales/Listers';
+
 import AdminHome from './pages/admin/AdminHome';
 import Users from './pages/admin/Users';
 import Settings from './pages/admin/Settings';
@@ -59,6 +65,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/invite/:token" element={<Invite />} />
+      <Route path="/register" element={<Register />} />
       {/* Public marketing pages — no auth, never redirect signed-in users */}
       <Route path="/empty-legs" element={<EmptyLegsPublic />} />
       <Route path="/empty-legs/:id" element={<EmptyLegPublicDetail />} />
@@ -73,6 +80,13 @@ export default function App() {
         <Route path="trips/:id" element={<TripDetail />} />
         <Route path="empty-legs" element={<MemberEmptyLegs />} />
         <Route path="invoices" element={<Invoices />} />
+      </Route>
+
+      {/* Lister — operators, agents and private flyers posting their own empty legs */}
+      <Route path="/l" element={guard(['lister'], <TopNavLayout kind="lister" />)}>
+        <Route index element={<ListerListings />} />
+        <Route path="requests" element={<ListerRequests />} />
+        <Route path="profile" element={<ListerProfile />} />
       </Route>
 
       {/* Pilot */}
@@ -97,6 +111,7 @@ export default function App() {
         <Route path="/s/invoices" element={guard(STAFF, <Invoices />)} />
         <Route path="/s/payments" element={guard(['sales', 'admin'], <Payments />)} />
         <Route path="/s/empty-legs" element={guard(STAFF, <EmptyLegsAdmin />)} />
+        <Route path="/s/listers" element={guard(['sales', 'admin'], <Listers />)} />
 
         <Route path="/o" element={guard(['ops', 'admin'], <StaffDashboard title="Operations dashboard" />)} />
         <Route path="/o/calendar" element={guard(['ops', 'admin'], <FleetCalendar />)} />

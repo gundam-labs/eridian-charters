@@ -442,10 +442,56 @@ UPDATE invoices i SET due_at = CASE
  WHERE c.id = i.charter_id AND i.due_at IS NULL AND c.legs->0->>'depart_at' IS NOT NULL;
 `;
 
+// v1.3 — Listers: charter operators, travel agents and private flyers who sign up themselves and post
+// their own empty legs. Upgrades a v1.2 database in place; every statement is idempotent.
+const SCHEMA_V13 = `
+DO $$
+DECLARE def TEXT;
+BEGIN
+  SELECT pg_get_constraintdef(oid) INTO def FROM pg_constraint
+   WHERE conrelid = 'users'::regclass AND conname = 'users_role_check';
+  IF def IS NULL OR def NOT LIKE '%lister%' THEN
+    ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+    ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('admin','sales','ops','pilot','member','lister'));
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS listers (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID UNIQUE NOT NULL REFERENCES users(id),
+  lister_type     TEXT NOT NULL CHECK (lister_type IN ('operator','agent','flyer')),
+  company         TEXT,
+  phone           TEXT NOT NULL,
+  city            TEXT,
+  gstin           TEXT,
+  nsop_permit_no  TEXT,
+  about           TEXT,
+  status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected','suspended')),
+  decided_by      UUID REFERENCES users(id),
+  decided_at      TIMESTAMPTZ,
+  decision_reason TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_listers_status ON listers(status, created_at);
+
+-- Lister legs fly aircraft outside the Meridian fleet: no aircraft_id, free-text aircraft details instead.
+ALTER TABLE empty_legs ALTER COLUMN aircraft_id DROP NOT NULL;
+ALTER TABLE empty_legs ADD COLUMN IF NOT EXISTS lister_id UUID REFERENCES listers(id);
+ALTER TABLE empty_legs ADD COLUMN IF NOT EXISTS ext_aircraft_type TEXT;
+ALTER TABLE empty_legs ADD COLUMN IF NOT EXISTS ext_registration TEXT;
+ALTER TABLE empty_legs ADD COLUMN IF NOT EXISTS operator_name TEXT;
+CREATE INDEX IF NOT EXISTS idx_empty_legs_lister ON empty_legs(lister_id, status);
+
+DO $$ BEGIN
+  ALTER TABLE empty_legs ADD CONSTRAINT empty_legs_owner_check CHECK (num_nonnulls(aircraft_id, lister_id) = 1);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+`;
+
 async function initDB() {
   await pool.query(SCHEMA);
   await pool.query(SCHEMA_V11);
   await pool.query(SCHEMA_V12);
+  await pool.query(SCHEMA_V13);
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await pool.query('INSERT INTO settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING', [key, value]);
   }

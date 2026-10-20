@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api, { errText } from '../../api';
 import { useFetch } from '../../lib/useFetch';
 import { PageHead, ErrorAlert, Loading, Empty, Modal } from '../../components/ui';
@@ -23,11 +23,14 @@ export default function MemberEmptyLegs() {
       ) : (
         <div className="el-grid">
           {legs.map(l => (
-            <EmptyLegCard key={l.id} leg={l} action={
-              <button className="btn btn-gold btn-block" disabled={l.can_book === false} onClick={() => setBooking(l)}>
-                {l.can_book === false ? 'Not bookable' : 'Book now'}
-              </button>
-            } />
+            <EmptyLegCard key={l.id} leg={l} action={l.request_only
+              // Listed by an independent operator: they confirm, so members send a request like anyone else.
+              ? <Link className="btn btn-block" to={`/empty-legs/${l.id}`}>Request from operator</Link>
+              : (
+                <button className="btn btn-gold btn-block" disabled={l.can_book === false} onClick={() => setBooking(l)}>
+                  {l.can_book === false ? 'Not bookable' : 'Book now'}
+                </button>
+              )} />
           ))}
         </div>
       )}

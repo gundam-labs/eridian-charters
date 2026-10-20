@@ -7,6 +7,7 @@ Members-only, quote-based charter booking and operations system for a licensed I
 - **Ops desk** runs the fleet calendar, assigns aircraft and crew, confirms charters and blocks aircraft for maintenance.
 - **Pilots** see their assigned flights and log block times and defects from a phone.
 - **Admin** manages users, airports and settings (GST rate, night-halt fee, quote validity and so on).
+- **Listers** — charter operators, travel agents and private flyers — sign up at `/register`, post empty legs on their own aircraft and confirm requests from the public. Sales or admin verify each lister at **Listers** before their flights can go live.
 
 The full contract between frontend and backend is in [SPEC.md](SPEC.md).
 
@@ -40,14 +41,16 @@ npm install
 npm run dev
 ```
 
-Demo users (password `Meridian@2026`): `admin@meridian.test`, `sales@meridian.test`, `ops@meridian.test`, `pilot1@meridian.test`, `pilot2@meridian.test`, and members `arjun.mehra@example.in`, `rajiv.malhotra@example.in`. All members, aircraft, crew and partners in the seed are fictional.
+Demo users (password `Meridian@2026`): `admin@meridian.test`, `sales@meridian.test`, `ops@meridian.test`, `pilot1@meridian.test`, `pilot2@meridian.test`, members `arjun.mehra@example.in`, `rajiv.malhotra@example.in`, and listers `ops@skyhopaviation.example.in` (approved operator) and `desk@wanderlusttravels.example.in` (pending agent). All members, aircraft, crew and partners in the seed are fictional.
 
 ## Tests
 
 ```bash
 cd backend && npm test                      # pricing unit tests
 cd backend && npm run test:lifecycle        # full lifecycle through the API (server must be running)
+cd backend && npm run test:listers          # lister sign-up, approval, listings and requests (server running)
 npm run test:e2e                            # browser test through the UI (both servers running)
+npm run test:e2e:listers                    # lister sign-up → approval → publish → request → confirm in the browser
 ```
 
 ## Deploy

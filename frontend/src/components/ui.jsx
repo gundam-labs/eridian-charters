@@ -21,6 +21,8 @@ const STATUS_COLOURS = {
   published: 'green', booked: 'navy',
   // empty-leg bookings (confirmed/cancelled share charter colours above)
   requested: 'amber', rejected: 'red',
+  // listers (pending shares the payment colour above)
+  approved: 'green', suspended: 'red',
 };
 
 const STATUS_LABELS = { partially_paid: 'Part paid', partially_refunded: 'Part refunded' };
@@ -37,7 +39,7 @@ export function TierPill({ tier }) {
 }
 
 export function RolePill({ role }) {
-  const c = { admin: 'navy', sales: 'blue', ops: 'teal', pilot: 'violet', member: 'gold' }[role] || 'grey';
+  const c = { admin: 'navy', sales: 'blue', ops: 'teal', pilot: 'violet', member: 'gold', lister: 'blue' }[role] || 'grey';
   return <span className={`pill pill-${c}`}>{role}</span>;
 }
 

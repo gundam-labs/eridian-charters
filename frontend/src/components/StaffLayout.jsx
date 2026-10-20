@@ -11,6 +11,7 @@ const SECTIONS = [
       { to: '/s/requests', label: 'Requests inbox' },
       { to: '/s/quotes', label: 'Quotes' },
       { to: '/s/empty-legs', label: 'Empty legs' },
+      { to: '/s/listers', label: 'Listers' },
       { to: '/s/members', label: 'Members' },
       { to: '/s/invoices', label: 'Invoices' },
       { to: '/s/payments', label: 'Payments' },

@@ -4,7 +4,7 @@ import api, { STORAGE_TOKEN } from '../api';
 const AuthContext = createContext(null);
 
 export const homeFor = (role) => ({
-  member: '/m', sales: '/s', ops: '/o', pilot: '/p', admin: '/admin',
+  member: '/m', sales: '/s', ops: '/o', pilot: '/p', admin: '/admin', lister: '/l',
 }[role] || '/login');
 
 export function AuthProvider({ children }) {
