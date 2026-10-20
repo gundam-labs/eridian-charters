@@ -761,7 +761,7 @@ async function seedListers() {
   const hash = await bcrypt.hash(PASSWORD, 10);
   const LISTERS = [
     // email, name, type, company, phone, city, nsop, status
-    ['ops@skyhopaviation.example.in', 'Farhan Qureshi', 'operator', 'SkyHop Aviation Pvt Ltd', '+91 98200 44112', 'Mumbai', 'NSOP-07/2019', 'approved'],
+    ['ops@skyhopaviation.example.in', 'Farhan Qureshi', 'operator', 'SkyHop Aviation Pvt Ltd', '+91 98200 44112', 'Mumbai', 'NSOP-98/2019', 'approved'],
     ['desk@wanderlusttravels.example.in', 'Neha Bhatt', 'agent', 'Wanderlust Luxury Travels', '+91 98450 33221', 'Bengaluru', null, 'pending'],
   ];
   const ids = {};

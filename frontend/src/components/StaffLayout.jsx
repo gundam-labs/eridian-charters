@@ -12,6 +12,7 @@ const SECTIONS = [
       { to: '/s/quotes', label: 'Quotes' },
       { to: '/s/empty-legs', label: 'Empty legs' },
       { to: '/s/listers', label: 'Listers' },
+      { to: '/admin/operators', label: 'Charter operators', roles: ['sales'] },
       { to: '/s/members', label: 'Members' },
       { to: '/s/invoices', label: 'Invoices' },
       { to: '/s/payments', label: 'Payments' },
@@ -35,6 +36,7 @@ const SECTIONS = [
     title: 'Administration', roles: ['admin'],
     links: [
       { to: '/admin/users', label: 'Users' },
+      { to: '/admin/operators', label: 'Charter operators' },
       { to: '/admin/airports', label: 'Airports' },
       { to: '/admin/settings', label: 'Settings' },
     ],

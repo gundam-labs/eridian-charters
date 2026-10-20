@@ -44,7 +44,10 @@ export default function Listers() {
                 <tr key={l.id}>
                   <td><button className="link-btn strong" onClick={() => setOpen(l)}>{l.company || l.name}</button>
                     <div className="muted xs">{l.company ? `${l.name} · ` : ''}joined {fmtDate(l.created_at)}</div></td>
-                  <td className="nowrap">{typeLabel(l.lister_type)}{l.nsop_permit_no && <div className="muted xs">{l.nsop_permit_no}</div>}</td>
+                  <td className="nowrap">{typeLabel(l.lister_type)}{l.nsop_permit_no && <div className="muted xs">{l.nsop_permit_no}
+                    {l.lister_type === 'operator' && (l.dgca_operator
+                      ? <span title={l.dgca_operator.name} style={{ color: 'var(--green-fg)' }}> · in DGCA list</span>
+                      : <span style={{ color: 'var(--amber-fg)' }}> · not in DGCA list</span>)}</div>}</td>
                   <td><div className="xs">{l.email}</div><div className="muted xs">{l.phone}{l.city ? ` · ${l.city}` : ''}</div></td>
                   <td className="num nowrap">{l.listings_count}<div className="muted xs">{l.live_count} live · {l.booked_count} booked</div></td>
                   <td><StatusPill status={l.status} label={l.status === 'pending' ? 'To review' : undefined} /></td>
@@ -98,15 +101,20 @@ function ReviewModal({ lister: l, onClose, onApproved, onReject }) {
         <dt>Contact</dt><dd>{l.name} · {l.email} · {l.phone}</dd>
         {l.city && <><dt>City</dt><dd>{l.city}</dd></>}
         {l.nsop_permit_no && <><dt>NSOP permit</dt><dd>{l.nsop_permit_no}</dd></>}
+        {l.lister_type === 'operator' && <><dt>DGCA list</dt><dd>{l.dgca_operator
+          ? <><span className="pill pill-green">Match</span>{' '}
+            <Link to={`/admin/operators?op=${l.dgca_operator.id}`}>{l.dgca_operator.name}</Link>
+            <span className="muted small"> · AOP {l.dgca_operator.aop_no}, valid to {fmtDate(l.dgca_operator.aop_valid_until)}</span></>
+          : <><span className="pill pill-amber">No match</span> <span className="muted small">No operator in the DGCA list has this permit number.</span></>}</dd></>}
         {l.gstin && <><dt>GSTIN</dt><dd>{l.gstin}</dd></>}
         {l.about && <><dt>About</dt><dd>{l.about}</dd></>}
         <dt>Registered</dt><dd>{fmtDateTime(l.created_at)}</dd>
         <dt>Status</dt><dd><StatusPill status={l.status} />{l.decision_reason ? <span className="muted small"> — {l.decision_reason}</span> : null}</dd>
         {l.decided_by_name && <><dt>Decided by</dt><dd>{l.decided_by_name}, {fmtDateTime(l.decided_at)}</dd></>}
       </dl>
-      {l.lister_type === 'operator' && l.status === 'pending' && (
-        <div className="alert alert-info" style={{ marginTop: 16 }}>
-          Check the NSOP permit against the DGCA list of non-scheduled operators before approving.
+      {l.lister_type === 'operator' && l.status === 'pending' && !l.dgca_operator && (
+        <div className="alert alert-warn" style={{ marginTop: 16 }}>
+          The permit number doesn’t match the DGCA list we hold. Check it with the operator before approving.
         </div>
       )}
       <ErrorAlert error={error} />

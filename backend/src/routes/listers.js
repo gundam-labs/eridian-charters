@@ -12,6 +12,14 @@ const router = asyncRouter();
 router.use(requireRole('sales'));
 
 const STATUSES = ['pending', 'approved', 'rejected', 'suspended'];
+const { aopKey } = require('./operators');
+
+/** Attach the DGCA directory entry whose AOP number matches the lister's NSOP permit, if any. */
+async function withDgcaMatch(rows) {
+  const ops = (await pool.query('SELECT id, name, aop_no, aop_valid_until, in_latest_list FROM charter_operators')).rows;
+  const byKey = new Map(ops.map((o) => [aopKey(o.aop_no), o]).filter(([k]) => k));
+  return rows.map((l) => ({ ...l, dgca_operator: (l.nsop_permit_no && byKey.get(aopKey(l.nsop_permit_no))) || null }));
+}
 const SELECT = `SELECT l.*, u.name, u.email, u.is_active, u.last_login_at, d.name AS decided_by_name,
   (SELECT count(*)::int FROM empty_legs el WHERE el.lister_id = l.id) AS listings_count,
   (SELECT count(*)::int FROM empty_legs el WHERE el.lister_id = l.id AND el.status = 'published') AS live_count,
@@ -28,7 +36,7 @@ router.get('/', async (req, res) => {
   }
   const { rows } = await pool.query(
     `${SELECT} ${where} ORDER BY CASE l.status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, l.created_at DESC`, params);
-  res.json(rows);
+  res.json(await withDgcaMatch(rows));
 });
 
 async function load(id, db = pool) {
@@ -39,7 +47,7 @@ async function load(id, db = pool) {
 }
 
 router.get('/:id', async (req, res) => {
-  res.json(await load(req.params.id));
+  res.json((await withDgcaMatch([await load(req.params.id)]))[0]);
 });
 
 // Allowed transitions: pending → approved|rejected; rejected → approved; approved → suspended; suspended → approved.

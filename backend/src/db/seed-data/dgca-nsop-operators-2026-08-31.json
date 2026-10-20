@@ -1,0 +1,6277 @@
+{
+ "source": "DGCA — List of Non-Scheduled Operators",
+ "as_of": "2026-08-31",
+ "operators": [
+  {
+   "sno": 1,
+   "name": "Aerokalinga Aviation Pvt. Ltd.",
+   "address": "C/O - MR SUDHIR KUMAR MISHRA, AT- BANIABAHAL, P.O- HULURUSINGHA DIST- ANGUL , ODISHA PIN- 759122.",
+   "pincode": "759122",
+   "phone": "+91 9338527773",
+   "fax": null,
+   "emails": [
+    "capt.sandeepmishra@gmail.com"
+   ],
+   "aop_no": "#17/2025",
+   "aop_valid_until": "2030-10-15",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-YUD",
+     "kind": "fixed_wing",
+     "model": "Beech Super King Air B200",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-OXL",
+     "kind": "fixed_wing",
+     "model": "EMB-135 (LEGACY 600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 1
+  },
+  {
+   "sno": 2,
+   "name": "Afcom Holdings Ltd.",
+   "address": "2, LIC Colony, Dr. Radhakrishnan Nagar, Thiruvanmiyur, Chennai, Tamil Nadu - 600041, India.",
+   "pincode": "600041",
+   "phone": "+91 44 22213333",
+   "fax": "+91 44 22213333",
+   "emails": [
+    "deepak@afcomcargo.com"
+   ],
+   "aop_no": "#12/2024",
+   "aop_valid_until": "2029-12-11",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-AFO",
+     "kind": "fixed_wing",
+     "model": "B737-800 Freighter",
+     "seats": null,
+     "role": "cargo",
+     "seats_raw": "Cargo"
+    },
+    {
+     "registration": "VT-AFN",
+     "kind": "fixed_wing",
+     "model": "B737-800 Freighter",
+     "seats": null,
+     "role": "cargo",
+     "seats_raw": "Cargo"
+    },
+    {
+     "registration": "VT-AFJ",
+     "kind": "fixed_wing",
+     "model": "B737-800 Freighter",
+     "seats": null,
+     "role": "cargo",
+     "seats_raw": "Cargo"
+    }
+   ],
+   "source_page": 1
+  },
+  {
+   "sno": 3,
+   "name": "Airports Authority of India",
+   "address": "Flight Inspection Unit, Rajiv Gandhi Bhawan, Safdarjung Airport, New Delhi – 110003.",
+   "pincode": "110003",
+   "phone": "011-24611077",
+   "fax": "011-24697211",
+   "emails": [
+    "fiuops@aai.aero"
+   ],
+   "aop_no": "#03/2019",
+   "aop_valid_until": "2029-05-14",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-FIU",
+     "kind": "fixed_wing",
+     "model": "Super King Air B300",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    },
+    {
+     "registration": "VT-EPU",
+     "kind": "fixed_wing",
+     "model": "Dornier DO-228-201",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-FIS",
+     "kind": "fixed_wing",
+     "model": "Super King Air B300",
+     "seats": 7,
+     "role": "aerial_work",
+     "seats_raw": "7/Aerial Work"
+    },
+    {
+     "registration": "VT-CNS",
+     "kind": "fixed_wing",
+     "model": "Super King Air B300",
+     "seats": 7,
+     "role": "aerial_work",
+     "seats_raw": "7/Aerial Work"
+    }
+   ],
+   "source_page": 1
+  },
+  {
+   "sno": 4,
+   "name": "Air Charters Services Pvt. Ltd.",
+   "address": "D-67, Ground Floor, Defence Colony, South Delhi, Delhi, India, 110024",
+   "pincode": "110024",
+   "phone": "011-25674449",
+   "fax": "011-25674479",
+   "emails": [
+    "sunil@aircharterservices.com"
+   ],
+   "aop_no": "#15/2008",
+   "aop_valid_until": "2029-05-14",
+   "fleet_type": "mixed",
+   "aircraft_count": 11,
+   "aircraft": [
+    {
+     "registration": "VT-FAE",
+     "kind": "fixed_wing",
+     "model": "SUPER KINGAIR B200",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-IKR",
+     "kind": "rotary_wing",
+     "model": "AGUSTA A109S",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-CVV",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION 560XL EXCEL",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-BVV",
+     "kind": "fixed_wing",
+     "model": "FALCON2000LX",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-DVV",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION 560XL EXCEL",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-JVV",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION 560XL EXCEL",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-HVV",
+     "kind": "fixed_wing",
+     "model": "FALCON 7X (M 1000)",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    },
+    {
+     "registration": "VT-KVV",
+     "kind": "rotary_wing",
+     "model": "A109S",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-MVV",
+     "kind": "rotary_wing",
+     "model": "A109S",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-PVV",
+     "kind": "fixed_wing",
+     "model": "CITATION 525A CJ2+",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-YVV",
+     "kind": "fixed_wing",
+     "model": "Falcon 6X",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    }
+   ],
+   "source_page": 1
+  },
+  {
+   "sno": 5,
+   "name": "Aman Aviation & Aerospace Solutions Pvt. Ltd.",
+   "address": "Juhu Airport, off S V Road, Vile Parle (W), Mumbai- 400056",
+   "pincode": "400056",
+   "phone": "022-42664700",
+   "fax": "022-29271163",
+   "emails": [
+    "am@amanaviation.in"
+   ],
+   "aop_no": "#10/2012",
+   "aop_valid_until": "2028-09-13",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-CNJ",
+     "kind": "rotary_wing",
+     "model": "ROBINSON R44",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-NRJ",
+     "kind": "rotary_wing",
+     "model": "AS365N3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 2
+  },
+  {
+   "sno": 6,
+   "name": "Aone Helicopters Private Limited",
+   "address": "Aone Helipad, Plot no. 82, Shree Narayan Bharat Vihar Farms, VPO- Malikpur, Via Govindgarh, Tehsil- Chomu, Jaipur, Rajasthan, India -303712",
+   "pincode": "303712",
+   "phone": "9166686166",
+   "fax": null,
+   "emails": [
+    "ceo@aonehelicopters.com"
+   ],
+   "aop_no": "#07/2026",
+   "aop_valid_until": "2031-04-15",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-BOS",
+     "kind": "rotary_wing",
+     "model": "Robinson R44 RAVEN II",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    }
+   ],
+   "source_page": 2
+  },
+  {
+   "sno": 7,
+   "name": "AR Airways Pvt. Ltd.",
+   "address": "304, 3rd Floor, Bhanot Corner, Pamposh Enclave, Greater Kailash-1, New Delhi-110048",
+   "pincode": "110048",
+   "phone": "011-26779093",
+   "fax": "011-26779093",
+   "emails": [
+    "radhey.gautam@cluboneair.com"
+   ],
+   "aop_no": "#01/2005",
+   "aop_valid_until": "2029-05-11",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 7,
+   "aircraft": [
+    {
+     "registration": "VT-CLA",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION 560 XL",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-CLB",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION II",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-ARF",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-CLF",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-ARC",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-ARO",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-ARM",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 2
+  },
+  {
+   "sno": 8,
+   "name": "Aryan Aviation Pvt. Ltd.",
+   "address": "801 & 802, 8th Floor, Classic Pantagon, Western Express Highway, Near Bisleri Factory, Andheri East, Mumbai-400099.",
+   "pincode": "400099",
+   "phone": "022-66249000",
+   "fax": "022-66173813",
+   "emails": [
+    "gm@aryanaviation.com"
+   ],
+   "aop_no": "#13/2009",
+   "aop_valid_until": "2029-04-07",
+   "fleet_type": "mixed",
+   "aircraft_count": 6,
+   "aircraft": [
+    {
+     "registration": "VT-SIL",
+     "kind": "rotary_wing",
+     "model": "EUROCOPTER AS355N",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-SIM",
+     "kind": "rotary_wing",
+     "model": "AS365N2 DAUPHIN",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-AVL",
+     "kind": "fixed_wing",
+     "model": "STEMME S6RT",
+     "seats": 2,
+     "role": "passenger",
+     "seats_raw": "2"
+    },
+    {
+     "registration": "VT-AVM",
+     "kind": "fixed_wing",
+     "model": "STEMME S6RT",
+     "seats": 2,
+     "role": "passenger",
+     "seats_raw": "2"
+    },
+    {
+     "registration": "VT-ARB",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-BKA",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 2
+  },
+  {
+   "sno": 9,
+   "name": "Arrow Aircrafts Sales & Charters Pvt. Ltd.",
+   "address": "A-50, Ground Floor, Road No.4, Mahipalpur Extension New Delhi-110 037.",
+   "pincode": "110037",
+   "phone": "011-42198327",
+   "fax": "011-42198328",
+   "emails": [
+    "shailendra@arrowaircraft.com"
+   ],
+   "aop_no": "#4/2014",
+   "aop_valid_until": "2028-03-10",
+   "fleet_type": "mixed",
+   "aircraft_count": 6,
+   "aircraft": [
+    {
+     "registration": "VT-JPH",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-ASC",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-YAN",
+     "kind": "fixed_wing",
+     "model": "BEECH SKA B200GT",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-ASD",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-TEN",
+     "kind": "fixed_wing",
+     "model": "Embraer EMB135BJ (Legacy 650)",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-TOP",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 3
+  },
+  {
+   "sno": 10,
+   "name": "Aurea Aviation Private Limited",
+   "address": "Office 49, Kalpataru Avenue, Opp. ESIS Hospital, Akurli Road, Kandivali East, Mumbai – 400101",
+   "pincode": "400101",
+   "phone": "+91-22-28851999",
+   "fax": "+91-22-39167437",
+   "emails": [
+    "rajesh@aureaaviation.com"
+   ],
+   "aop_no": "#06/2026",
+   "aop_valid_until": "2031-03-29",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-ACG",
+     "kind": "fixed_wing",
+     "model": "PC-12/45",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 3
+  },
+  {
+   "sno": 11,
+   "name": "Avenor Aviation LLP",
+   "address": "Unit no.602, survey no.129 and 130, Aquila Apartment , Plot no.101 , Anand Park , Aundh , Pune , Maharashtra 411007",
+   "pincode": "411007",
+   "phone": "020–25880110",
+   "fax": "020–25880110",
+   "emails": [
+    "accountablemanager@avenoraviation.com"
+   ],
+   "aop_no": "#08/2026",
+   "aop_valid_until": "2031-07-09",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-RJA",
+     "kind": "fixed_wing",
+     "model": "BEECH SUPER KING AIR B-200",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 3
+  },
+  {
+   "sno": 12,
+   "name": "Aviation Connectivity & Infrastructure Developers Pvt. Ltd.",
+   "address": "PLOT NO. 3, KHASRA NO. 385, BACK BUILDING, 3RD FLOOR, 100 FOOTA ROAD, GADAIPUR, GHITORNI, SOUTH WEST, Delhi, India, 110030",
+   "pincode": "110030",
+   "phone": "0124-4007099",
+   "fax": "0124-4007099",
+   "emails": [
+    "ceo@flyairtaxi.in"
+   ],
+   "aop_no": "#07/2023",
+   "aop_valid_until": "2028-07-02",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 5,
+   "aircraft": [
+    {
+     "registration": "VT-KTC",
+     "kind": "fixed_wing",
+     "model": "TECNAM P2010TDI",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-XIA",
+     "kind": "fixed_wing",
+     "model": "TECNAM P2010TDI",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-XIB",
+     "kind": "fixed_wing",
+     "model": "TECNAM P2010TDI",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-IXC",
+     "kind": "fixed_wing",
+     "model": "TECNAM P2010TDI",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-FCA",
+     "kind": "fixed_wing",
+     "model": "TECNAM P2010TDI",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    }
+   ],
+   "source_page": 3
+  },
+  {
+   "sno": 13,
+   "name": "Avocet Aviation Pvt. Ltd.",
+   "address": "B Safal House, Near Tej Motors, Off SG Road, Behind Mirch Masala Restaurant, Ahmedabad-380059.",
+   "pincode": "380059",
+   "phone": "079-26445605",
+   "fax": "079-26445605",
+   "emails": [
+    "yashpal@avocet.co.in"
+   ],
+   "aop_no": "#10/2023",
+   "aop_valid_until": "2028-11-01",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-BNB",
+     "kind": "fixed_wing",
+     "model": "Beechcraft Premier1A-390",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-BBN",
+     "kind": "fixed_wing",
+     "model": "Beechcraft Premier1A-390",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 4
+  },
+  {
+   "sno": 14,
+   "name": "Bajaj Aviation Pvt. Ltd.",
+   "address": "117, 11th Floor, Bajaj Bhawan, 226 Nariman Poin, Mumbai, Maharashtra, India-400021.",
+   "pincode": "400021",
+   "phone": "022-22049056",
+   "fax": "022-22022238",
+   "emails": [
+    "srisanth@bajajaviation.com"
+   ],
+   "aop_no": "#14/2012",
+   "aop_valid_until": "2028-12-10",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-AYV",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000LX",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 4
+  },
+  {
+   "sno": 15,
+   "name": "Baramati Agro Limited",
+   "address": "Farena Corporate Park, 4th Floor, Near Seasons Mall, Magarpatta Road, Hadapsar, Pune- 411028, India.",
+   "pincode": "411028",
+   "phone": "+91 20 67482800",
+   "fax": "+91 20 67482917",
+   "emails": [
+    "aviation@baramatiagro.com"
+   ],
+   "aop_no": "#14/2025",
+   "aop_valid_until": "2031-09-17",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-RRP",
+     "kind": "rotary_wing",
+     "model": "Bell407GXP",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 4
+  },
+  {
+   "sno": 16,
+   "name": "Bativala M Bhagvati Flying Charters LLP",
+   "address": "Flat No. 8, 2nd Floor, Tajkamal Bldg, 12th Road, Santacruz West, Mumbai-400055.",
+   "pincode": "400055",
+   "phone": "022-26126288",
+   "fax": "020-26126288",
+   "emails": [
+    "am@flyingcharters.com"
+   ],
+   "aop_no": "#05/2023",
+   "aop_valid_until": "2028-05-31",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-IJS",
+     "kind": "fixed_wing",
+     "model": "CESSNA R172K",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-GEM",
+     "kind": "fixed_wing",
+     "model": "CESSNA172S",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    }
+   ],
+   "source_page": 4
+  },
+  {
+   "sno": 17,
+   "name": "B.G. Shirke Construction Technology Pvt. Ltd.",
+   "address": "72-76 Industrial Estate Mundhwa, Pune-411 036.",
+   "pincode": "411036",
+   "phone": "020-26813085",
+   "fax": "020-26871612",
+   "emails": [
+    "phalkedhananjay@gmail.com"
+   ],
+   "aop_no": "#10/2010",
+   "aop_valid_until": "2028-12-21",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-PBS",
+     "kind": "rotary_wing",
+     "model": "Bell427",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 4
+  },
+  {
+   "sno": 18,
+   "name": "Bluecraft Aviation Pvt Ltd",
+   "address": "2nd Floor ,10 Abhishree Corporate Park , Bopal Ambali Road, Nr Swagat Bungalow BRTS Bus Stand , AHMEDABAD, Gujarat, India, 380058",
+   "pincode": "380058",
+   "phone": "9978111041",
+   "fax": null,
+   "emails": [
+    "info@bluecraftaviation.com"
+   ],
+   "aop_no": "#09/2026",
+   "aop_valid_until": "2031-07-15",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-DOV",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION CJ2",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 4
+  },
+  {
+   "sno": 19,
+   "name": "Carewell Aviation India Pvt. Ltd.",
+   "address": "23/24 RADHA BAZAR STREET, 5th FLOOR, SETHIA HOUSE, KOLKATA-700001",
+   "pincode": "700001",
+   "phone": "033-35034455",
+   "fax": "033-35034455",
+   "emails": [
+    "pawan@carewellaviation.com"
+   ],
+   "aop_no": "#11/2023",
+   "aop_valid_until": "2028-11-09",
+   "fleet_type": "mixed",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-KOL",
+     "kind": "fixed_wing",
+     "model": "Embraer EMB-135 (Legacy 600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GIM",
+     "kind": "rotary_wing",
+     "model": "AW109SP",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 4
+  },
+  {
+   "sno": 20,
+   "name": "Charlie Foxtrot Aviation Service Pvt. Ltd.",
+   "address": "317C, 3rd Floor, D-21, Corporate Park, Sector-21, Dwarka, New Delhi -110077, India.",
+   "pincode": "110077",
+   "phone": "011-26102644",
+   "fax": "011-26712591",
+   "emails": [
+    "am@charliefoxtrot.in"
+   ],
+   "aop_no": "#03/2020",
+   "aop_valid_until": "2030-12-27",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 5,
+   "aircraft": [
+    {
+     "registration": "VT-CVA",
+     "kind": "fixed_wing",
+     "model": "CHALLENGER 605 CL-600-2B16",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-CVB",
+     "kind": "fixed_wing",
+     "model": "CHALLENGER 605 CL-600-2B16",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-CVC",
+     "kind": "fixed_wing",
+     "model": "CL-600-2B16 CL 604 VARIANT (CL605)",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-CVD",
+     "kind": "fixed_wing",
+     "model": "CL-600-2B16 CL 604 VARIANT (CL605)",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-CVE",
+     "kind": "fixed_wing",
+     "model": "CL-600-2B16 CL 604 VARIANT (CL605)",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    }
+   ],
+   "source_page": 5
+  },
+  {
+   "sno": 21,
+   "name": "Chipsan Aviation Pvt. Ltd.",
+   "address": "234, Vasant Enclave, Vasant Vihar, New Delhi-110057",
+   "pincode": "110057",
+   "phone": "011-49126840",
+   "fax": "011-49126840",
+   "emails": [
+    "am@chipsan.com"
+   ],
+   "aop_no": "#04/2017",
+   "aop_valid_until": "2029-05-22",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 9,
+   "aircraft": [
+    {
+     "registration": "VT-IBA",
+     "kind": "rotary_wing",
+     "model": "EC135P2+",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RPO",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RGQ",
+     "kind": "rotary_wing",
+     "model": "Airbus H145 D3 (MBB-BK117 D-3)",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-RGL",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RGM",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RGR",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RGO",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RGY",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RGZ",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 5
+  },
+  {
+   "sno": 22,
+   "name": "Dadachanji Aviation Pvt. Ltd.",
+   "address": "Free Press House, 7th Floor, 72-73, Free Press Journal Marg, Nariman Point, Mumbai-400021. Maharashtra, India.",
+   "pincode": "400021",
+   "phone": "079-26445605",
+   "fax": "079-26445605",
+   "emails": [
+    "am@dadachanjiaviation.com"
+   ],
+   "aop_no": "#11/2024",
+   "aop_valid_until": "2029-10-29",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-KPR",
+     "kind": "rotary_wing",
+     "model": "EC130T2",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 5
+  },
+  {
+   "sno": 23,
+   "name": "Davangere Sugar Company Ltd.",
+   "address": "No.19, Shivashankar Plaza, 3rd Floor, Richmond Circle, Lalbagh Road, Bangalore-560 027",
+   "pincode": "560027",
+   "phone": "080-25230444",
+   "fax": "080-25237222",
+   "emails": [
+    "ratnarajcp.dscl@gmail.com"
+   ],
+   "aop_no": "#4/2012",
+   "aop_valid_until": "2028-04-29",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-DVG",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 5
+  },
+  {
+   "sno": 24,
+   "name": "Deccan Charters Pvt. Ltd.",
+   "address": "Jakkur aerodrome, Bellary Road, Bangalore-560064",
+   "pincode": "560064",
+   "phone": "080-42459696",
+   "fax": "080-28567525",
+   "emails": [
+    "am@deccanair.com"
+   ],
+   "aop_no": "#26/2008",
+   "aop_valid_until": "2028-10-06",
+   "fleet_type": "mixed",
+   "aircraft_count": 9,
+   "aircraft": [
+    {
+     "registration": "VT-RBG",
+     "kind": "rotary_wing",
+     "model": "BELL 206 L4",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-DAX",
+     "kind": "rotary_wing",
+     "model": "ECUREUIL AS-355 F1",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-DCB",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-TSG",
+     "kind": "fixed_wing",
+     "model": "Hawker 900XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-CSL",
+     "kind": "rotary_wing",
+     "model": "Bell 429",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-KNH",
+     "kind": "rotary_wing",
+     "model": "Sikorsky S-76C",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-UDY",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-AGP",
+     "kind": "fixed_wing",
+     "model": "Hawker 850XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-DCV",
+     "kind": "rotary_wing",
+     "model": "EC-130 B4",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 6
+  },
+  {
+   "sno": 25,
+   "name": "Dhillon Aviation Pvt. Ltd.",
+   "address": "A-883C, Sushant Lok 1, Gurgaon, Haryana-122001.",
+   "pincode": "122001",
+   "phone": "0124-4019203",
+   "fax": "0120-4019077",
+   "emails": [
+    "dhillon.aviation1@gmail.com"
+   ],
+   "aop_no": "#5/2005",
+   "aop_valid_until": "2028-09-07",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-IQB",
+     "kind": "rotary_wing",
+     "model": "BELL206 L4",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-ZIN",
+     "kind": "rotary_wing",
+     "model": "BELL206 L4",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-HKL",
+     "kind": "rotary_wing",
+     "model": "BELL412",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 6
+  },
+  {
+   "sno": 26,
+   "name": "Dunes Aviation Private Limited",
+   "address": "A - 62/63, Krishna Nagar, New Pali Road, Jodhpur, Jodhpur, Rajasthan, lndia, 342005.",
+   "pincode": "342005",
+   "phone": "079 49384411",
+   "fax": "079 49384411",
+   "emails": [
+    "am@dunesair.in"
+   ],
+   "aop_no": "#08/2024",
+   "aop_valid_until": "2029-10-13",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-NDA",
+     "kind": "fixed_wing",
+     "model": "CITATION 525A CJ2+",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-ZST",
+     "kind": "fixed_wing",
+     "model": "CHALLENGER CL 600-2B16-CL 604",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 6
+  },
+  {
+   "sno": 27,
+   "name": "E-Factor Adventure Tourism (P) Ltd.",
+   "address": "101-A, Kundan Kutir, Hari Nagar, Ashram, New Delhi – 110014",
+   "pincode": "110014",
+   "phone": "0141-2783154",
+   "fax": "0141-2783173",
+   "emails": [
+    "samit@efactor4u.com"
+   ],
+   "aop_no": "#1/2008",
+   "aop_valid_until": "2029-01-01",
+   "fleet_type": "hot_air_balloon",
+   "aircraft_count": 9,
+   "aircraft": [
+    {
+     "registration": "VT-BIG",
+     "kind": "hot_air_balloon",
+     "model": "T210 ULTRAMAGIC (HOT AIR BALLOON)",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-FAR",
+     "kind": "hot_air_balloon",
+     "model": "T210 ULTRAMAGIC (HOT AIR BALLOON)",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-GOA",
+     "kind": "hot_air_balloon",
+     "model": "CAMERON A-210 (HOT AIR BALLOON)",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-WOW",
+     "kind": "hot_air_balloon",
+     "model": "CAMERON A-105 (HOT AIR BALLOON)",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-FUN",
+     "kind": "hot_air_balloon",
+     "model": "CAMERON A-120 (HOT AIR BALLOON)",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    },
+    {
+     "registration": "VT-OMG",
+     "kind": "hot_air_balloon",
+     "model": "ULTRAMAGIC N-355 (HOT AIR BALLOON)",
+     "seats": 16,
+     "role": "passenger",
+     "seats_raw": "16"
+    },
+    {
+     "registration": "VT-FLO",
+     "kind": "hot_air_balloon",
+     "model": "ULTRAMAGIC N-425 (HOT AIR BALLOON)",
+     "seats": 24,
+     "role": "passenger",
+     "seats_raw": "24"
+    },
+    {
+     "registration": "VT-RUN",
+     "kind": "hot_air_balloon",
+     "model": "ULTRAMAGIC N-250 (HOT AIR BALLOON)",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-JHK",
+     "kind": "hot_air_balloon",
+     "model": "ULTRAMAGIC T-210 (HOT AIR BALLOON)",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 6
+  },
+  {
+   "sno": 28,
+   "name": "EHA Aviation Pvt. Ltd.",
+   "address": "No. 809, Akik Tower, NR. Pakvan 2, Opp. Rajpath Club, S G Highway, Bodakdev, Ahmedabad, Gujarat - 380054",
+   "pincode": "380054",
+   "phone": "079-35637424",
+   "fax": "079-35637424",
+   "emails": [
+    "operations@ehaaviation.com"
+   ],
+   "aop_no": "#01/2022",
+   "aop_valid_until": "2027-03-31",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-NKS",
+     "kind": "fixed_wing",
+     "model": "EMB135BJ (LEGACY 650)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-SKN",
+     "kind": "fixed_wing",
+     "model": "Cessna Citation 560XLS+",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-DIA",
+     "kind": "fixed_wing",
+     "model": "BD-700- 1A11(GLOBAL 5500)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 7
+  },
+  {
+   "sno": 29,
+   "name": "EIH Ltd.",
+   "address": "7, Sham Nath Marg, New Delhi-110054",
+   "pincode": "110054",
+   "phone": "011-23890505",
+   "fax": "011-23890575",
+   "emails": [
+    "director.aviation@oberoigroup.com"
+   ],
+   "aop_no": "#02/1996",
+   "aop_valid_until": "2029-08-01",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-OBR",
+     "kind": "fixed_wing",
+     "model": "HAWKER 850XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 7
+  },
+  {
+   "sno": 30,
+   "name": "Empire Aircraft Management Services Pvt. Ltd.",
+   "address": "3rd Floor, No.11 Commissariat Road Bengaluru-560 025.",
+   "pincode": "560025",
+   "phone": "080-46741000",
+   "fax": "080-46741001",
+   "emails": [
+    "qualityind@empire.aero"
+   ],
+   "aop_no": "#08/2017",
+   "aop_valid_until": "2027-03-31",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-SMS",
+     "kind": "fixed_wing",
+     "model": "King Air 250 (B200GT)",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-FLX",
+     "kind": "fixed_wing",
+     "model": "Falcon2000LX",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 7
+  },
+  {
+   "sno": 31,
+   "name": "EMSOS Aviation Private Limited",
+   "address": "2-C, 6-Tilak Marg, New Delhi – 110 001.",
+   "pincode": "110001",
+   "phone": "011-47018222",
+   "fax": "011-23388222",
+   "emails": [
+    "am@emsosav.com"
+   ],
+   "aop_no": "#11/2022",
+   "aop_valid_until": "2027-10-11",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-ECG",
+     "kind": "fixed_wing",
+     "model": "Citation 525A CJ2+",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 7
+  },
+  {
+   "sno": 32,
+   "name": "Everdeliver Logistics Pvt. Ltd.",
+   "address": "55/B, MIRZA GHALIB STREET, KOLKATA, WEST BENGAL – 700 016",
+   "pincode": "700016",
+   "phone": "06532 -796030",
+   "fax": "06532 -796030",
+   "emails": [
+    "Operations@everdeliver.in"
+   ],
+   "aop_no": "#02/2025",
+   "aop_valid_until": "2030-01-23",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-SKJ",
+     "kind": "fixed_wing",
+     "model": "PC-12/47E",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 7
+  },
+  {
+   "sno": 33,
+   "name": "Falcon Aviation Services Pvt. Ltd.",
+   "address": "H. No. 534, Urban Estate, Phase-2, Garha, Jalandhar, Punjab-144022.",
+   "pincode": "144022",
+   "phone": "0181-3565152",
+   "fax": "0181-3565152",
+   "emails": [
+    "am@faspl.co.in"
+   ],
+   "aop_no": "#06/2024",
+   "aop_valid_until": "2029-06-24",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-DBJ",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 8
+  },
+  {
+   "sno": 34,
+   "name": "Fairwinds Aviation Pvt. Ltd.",
+   "address": "B XX, 3168, Street No. 7, Gurdev Nagar, Ludhiana, Punjab-140001.",
+   "pincode": "140001",
+   "phone": "0161-5079410",
+   "fax": "0161-5079410",
+   "emails": [
+    "fairwinds.ldh@gmail.com"
+   ],
+   "aop_no": "#01/2019",
+   "aop_valid_until": "2029-01-10",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-SSJ",
+     "kind": "fixed_wing",
+     "model": "CESSNA 206H",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    },
+    {
+     "registration": "VT-GYN",
+     "kind": "fixed_wing",
+     "model": "CESSNA T206H",
+     "seats": null,
+     "role": "aerial_work",
+     "seats_raw": "Aerial Work"
+    },
+    {
+     "registration": "VT-GIC",
+     "kind": "fixed_wing",
+     "model": "CESSNA T206H",
+     "seats": null,
+     "role": "aerial_work",
+     "seats_raw": "Aerial Work"
+    }
+   ],
+   "source_page": 8
+  },
+  {
+   "sno": 35,
+   "name": "Fern Aviation India Pvt. Ltd.",
+   "address": "B272, Ground Floor, Greater Kailash, Part-I, New Delhi-110048",
+   "pincode": "110048",
+   "phone": "0120-4207776",
+   "fax": "0120-4207776",
+   "emails": [
+    "info@fernaviation.com"
+   ],
+   "aop_no": "#07/2017",
+   "aop_valid_until": "2027-08-21",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-JHP",
+     "kind": "fixed_wing",
+     "model": "HAWKER 850XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 8
+  },
+  {
+   "sno": 36,
+   "name": "Flaps Aviation Pvt. Ltd.",
+   "address": "250/15, Arya Nagar, Jhajjar, Haryana – 124 103.",
+   "pincode": "124103",
+   "phone": "011-25652234",
+   "fax": "011-25652234",
+   "emails": [
+    "gyan@flapsaviation.in"
+   ],
+   "aop_no": "#07/2022",
+   "aop_valid_until": "2027-09-20",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 5,
+   "aircraft": [
+    {
+     "registration": "VT-RSL",
+     "kind": "fixed_wing",
+     "model": "Beech Kingair C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RAS",
+     "kind": "fixed_wing",
+     "model": "BEECH SUPER KING AIR B-200",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-REM",
+     "kind": "fixed_wing",
+     "model": "BEECH SUPER KING AIR B-200",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-LKK",
+     "kind": "fixed_wing",
+     "model": "BEECH SUPER KING AIR B-200",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-SLK",
+     "kind": "fixed_wing",
+     "model": "BEECH KING AIR C-90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 8
+  },
+  {
+   "sno": 37,
+   "name": "FLYSBS AVIATION LIMITED",
+   "address": "FLAT 101, CORNER STONE APTS, NEW NO 60, MMTC COLONY,, MAIN ROAD, NANGANALLUR, CHENNAI, India, 600061",
+   "pincode": "600061",
+   "phone": "+914423453116",
+   "fax": "+914423453116",
+   "emails": [
+    "kannan@sbsaviation.in"
+   ],
+   "aop_no": "#13/2023",
+   "aop_valid_until": "2028-12-18",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-SSR",
+     "kind": "fixed_wing",
+     "model": "EMB-135 (LEGACY 600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GPS",
+     "kind": "fixed_wing",
+     "model": "EMB-135BJ (LEGACY 650)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 8
+  },
+  {
+   "sno": 38,
+   "name": "Forum I Aviation Pvt. Ltd.",
+   "address": "505, G+5 Building. Opp. Domestic Airport Terminal, IGI Airport, New Delhi-110037.",
+   "pincode": "110037",
+   "phone": "011-25674286",
+   "fax": "011-25674291",
+   "emails": [
+    "harry@forum1aviation.net"
+   ],
+   "aop_no": "#01/2006",
+   "aop_valid_until": "2029-03-20",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-FAF",
+     "kind": "fixed_wing",
+     "model": "HAWKER 800XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-KNB",
+     "kind": "fixed_wing",
+     "model": "HAWKER 850XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-BBD",
+     "kind": "fixed_wing",
+     "model": "CHALLENGER 650 CL-600-2B16",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 8
+  },
+  {
+   "sno": 39,
+   "name": "Freedom Charter Services Pvt. Ltd.",
+   "address": "18, Ali Chambers, 2nd Floor, Nagindas Master Road,Fort, Mumbai - 400 001",
+   "pincode": "400001",
+   "phone": "022 - 40794700",
+   "fax": "022 - 40794777",
+   "emails": [
+    "am@flyfreedom.in"
+   ],
+   "aop_no": "#01/2013",
+   "aop_valid_until": "2029-01-28",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-AJM",
+     "kind": "fixed_wing",
+     "model": "HAWKER BEECHCRAFT 900XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-AMG",
+     "kind": "fixed_wing",
+     "model": "EMB-135BJ (LEGACY 650)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 9
+  },
+  {
+   "sno": 40,
+   "name": "Global Vectra Helicorp Limited",
+   "address": "C-He & Hf, Airports Authority of India, Civil Aerodrome, Juhu, Mumbai-400 054",
+   "pincode": "400054",
+   "phone": "022 - 61409273",
+   "fax": "022 - 61409253",
+   "emails": [
+    "maneesh@gvhl.net"
+   ],
+   "aop_no": "#08/1998",
+   "aop_valid_until": "2028-04-28",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 26,
+   "aircraft": [
+    {
+     "registration": "VT-AZS",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVA",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVL",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVK",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVM",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVT",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVW",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVX",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVY",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-GVF",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-GVP",
+     "kind": "rotary_wing",
+     "model": "AW 139",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    },
+    {
+     "registration": "VT-GVZ",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-RRA",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3e",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-RRB",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3e",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-RRC",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-RRD",
+     "kind": "rotary_wing",
+     "model": "BELL412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-RRE",
+     "kind": "rotary_wing",
+     "model": "AW139",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    },
+    {
+     "registration": "VT-RRF",
+     "kind": "rotary_wing",
+     "model": "BELL412EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-RRG",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-RRH",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3e",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-RRI",
+     "kind": "rotary_wing",
+     "model": "BELL412EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-RRJ",
+     "kind": "rotary_wing",
+     "model": "BELL412EP",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-RRK",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-RRL",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-RRN",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-RRO",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 9
+  },
+  {
+   "sno": 41,
+   "name": "Ghodawat Enterprises Pvt. Ltd.",
+   "address": "Star House, Plot No. 438, P.B. 118, Jaysingpur, Dist.: Kolhapur, Maharashtra - 416 101",
+   "pincode": "416101",
+   "phone": "02322-255212-255218",
+   "fax": "02322-255059-255211",
+   "emails": [
+    "suresh.karelam@starair.in"
+   ],
+   "aop_no": "#06/2014",
+   "aop_valid_until": "2028-03-17",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-GSD",
+     "kind": "rotary_wing",
+     "model": "EC-135",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-ISG",
+     "kind": "rotary_wing",
+     "model": "EC-130 T2",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-GSR",
+     "kind": "rotary_wing",
+     "model": "EC-135T3H",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-RGP",
+     "kind": "rotary_wing",
+     "model": "MBB-BK117 D-3",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 10
+  },
+  {
+   "sno": 42,
+   "name": "GMR Aviation Pvt. Ltd.",
+   "address": "Room No. 10, Ground floor, Udaan Bhawan, Terminal 1D, Indira Gandhi International Airport, New Delhi - 110037.",
+   "pincode": "110037",
+   "phone": "011-39585858",
+   "fax": "011-39585858",
+   "emails": [
+    "ashok.gopinath@gmrgroup.in"
+   ],
+   "aop_no": "#06/2007",
+   "aop_valid_until": "2028-08-06",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-BRK",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000EX",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-RDS",
+     "kind": "fixed_wing",
+     "model": "EMB135BJ (LEGACY 650)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 10
+  },
+  {
+   "sno": 43,
+   "name": "Golden Baritone Private Limited (JATAYU)",
+   "address": "Plot No:5/ 3rd & 4th Floor, KH No. 349, Jayakunj Village, Shabad Mohammadpur, New Delhi- 110061",
+   "pincode": "110061",
+   "phone": "011-46056562",
+   "fax": "011-46056562",
+   "emails": [
+    "accountablemanager@jetayou.com"
+   ],
+   "aop_no": "#13/2025",
+   "aop_valid_until": "2030-09-14",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-PCR",
+     "kind": "fixed_wing",
+     "model": "G-200",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 11
+  },
+  {
+   "sno": 44,
+   "name": "Golden Crane Aviation Pvt. Ltd.",
+   "address": "125A, Lenin Sarani, Kolkata, West Bengal, 700013.",
+   "pincode": "700013",
+   "phone": "033-22653188",
+   "fax": "033-22653188",
+   "emails": [
+    "am@goldencrane.in"
+   ],
+   "aop_no": "#03/2023",
+   "aop_valid_until": "2028-03-08",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-VSR",
+     "kind": "rotary_wing",
+     "model": "Agusta A109E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RAJ",
+     "kind": "rotary_wing",
+     "model": "Agusta A109E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-GDC",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76D",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 11
+  },
+  {
+   "sno": 45,
+   "name": "GSEC Aviation Limited",
+   "address": "2nd Floor, Gujarat Chamber's Building, Ashram Road, Ahmedabad, AHMEDABAD, Gujarat, India- 380009.",
+   "pincode": "380009",
+   "phone": "+91 79 2655 4100",
+   "fax": "+91 79 2655 4100",
+   "emails": [
+    "naveen.kumar@gsecaviation.com"
+   ],
+   "aop_no": "#15/2025",
+   "aop_valid_until": "2030-09-21",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-APL",
+     "kind": "fixed_wing",
+     "model": "Bombardier Challenger 605",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 11
+  },
+  {
+   "sno": 46,
+   "name": "Himalyaputra Aviation Ltd.",
+   "address": "54, J.A. Annexe, Basant Lok, Vasant Vihar, New Delhi-110 057.",
+   "pincode": "110057",
+   "phone": "011-26141540 / 26147411",
+   "fax": "011-26154293",
+   "emails": [
+    "julian.dsouza@adani.com"
+   ],
+   "aop_no": "#11/2012",
+   "aop_valid_until": "2028-10-09",
+   "fleet_type": "mixed",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-JMG",
+     "kind": "fixed_wing",
+     "model": "BEECH CRAFT KING AIR B200GT",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-JIT",
+     "kind": "rotary_wing",
+     "model": "AGUSTA 109E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 11
+  },
+  {
+   "sno": 47,
+   "name": "Himalayan Heli Services Ltd.",
+   "address": "104, 1ST FLOOR, M.G. BHAWAN-1, 7 LOCAL SHOPPING CENTRE, MADANGIR, NEW DELHI, INDIA-110062.",
+   "pincode": "110062",
+   "phone": "011-41649348 / 59 / 60",
+   "fax": "011-41649357",
+   "emails": [
+    "operations@himalayanheli.com"
+   ],
+   "aop_no": "#01/2002",
+   "aop_valid_until": "2029-01-17",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 5,
+   "aircraft": [
+    {
+     "registration": "VT-BSG",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3 ECUREUIL",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-BKJ",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-HHB",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-HHC",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-HHD",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 11
+  },
+  {
+   "sno": 48,
+   "name": "Heritage Aviation Pvt. Ltd.",
+   "address": "506, 5th Floor, Bhikaji Cama Bhawan,Bhikaji Cama Place, New Delhi-110 066.",
+   "pincode": "110066",
+   "phone": "011-41600238",
+   "fax": "011-66173915",
+   "emails": [
+    "rohit.mathur@heritageaviation.in"
+   ],
+   "aop_no": "#04/2015",
+   "aop_valid_until": "2029-06-30",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 5,
+   "aircraft": [
+    {
+     "registration": "VT-RMX",
+     "kind": "rotary_wing",
+     "model": "AS350B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-HKX",
+     "kind": "rotary_wing",
+     "model": "AS350B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-HJX",
+     "kind": "rotary_wing",
+     "model": "AS350B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-HIX",
+     "kind": "rotary_wing",
+     "model": "EC130T2",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-HOX",
+     "kind": "rotary_wing",
+     "model": "EC130T2",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 11
+  },
+  {
+   "sno": 49,
+   "name": "Heligo Charters Pvt. Limited",
+   "address": "Hangar No. 3A, Juhu Airport, S.V.Road, Vile parle(W), Mumbai-400 056",
+   "pincode": "400056",
+   "phone": "022-26613245",
+   "fax": "022-26600534",
+   "emails": [
+    "am@heligo.in"
+   ],
+   "aop_no": "#01/2009",
+   "aop_valid_until": "2029-02-10",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 16,
+   "aircraft": [
+    {
+     "registration": "VT-HLD",
+     "kind": "rotary_wing",
+     "model": "AW139",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    },
+    {
+     "registration": "VT-HLH",
+     "kind": "rotary_wing",
+     "model": "AW139",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    },
+    {
+     "registration": "VT-HLI",
+     "kind": "rotary_wing",
+     "model": "AS 365 N3",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-HLJ",
+     "kind": "rotary_wing",
+     "model": "AS 365 N3",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-HLP",
+     "kind": "rotary_wing",
+     "model": "H145",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-HLQ",
+     "kind": "rotary_wing",
+     "model": "H145",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-HLR",
+     "kind": "rotary_wing",
+     "model": "AW139",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    },
+    {
+     "registration": "VT-HLS",
+     "kind": "rotary_wing",
+     "model": "BELL 412EP",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-HLT",
+     "kind": "rotary_wing",
+     "model": "BELL 412EP",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-HLU",
+     "kind": "rotary_wing",
+     "model": "AW139",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    },
+    {
+     "registration": "VT-HLV",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EPI",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-HLW",
+     "kind": "rotary_wing",
+     "model": "H145",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-HLX",
+     "kind": "rotary_wing",
+     "model": "H145",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-HLZ",
+     "kind": "rotary_wing",
+     "model": "H145",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-HLY",
+     "kind": "rotary_wing",
+     "model": "H145",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-HNB",
+     "kind": "rotary_wing",
+     "model": "AW139",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    }
+   ],
+   "source_page": 12
+  },
+  {
+   "sno": 50,
+   "name": "Himanad Management Services Private Limited",
+   "address": "7th Floor, Wing A, Milestone Experion Centre, Sector 15, Silokhera, Gurugram, Haryana- 122001",
+   "pincode": "122001",
+   "phone": "0124-6900250",
+   "fax": "0124-6900250",
+   "emails": [
+    "contact@himanad.com"
+   ],
+   "aop_no": "#16/2025",
+   "aop_valid_until": "2030-09-22",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-HAB",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 13
+  },
+  {
+   "sno": 51,
+   "name": "HN Safal Aviation Pvt. Ltd.",
+   "address": "HN Safal House, Beside Circle P Complex, Nr. Prahlad Nagar Cross Road, S.G. Highway, Ahmedabad, Gujarat- 380015.",
+   "pincode": "380015",
+   "phone": "079- 40800800",
+   "fax": "079- 40800888",
+   "emails": [
+    "ops@hnsafal.com"
+   ],
+   "aop_no": "#07/2019",
+   "aop_valid_until": "2029-10-24",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-GKB",
+     "kind": "fixed_wing",
+     "model": "Gulfstream G-150",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-HNA",
+     "kind": "fixed_wing",
+     "model": "Gulfstream G-150",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 13
+  },
+  {
+   "sno": 52,
+   "name": "Hyderabad Airlines Pvt. Ltd.",
+   "address": "Plot No. 213, Film Nagar, Hyderabad- 500096.",
+   "pincode": "500096",
+   "phone": "040- 23554125",
+   "fax": "040- 49524904",
+   "emails": [
+    "info@hyderabadairlines.com"
+   ],
+   "aop_no": "#14/2022",
+   "aop_valid_until": "2027-12-12",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-BHH",
+     "kind": "rotary_wing",
+     "model": "EC 135P3H",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 13
+  },
+  {
+   "sno": 53,
+   "name": "IIC Technologies Limited",
+   "address": "8-2-350/5/b-22, Road No.3, Banjara Hills, Hyderabad-500 034",
+   "pincode": "500034",
+   "phone": "040-39144444",
+   "fax": "040-39144455",
+   "emails": [
+    "vijay.madhavarapu@iictechnologies.com"
+   ],
+   "aop_no": "#06/2015",
+   "aop_valid_until": "2029-07-09",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-IIC",
+     "kind": "fixed_wing",
+     "model": "CESSNA CARAVAN 208B",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-ASU",
+     "kind": "fixed_wing",
+     "model": "CESSNA CARAVAN 208B",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-HSR",
+     "kind": "fixed_wing",
+     "model": "CESSNA 206H",
+     "seats": null,
+     "role": "aerial_work",
+     "seats_raw": "Aerial Work"
+    }
+   ],
+   "source_page": 13
+  },
+  {
+   "sno": 54,
+   "name": "Indocopters Pvt. Ltd.",
+   "address": "A-54, Kailash Colony, New Delhi.",
+   "pincode": null,
+   "phone": "011 - 43171111 F ax : 011 - 66173994",
+   "fax": null,
+   "emails": [
+    "info@indocopters.com"
+   ],
+   "aop_no": "#06/2006",
+   "aop_valid_until": "2028-08-24",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-VAD",
+     "kind": "rotary_wing",
+     "model": "AS 350 B3 ECUREUIL",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 13
+  },
+  {
+   "sno": 55,
+   "name": "Indo Pacific Aviation Pvt. Ltd.",
+   "address": "E- 14/19 Basement, Vasant Vihar, Delhi, India, 110057",
+   "pincode": "110057",
+   "phone": "011- 40845858",
+   "fax": "011- 66173703",
+   "emails": [
+    "accountable.manager@indopacific.in"
+   ],
+   "aop_no": "#03/1997",
+   "aop_valid_until": "2028-10-14",
+   "fleet_type": "mixed",
+   "aircraft_count": 10,
+   "aircraft": [
+    {
+     "registration": "VT-FOR",
+     "kind": "rotary_wing",
+     "model": "AGUSTA A109E",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-LIB",
+     "kind": "fixed_wing",
+     "model": "Hawker 800XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-POP",
+     "kind": "fixed_wing",
+     "model": "Hawker 800XP",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-SFU",
+     "kind": "fixed_wing",
+     "model": "Embraer EMB-135 (Legacy 600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-MUM",
+     "kind": "fixed_wing",
+     "model": "Hawker 800XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-ZEN",
+     "kind": "rotary_wing",
+     "model": "AW109SP",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-MON",
+     "kind": "fixed_wing",
+     "model": "Cessna Citation CJ2 525A",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-JRG",
+     "kind": "fixed_wing",
+     "model": "HAWKER900XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-BMS",
+     "kind": "fixed_wing",
+     "model": "CESSNA T206H",
+     "seats": null,
+     "role": "aerial_work",
+     "seats_raw": "Aerial Work"
+    },
+    {
+     "registration": "VT-HUH",
+     "kind": "fixed_wing",
+     "model": "BD-700-1A10(G6000)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 13
+  },
+  {
+   "sno": 56,
+   "name": "India Flysafe Aviation Ltd.",
+   "address": "28 Najafgarh Road, New Delhi-110015",
+   "pincode": "110015",
+   "phone": "011-47104526",
+   "fax": "011-66173646",
+   "emails": [
+    "am@indiaflysafe.com"
+   ],
+   "aop_no": "#09/2004",
+   "aop_valid_until": "2028-12-14",
+   "fleet_type": "mixed",
+   "aircraft_count": 6,
+   "aircraft": [
+    {
+     "registration": "VT-JSC",
+     "kind": "fixed_wing",
+     "model": "PILATUS PC-12/47E",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-JSI",
+     "kind": "fixed_wing",
+     "model": "EMBRAER EMB-135LR",
+     "seats": 37,
+     "role": "passenger",
+     "seats_raw": "37"
+    },
+    {
+     "registration": "VT-JSA",
+     "kind": "rotary_wing",
+     "model": "AW-139 AGUSTA",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-JSF",
+     "kind": "rotary_wing",
+     "model": "GRAND AGUSTA 109S",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-JSX",
+     "kind": "fixed_wing",
+     "model": "BD-100-1A10",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-JSQ",
+     "kind": "fixed_wing",
+     "model": "PILATUS PC-12/47E",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 14
+  },
+  {
+   "sno": 57,
+   "name": "Innxt Aviation Pvt. Ltd.",
+   "address": "S. No. 29, H. N. 20, Kondhwa KD, Near Shera School, Pune, Maharashtra-411048",
+   "pincode": "411048",
+   "phone": "020-29704521",
+   "fax": "020-29704521",
+   "emails": [
+    "innxtaviation@gmail.com"
+   ],
+   "aop_no": "#03/2021",
+   "aop_valid_until": "2026-10-25",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-MHM",
+     "kind": "rotary_wing",
+     "model": "EC135P2+",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 14
+  },
+  {
+   "sno": 58,
+   "name": "IRM Pvt. Ltd.",
+   "address": "IRM House, Kalpana Society, Sardar Samaj Sewa Road, Navrangpura, Ahmedabad - 380 009",
+   "pincode": "380009",
+   "phone": "079 - 26562615",
+   "fax": "079 - 26420022",
+   "emails": [
+    "alekh.jain@irmltd.co.in"
+   ],
+   "aop_no": "#09/2014",
+   "aop_valid_until": "2028-07-03",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-RIM",
+     "kind": "fixed_wing",
+     "model": "GULFSTREAM GV-SP (G550)",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 14
+  },
+  {
+   "sno": 59,
+   "name": "Jet Serve Aviation Pvt. Ltd.",
+   "address": "Indraprastha Aerospace & Knowledge Park, Delhi-Jaipur Highway (NH-08), Sector-77, Gurugram, Haryana-122004.",
+   "pincode": "122004",
+   "phone": "0124-2214021",
+   "fax": "0124-2214022",
+   "emails": [
+    "srola@jetaviation.co.in"
+   ],
+   "aop_no": "#02/2017",
+   "aop_valid_until": "2029-02-09",
+   "fleet_type": "mixed",
+   "aircraft_count": 10,
+   "aircraft": [
+    {
+     "registration": "VT-ZJM",
+     "kind": "rotary_wing",
+     "model": "ROBINSON-44 RAVEN II",
+     "seats": 3,
+     "role": "aerial_work",
+     "seats_raw": "3/Aerial Work"
+    },
+    {
+     "registration": "VT-OJS",
+     "kind": "rotary_wing",
+     "model": "ROBINSON-44 RAVEN II",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-HNC",
+     "kind": "rotary_wing",
+     "model": "ROBINSON-44 RAVEN II",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-JIL",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-EMJ",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RSN",
+     "kind": "fixed_wing",
+     "model": "Super King Air B-200",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-DEJ",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-JPK",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-OSR",
+     "kind": "rotary_wing",
+     "model": "A109E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-OSN",
+     "kind": "rotary_wing",
+     "model": "A109E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 14
+  },
+  {
+   "sno": 60,
+   "name": "Jhankar Aviation Pvt. Ltd.",
+   "address": "Jhankar Sr. Sec. School, Shikohpur Gurugram, Manesar, Gurgaon, Haryana-122050.",
+   "pincode": "122050",
+   "phone": "011-45528003",
+   "fax": "011-45528003",
+   "emails": [
+    "jhankaraviationops@gmail.com"
+   ],
+   "aop_no": "#13/2022",
+   "aop_valid_until": "2027-11-10",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-TIS",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-UPA",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT 300LW",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-VBS",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 15
+  },
+  {
+   "sno": 61,
+   "name": "Joyalukkas India Limited",
+   "address": "DOOR NO 5/309-3, BISHOP ALAPATT ROAD, FATHIMA NAGAR, MISSION QUARTERS, THRISSUR, KERALA , INDIA - 680005.",
+   "pincode": "680005",
+   "phone": "+91 487 2329222",
+   "fax": "+91 487 2329222",
+   "emails": [
+    "am@joyalukkas.com"
+   ],
+   "aop_no": "#05/2025",
+   "aop_valid_until": "2030-02-26",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-JJL",
+     "kind": "rotary_wing",
+     "model": "AW109SP",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 15
+  },
+  {
+   "sno": 62,
+   "name": "Kainos Aviation Private Limited",
+   "address": "4911, Amaltas Drive, First Floor, DLF Phase-4, Near Galleria Market, DLF QE, Gurgaon-122002, Hayyana, India.",
+   "pincode": "122002",
+   "phone": "0124-4238657",
+   "fax": "0124-4238657",
+   "emails": [
+    "info@kainosaviation.com"
+   ],
+   "aop_no": "#01/2024",
+   "aop_valid_until": "2029-01-04",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-KHA",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76C++",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 15
+  },
+  {
+   "sno": 63,
+   "name": "Kairamya Aviation Pvt. Ltd.",
+   "address": "6th Floor, New Astral House, Opp. Satyam Corporate House, Off S G Highway, Ahmedabad- 380059. India.",
+   "pincode": "380059",
+   "phone": "+91 79 66212000",
+   "fax": null,
+   "emails": [
+    "info@kairamyaair.com"
+   ],
+   "aop_no": "#19/2025",
+   "aop_valid_until": "2029-11-24",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-BIP",
+     "kind": "fixed_wing",
+     "model": "CITATION 525A",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-AST",
+     "kind": "fixed_wing",
+     "model": "G-150",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 15
+  },
+  {
+   "sno": 64,
+   "name": "Kakini Enterprises Pvt. Ltd.",
+   "address": "#204, Ashoka Capitol, Road No. 2, Banjara Hills, Hyderabad, Telangana-500034.",
+   "pincode": "500034",
+   "phone": "040-46021833",
+   "fax": "040-46021833",
+   "emails": [
+    "ceo@bluhorse-kepl.in"
+   ],
+   "aop_no": "#06/2023",
+   "aop_valid_until": "2028-06-05",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-PSB",
+     "kind": "fixed_wing",
+     "model": "Citation 525A",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 16
+  },
+  {
+   "sno": 65,
+   "name": "KAN Aerofoil Private Limited",
+   "address": "603, Aamrakunj Avis, Near Tapovan Circle, Motera Gandhinagar Road, Motera, Chandkheda, Gandhinagar Ahmedabad - 382424, Gujarat.",
+   "pincode": "382424",
+   "phone": "06352842821",
+   "fax": "06352842821",
+   "emails": [
+    "am@kanaero.com"
+   ],
+   "aop_no": "#09/2024",
+   "aop_valid_until": "2029-10-16",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-NJP",
+     "kind": "rotary_wing",
+     "model": "BELL-407GX",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-PNJ",
+     "kind": "rotary_wing",
+     "model": "BELL-407GX",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 16
+  },
+  {
+   "sno": 66,
+   "name": "Karnavati Aviation Pvt. Ltd.",
+   "address": "Adani House, NR, Mithakhali, Six Rods, Navrangpura, Ahmedabad - 380 009",
+   "pincode": "380009",
+   "phone": "079 - 25555239",
+   "fax": "079 - 25556112",
+   "emails": [
+    "julian.dsouza@adani.com"
+   ],
+   "aop_no": "#22/2008",
+   "aop_valid_until": "2028-08-06",
+   "fleet_type": "mixed",
+   "aircraft_count": 10,
+   "aircraft": [
+    {
+     "registration": "VT-AML",
+     "kind": "fixed_wing",
+     "model": "EMB-135BJ LEGACY 650",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-AGL",
+     "kind": "fixed_wing",
+     "model": "Bombardier BD-700-1A10",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-AHM",
+     "kind": "fixed_wing",
+     "model": "EMB-135BJ",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-ARL",
+     "kind": "fixed_wing",
+     "model": "EMB-135BJ",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-AQL",
+     "kind": "fixed_wing",
+     "model": "PC-24",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-KGA",
+     "kind": "fixed_wing",
+     "model": "PC-24",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-PGA",
+     "kind": "fixed_wing",
+     "model": "PC-24",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-AFL",
+     "kind": "fixed_wing",
+     "model": "PC-24",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-APV",
+     "kind": "fixed_wing",
+     "model": "PC-24",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-GKA",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 16
+  },
+  {
+   "sno": 67,
+   "name": "Kelachandra Logistics Pvt. Ltd.",
+   "address": "#16, St. Mark’s Road, Bangalore-560001.",
+   "pincode": "560001",
+   "phone": "+91-80-46384900",
+   "fax": "+91-80-46384944",
+   "emails": [
+    "uksharma@kelachandragroup.com"
+   ],
+   "aop_no": "#04/2019",
+   "aop_valid_until": "2029-06-13",
+   "fleet_type": "mixed",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-HKB",
+     "kind": "rotary_wing",
+     "model": "BELL429",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-AVS",
+     "kind": "fixed_wing",
+     "model": "EMBRAER EMB-500 (Phenom100)",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    }
+   ],
+   "source_page": 16
+  },
+  {
+   "sno": 68,
+   "name": "Kestrel Aviation Pvt. Ltd.",
+   "address": "Airport Authority of India, Juhu Airport, Mumbai, Maharashtra, India, 400056",
+   "pincode": "400056",
+   "phone": "022 - 26601023",
+   "fax": "022 - 26609533",
+   "emails": [
+    "AM@kestrel-aviation.com"
+   ],
+   "aop_no": "#14/2008",
+   "aop_valid_until": "2029-05-08",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-CLN",
+     "kind": "rotary_wing",
+     "model": "AGUSTA A119 KOALA",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-VSB",
+     "kind": "rotary_wing",
+     "model": "AS350B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-VSK",
+     "kind": "rotary_wing",
+     "model": "AS350B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 16
+  },
+  {
+   "sno": 69,
+   "name": "Khazana Jewellery Pvt. Ltd.",
+   "address": "252A TTK Road, Alwarpet, Chennai-600018, Tamilnadu",
+   "pincode": "600018",
+   "phone": "044-40097724",
+   "fax": "044-42297799",
+   "emails": [
+    "am@kingjets.in"
+   ],
+   "aop_no": "#03/2017",
+   "aop_valid_until": "2029-03-28",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-KZN",
+     "kind": "fixed_wing",
+     "model": "GULFSTREAM G150",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 17
+  },
+  {
+   "sno": 70,
+   "name": "Kingscraft Aviation Private Limited",
+   "address": "702, Platinum Square, Next to Hotel Hyatt, Viman Nagar, Pune, Maharashtra, India, 411014",
+   "pincode": "411014",
+   "phone": "+91 8956438691",
+   "fax": null,
+   "emails": [
+    "am@flykings.com"
+   ],
+   "aop_no": "#01/2026",
+   "aop_valid_until": "2031-01-04",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-KGV",
+     "kind": "fixed_wing",
+     "model": "HAWKER 900XP",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 17
+  },
+  {
+   "sno": 71,
+   "name": "Kyathi Climate Modification Consultants LLP",
+   "address": "No. 6/6/2, Yashodanagara, Jakkur Plantation, Opp. Jakkur Flying School, Bellary Road, Bangalore- 560064.",
+   "pincode": "560064",
+   "phone": "080-28564041",
+   "fax": "080- 66885686",
+   "emails": [
+    "am@flykings.com"
+   ],
+   "aop_no": "#04/2020",
+   "aop_valid_until": "2030-12-27",
+   "fleet_type": "mixed",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-KCM",
+     "kind": "fixed_wing",
+     "model": "Superking Air B200",
+     "seats": 7,
+     "role": "aerial_work",
+     "seats_raw": "7/Aerial Work"
+    },
+    {
+     "registration": "VT-AUS",
+     "kind": "rotary_wing",
+     "model": "Agusta A109E",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 17
+  },
+  {
+   "sno": 72,
+   "name": "Lakeworkoffice Club Pvt. Ltd.",
+   "address": "E-5 F/F L/SIDE OLD NO 133 WESTERN MARG LANE NO 1, GADAIPUR NEW DELHI, SOUTH WEST DELHI Delhi, India, 110030",
+   "pincode": "110030",
+   "phone": "011-44792083",
+   "fax": "011-44792083",
+   "emails": [
+    "abhinavtripathi@lakeworkoffice.com"
+   ],
+   "aop_no": "#10/2025",
+   "aop_valid_until": "2030-09-09",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-JPA",
+     "kind": "rotary_wing",
+     "model": "A109E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-OSC",
+     "kind": "rotary_wing",
+     "model": "A109E",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 17
+  },
+  {
+   "sno": 73,
+   "name": "LCL Aviation Pvt. Ltd. (ECOJET)",
+   "address": "MR 1 AltF Noida 142, 9th Floor, Plot No. 21 & 22, Sector 142, Noida, Gautam Buddha Nagar, Uttar Pradesh, India, 201301.",
+   "pincode": "201301",
+   "phone": "011-30641776",
+   "fax": "011-30641776",
+   "emails": [
+    "am@lclaviation.com"
+   ],
+   "aop_no": "#09/2022",
+   "aop_valid_until": "2027-09-27",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-ANF",
+     "kind": "fixed_wing",
+     "model": "Beechcraft Premier 1A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 17
+  },
+  {
+   "sno": 74,
+   "name": "LMCS Infra Holdings Pvt. Ltd.",
+   "address": "Room No. 306, G+5 Building, Opp. Terminal-1, IGI Airport, New Delhi - 110 037",
+   "pincode": "110037",
+   "phone": "011 - 26854090",
+   "fax": "011 - 26854090",
+   "emails": [
+    "acctmgr@flylotus.aero"
+   ],
+   "aop_no": "#05/2016",
+   "aop_valid_until": "2028-10-25",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-PEC",
+     "kind": "rotary_wing",
+     "model": "EC 135 P2+",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 17
+  },
+  {
+   "sno": 75,
+   "name": "L & T Aviation Services Pvt. Ltd.",
+   "address": "L & T house, Ballard Estate, P.O. Box - 278, Mumbai - 400 001",
+   "pincode": "400001",
+   "phone": "022 - 67525656",
+   "fax": "022 - 67525858",
+   "emails": [
+    "ashutosh.v@larsentoubro.com"
+   ],
+   "aop_no": "#06/2010",
+   "aop_valid_until": "2028-11-02",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-LTC",
+     "kind": "fixed_wing",
+     "model": "HAWKER HS 125 900XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 17
+  },
+  {
+   "sno": 76,
+   "name": "MAB Aviation Pvt. Ltd.",
+   "address": "B1 , Ashok Guruprasad CHS, [ Behind SVC Bank ] Hanuman Road, Vile Parle [E] Mumbai - 400 057.",
+   "pincode": "400057",
+   "phone": "022 - 26615165 F ax : 022-26615165",
+   "fax": null,
+   "emails": [
+    "areez.vakil@mabaviation.com"
+   ],
+   "aop_no": "#06/2016",
+   "aop_valid_until": "2028-12-22",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-MAM",
+     "kind": "fixed_wing",
+     "model": "Learjet 60XR",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 77,
+   "name": "Maharaja Aviation Pvt. Ltd.",
+   "address": "A-87, Road No-2, Mahipalpur Ext., New Delhi-110 037",
+   "pincode": "110037",
+   "phone": "011 - 40586165",
+   "fax": "011 - 40586165",
+   "emails": [
+    "info@maharajaaviation.com"
+   ],
+   "aop_no": "#07/2015",
+   "aop_valid_until": "2027-08-26",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-MAL",
+     "kind": "rotary_wing",
+     "model": "ROBINSON R66",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    },
+    {
+     "registration": "VT-SDD",
+     "kind": "rotary_wing",
+     "model": "ROBINSON R44",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    },
+    {
+     "registration": "VT-NDN",
+     "kind": "rotary_wing",
+     "model": "ROBINSON R66",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 78,
+   "name": "Mahindra Airways Ltd.",
+   "address": "Mahindra Towers, Pandurang Budhkar Marg, NR. Doordarshan Kendra, Worli, Mumbai 400018. India.",
+   "pincode": "400018",
+   "phone": "+91 22 24901441",
+   "fax": "+91 22 24966573",
+   "emails": [
+    "NISAL.NITIN@mahindra.com"
+   ],
+   "aop_no": "#10/2024",
+   "aop_valid_until": "2029-10-27",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-MAY",
+     "kind": "fixed_wing",
+     "model": "Bombardier BD-100-1A10",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 79,
+   "name": "Malhotra Helikopters Pvt. Ltd.",
+   "address": "Ground Floor, Flat No. 2, Pitamjali Building, Near Iswarilala Park, Vile Parle West, Mumbai- 400056.",
+   "pincode": "400056",
+   "phone": "022-26156552",
+   "fax": "022-26607702",
+   "emails": [
+    "ops@mhpl.in"
+   ],
+   "aop_no": "#01/2023",
+   "aop_valid_until": "2028-01-11",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-RLB",
+     "kind": "rotary_wing",
+     "model": "BELL 206 L3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-JVS",
+     "kind": "rotary_wing",
+     "model": "BELL 206 L4",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 80,
+   "name": "Mandke and Mandke Infrastructure Pvt. Ltd.",
+   "address": "1132/2, Alankar Bhawan, Opp. Police Ground, F.C.Road, Shivajinagar, Pune - 411 016",
+   "pincode": "411016",
+   "phone": "020 - 25652521/25652213",
+   "fax": "020 - 25654941",
+   "emails": [
+    "info@sudhirmandke.com"
+   ],
+   "aop_no": "#01/2015",
+   "aop_valid_until": "2029-02-12",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-MAN",
+     "kind": "rotary_wing",
+     "model": "ROBINSON R66",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 81,
+   "name": "Media House DND Private Limited",
+   "address": "HM Strafford, 29/4, 3rd Floor, 7th Cross, Vasanthnagar, Bengaluru, karnataka-560052",
+   "pincode": "560052",
+   "phone": "+91 80 29915335",
+   "fax": "+91 80 29915335",
+   "emails": [
+    "am.dndmedia@gmail.com"
+   ],
+   "aop_no": "#05/2024",
+   "aop_valid_until": "2029-02-27",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-MNK",
+     "kind": "rotary_wing",
+     "model": "EC-130T2",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 82,
+   "name": "Modifi Aviations Pvt. Ltd.",
+   "address": "Farm House No. 16 & 17, Vedic Village, Sikharpur, North 24 Parganas, West Bengal, India, 700135",
+   "pincode": "700135",
+   "phone": "+91 7003196374",
+   "fax": "___",
+   "emails": [
+    "am@modifiaviations.com"
+   ],
+   "aop_no": "#02/2026",
+   "aop_valid_until": "2031-02-10",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-HGL",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 83,
+   "name": "MSPL Ltd.",
+   "address": "Baldota Bhawan,117, Maharshi Karve Road, Mumbai - 400 020",
+   "pincode": "400020",
+   "phone": "08394 - 232002",
+   "fax": "08394 - 232444",
+   "emails": [
+    "accountablemanager@mspllimited.com"
+   ],
+   "aop_no": "#02/2009",
+   "aop_valid_until": "2027-02-11",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-SNB",
+     "kind": "fixed_wing",
+     "model": "P-180 AVANTI II",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 84,
+   "name": "Mytri Aviation Pvt. Ltd.",
+   "address": "S-2, TIE, BALANAGAR, HYDERABAD-500037.",
+   "pincode": "500037",
+   "phone": "040-44336700",
+   "fax": "040-44336790",
+   "emails": [
+    "am@mytriaviation.in"
+   ],
+   "aop_no": "#01/2018",
+   "aop_valid_until": "2028-07-02",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-PVK",
+     "kind": "fixed_wing",
+     "model": "EMBRAER 135BJ",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-PRM",
+     "kind": "fixed_wing",
+     "model": "EMBRAER 190-100ECJ (Lineage 1000)",
+     "seats": 19,
+     "role": "passenger",
+     "seats_raw": "19"
+    }
+   ],
+   "source_page": 18
+  },
+  {
+   "sno": 85,
+   "name": "Navdurga Aviation Pvt. Ltd.",
+   "address": "8/29, Ground Floor, Mehram Nagar, Near Airport Hotel, IGI Airport, South West, Delhi, India, 110037.",
+   "pincode": "110037",
+   "phone": "011-40197185",
+   "fax": "011-40197185",
+   "emails": [
+    "am@navdurgaaviation.com"
+   ],
+   "aop_no": "#15/2022",
+   "aop_valid_until": "2027-12-27",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-AHB",
+     "kind": "fixed_wing",
+     "model": "CESSNA CARAVAN 208B",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-CSP",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION 560XL",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 19
+  },
+  {
+   "sno": 86,
+   "name": "NIBE AERONAUTICS LIMITED",
+   "address": "7th Floor, The Melange, Bhosari, Haveli, Pune, Maharashtra. India-411012.",
+   "pincode": "411012",
+   "phone": "+91 20 69133788",
+   "fax": "+91 20 69133789",
+   "emails": [
+    "sourabh.jangid@nibeaeronautics.com"
+   ],
+   "aop_no": "#06/2025",
+   "aop_valid_until": "2029-05-27",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-VRL",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT PREMIER 1A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 19
+  },
+  {
+   "sno": 87,
+   "name": "Niraant Aviation Pvt. Ltd.",
+   "address": "3rd Floor, Sheil Estate Dani Corporate Park CST Rd Vidyanagari Mumbai, Maharashtra, India 400098.",
+   "pincode": "400098",
+   "phone": "+91 99207 73000",
+   "fax": "02269308300",
+   "emails": [
+    "Shamsher.sindhu@uskcapital.com"
+   ],
+   "aop_no": "#12/2025",
+   "aop_valid_until": "2030-09-10",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-KTK",
+     "kind": "rotary_wing",
+     "model": "BELL 429",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 19
+  },
+  {
+   "sno": 88,
+   "name": "OSS Air Management Pvt. Ltd.",
+   "address": "Property No. 94, Block-B, 1st Floor, Pocket-10, Sector-13, Dwarka, New Delhi-110075.",
+   "pincode": "110075",
+   "phone": "011 - 41312000",
+   "fax": "011 - 41312001",
+   "emails": [
+    "sr.solanki@ossair.com"
+   ],
+   "aop_no": "#02/2006",
+   "aop_valid_until": "2029-04-03",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-OSH",
+     "kind": "rotary_wing",
+     "model": "AGUSTA A109SP",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 19
+  },
+  {
+   "sno": 89,
+   "name": "Pawan Hans Ltd.",
+   "address": "C-14, Sector-1, Noida-201301.",
+   "pincode": "201301",
+   "phone": "0120-2476449 F a x : 0120-2542208",
+   "fax": null,
+   "emails": [
+    "jitendra.negi@pawanhans.co.in"
+   ],
+   "aop_no": "#02/1998",
+   "aop_valid_until": "2029-03-14",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 36,
+   "aircraft": [
+    {
+     "registration": "VT-ELE",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN 2",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-ELI",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN 2",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-ELL",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN 2",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-ELN",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN 2",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-ELT",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN 2",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-ENW",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN 2",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-ENZ",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN 2",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-PHA",
+     "kind": "rotary_wing",
+     "model": "BELL 206 L4",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-PHE",
+     "kind": "rotary_wing",
+     "model": "BELL 206 L4",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-PHI",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-PHN",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-PHQ",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-PHJ",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-PHL",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-PHM",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-PHR",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-PHS",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-PHW",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PHX",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PHY",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PHZ",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PWC",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PWB",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PWD",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PWE",
+     "kind": "rotary_wing",
+     "model": "DAUPHIN AS 365 N3",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PHV",
+     "kind": "rotary_wing",
+     "model": "ECUREUIL AS 350 B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-PHU",
+     "kind": "rotary_wing",
+     "model": "ECUREUIL AS 350 B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-PHG",
+     "kind": "rotary_wing",
+     "model": "MI-172",
+     "seats": 26,
+     "role": "passenger",
+     "seats_raw": "26"
+    },
+    {
+     "registration": "VT-PWM",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76D",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PWJ",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76D",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-PWK",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76D",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    },
+    {
+     "registration": "VT-ELD",
+     "kind": "rotary_wing",
+     "model": "SA 365N",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-ELG",
+     "kind": "rotary_wing",
+     "model": "SA 365N",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-ELS",
+     "kind": "rotary_wing",
+     "model": "SA 365N",
+     "seats": 11,
+     "role": "passenger",
+     "seats_raw": "11"
+    },
+    {
+     "registration": "VT-HAU",
+     "kind": "rotary_wing",
+     "model": "ALH (DHRUV)",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-PWL",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76D",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    }
+   ],
+   "source_page": 19
+  },
+  {
+   "sno": 90,
+   "name": "PILGRIMAGE AVIATION PRIVATE LIMITED",
+   "address": "8/11, 1ST FLOOR, HOSPITAL ROAD, JANGPURA EXTENSION,SOUTH DELHI, DELHI, INDIA, 110014.",
+   "pincode": "110014",
+   "phone": "011-47037070",
+   "fax": "011-47037070",
+   "emails": [
+    "info.pilgrimageaviation@gmail.com"
+   ],
+   "aop_no": "#08/2025",
+   "aop_valid_until": "2030-06-04",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-NSS",
+     "kind": "rotary_wing",
+     "model": "AS350B3E",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 21
+  },
+  {
+   "sno": 91,
+   "name": "Pioneer Flying Academy Pvt. Ltd.",
+   "address": "C-112, 3rd Floor, C Block, Mayapuri Industrial Area, Phase II, New Delhi 110064",
+   "pincode": "110064",
+   "phone": "011 - 24109460",
+   "fax": "011 - 26885553",
+   "emails": [
+    "rajesh@pioneerflyingacademy.com"
+   ],
+   "aop_no": "#09/2015",
+   "aop_valid_until": "2027-10-13",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-PFA",
+     "kind": "fixed_wing",
+     "model": "CESSNA 172S",
+     "seats": 3,
+     "role": "aerial_work",
+     "seats_raw": "3/Aerial Work"
+    },
+    {
+     "registration": "VT-AGH",
+     "kind": "fixed_wing",
+     "model": "CESSNA 172S",
+     "seats": 3,
+     "role": "aerial_work",
+     "seats_raw": "3/Aerial Work"
+    }
+   ],
+   "source_page": 21
+  },
+  {
+   "sno": 92,
+   "name": "Pinnacle Air Pvt. Ltd.",
+   "address": "T-15, 2nd floor, Green Park, New Delhi - 110 016",
+   "pincode": "110016",
+   "phone": "011 - 26547500",
+   "fax": "011- 26547501",
+   "emails": [
+    "ceo@pinnacleair.in"
+   ],
+   "aop_no": "#25/2008",
+   "aop_valid_until": "2028-10-02",
+   "fleet_type": "mixed",
+   "aircraft_count": 7,
+   "aircraft": [
+    {
+     "registration": "VT-PSA",
+     "kind": "rotary_wing",
+     "model": "BELL-407",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-TAA",
+     "kind": "fixed_wing",
+     "model": "P68 Obeserver-2",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    },
+    {
+     "registration": "VT-NKF",
+     "kind": "fixed_wing",
+     "model": "King Air C90B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-MEL",
+     "kind": "fixed_wing",
+     "model": "Beechcraft Premier 1A-390",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-KJS",
+     "kind": "fixed_wing",
+     "model": "King Air C90GTI",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-VEL",
+     "kind": "fixed_wing",
+     "model": "G-200",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-KBS",
+     "kind": "rotary_wing",
+     "model": "AS350B2",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    }
+   ],
+   "source_page": 21
+  },
+  {
+   "sno": 93,
+   "name": "Poonawalla Aviation Pvt. Ltd.",
+   "address": "212/2, Off. Soli Poonawalla Road, Hadapsar, Pune - 411 028",
+   "pincode": "411028",
+   "phone": "020 - 26346963",
+   "fax": "020 - 26343711",
+   "emails": [
+    "poonawallaops@poonawallaaviation.com"
+   ],
+   "aop_no": "#03/2006",
+   "aop_valid_until": "2029-06-25",
+   "fleet_type": "mixed",
+   "aircraft_count": 6,
+   "aircraft": [
+    {
+     "registration": "VT-NAP",
+     "kind": "rotary_wing",
+     "model": "H145",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-CDP",
+     "kind": "fixed_wing",
+     "model": "Bombardier Global 6000",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-NAD",
+     "kind": "fixed_wing",
+     "model": "Bombardier Global 6500",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-CDC",
+     "kind": "fixed_wing",
+     "model": "Bombardier Global 6500",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-CND",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-CCA",
+     "kind": "fixed_wing",
+     "model": "Bombardier Global 6500",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    }
+   ],
+   "source_page": 22
+  },
+  {
+   "sno": 94,
+   "name": "Pradhaan Air Express Pvt. Ltd.",
+   "address": "A250, Ground Floor, Road Number 6, Mahipalpur, New Delhi – 110 037.",
+   "pincode": "110037",
+   "phone": "+91-9289717900",
+   "fax": "+91-9289717900",
+   "emails": [
+    "am@pradhaanair.com"
+   ],
+   "aop_no": "#08/2022",
+   "aop_valid_until": "2027-09-21",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-PNS",
+     "kind": "fixed_wing",
+     "model": "A320-232",
+     "seats": null,
+     "role": "cargo",
+     "seats_raw": "Cargo"
+    }
+   ],
+   "source_page": 22
+  },
+  {
+   "sno": 95,
+   "name": "Property Ventures (India) Pvt. Ltd.",
+   "address": "5th Floor, Kiwani Club of New Delhi, B-35, Qutub Institutional Area, New Delhi-110016.",
+   "pincode": "110016",
+   "phone": "011 - 41660273",
+   "fax": "011- 66173993",
+   "emails": [
+    "sudeep.singh@skylightairways.com"
+   ],
+   "aop_no": "#04/2022",
+   "aop_valid_until": "2027-04-18",
+   "fleet_type": "mixed",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-WCL",
+     "kind": "rotary_wing",
+     "model": "AW169",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-RKP",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000EX",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-RKV",
+     "kind": "rotary_wing",
+     "model": "EC-130T2",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RKS",
+     "kind": "fixed_wing",
+     "model": "BEECH SUPER KING AIR 250 B- 200GT",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 22
+  },
+  {
+   "sno": 96,
+   "name": "Rajas Aerosports and Adventures Private Limited (Air Safari)",
+   "address": "Fifth Floor Wing - A, Commercial Plaza, Radisson Blu Plaza, National Highway No. 8, Mahipalpur, New Delhi, India, 110037",
+   "pincode": "110037",
+   "phone": "011 - 40528303",
+   "fax": "011- 40528303",
+   "emails": [
+    "am@rajasaero.com"
+   ],
+   "aop_no": "#02/2024",
+   "aop_valid_until": "2029-01-31",
+   "fleet_type": "mixed",
+   "aircraft_count": 7,
+   "aircraft": [
+    {
+     "registration": "VT-RJL",
+     "kind": "fixed_wing",
+     "model": "Cessna Citation 560XL",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-RJF",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-RJG",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-RJH",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-RAG",
+     "kind": "hot_air_balloon",
+     "model": "ULTRAMAGIC M-105",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    },
+    {
+     "registration": "VT-RBO",
+     "kind": "hot_air_balloon",
+     "model": "ULTRAMAGIC N-210",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-RJM",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 22
+  },
+  {
+   "sno": 97,
+   "name": "RAJHANS INFRACON (INDIA) PRIVATE LIMITED",
+   "address": "Rajhans Empire, Dumas Road, Near Airport, Besides Le Meridien, Surat, Gujarat-395007.",
+   "pincode": "395007",
+   "phone": "0261 2961101",
+   "fax": "0261 2961101",
+   "emails": [
+    "priyanshi.nair@rajhans.co.in"
+   ],
+   "aop_no": "#03/2024",
+   "aop_valid_until": "2029-02-08",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-DJB",
+     "kind": "fixed_wing",
+     "model": "Beech SKA B200GT",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 23
+  },
+  {
+   "sno": 98,
+   "name": "Raymond Ltd.",
+   "address": "(Aviation Division) Sapphire, 1st Floor, Jakegram, Pokhran Road No.1, Thane (West) - 400606.",
+   "pincode": "400606",
+   "phone": "022 – 61527727-31",
+   "fax": "022 - 25410018",
+   "emails": [
+    "raymond.accmgr@raymond.in"
+   ],
+   "aop_no": "#05/1996",
+   "aop_valid_until": "2029-01-28",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-GHS",
+     "kind": "rotary_wing",
+     "model": "AGUSTA A109S",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 23
+  },
+  {
+   "sno": 99,
+   "name": "Redbird Airways Pvt. Ltd.",
+   "address": "PROP. NO. K-59, FIRST FLOOR. KH. NO. 796/2, NEAR OBC BANK, VASANT KUNJ ROAD, MAHIPALPUR, SOUTH WEST DELHI, NEW DELHI, INDIA, 110037.",
+   "pincode": "110037",
+   "phone": "011 - 25672109",
+   "fax": "011- 25672109",
+   "emails": [
+    "opc@redbirdairways.com"
+   ],
+   "aop_no": "#01/2020",
+   "aop_valid_until": "2030-08-12",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 6,
+   "aircraft": [
+    {
+     "registration": "VT-RAM",
+     "kind": "fixed_wing",
+     "model": "KINGAIR C90B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-EHB",
+     "kind": "fixed_wing",
+     "model": "SKA B200",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-EJZ",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-IPA",
+     "kind": "fixed_wing",
+     "model": "Cessna Citation III (650)",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-BSL",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION 560XL",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-EQN",
+     "kind": "fixed_wing",
+     "model": "King Air C90A",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 23
+  },
+  {
+   "sno": 100,
+   "name": "Redbird Flight Training Academy Private Limited",
+   "address": "C-713/G, First & Second Floor, Block C, Palam Extension, Sector 7, Dwarka, South West Delhi, New Delhi – 110 077.",
+   "pincode": "110077",
+   "phone": "011 -49122304",
+   "fax": "011 -49122304",
+   "emails": [
+    "coo@redbirdaviation.com"
+   ],
+   "aop_no": "#10/2022",
+   "aop_valid_until": "2027-10-06",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-RBB",
+     "kind": "fixed_wing",
+     "model": "TECNAM P2006T",
+     "seats": 3,
+     "role": "passenger",
+     "seats_raw": "3"
+    }
+   ],
+   "source_page": 24
+  },
+  {
+   "sno": 101,
+   "name": "Reliance Transport & Travels Pvt. Ltd.",
+   "address": "Office No. 702, 7th Floor, B Wing, Raheja Point 1, Jawaharlal Nehru Road, Near SVC Bank, Mumbai, Maharashtra, India, 400055",
+   "pincode": "400055",
+   "phone": "022 - 33033130",
+   "fax": "022 - 26157403",
+   "emails": [
+    "Ajay.Kapur@reliancegroupindia.com"
+   ],
+   "aop_no": "#03/2000",
+   "aop_valid_until": "2028-09-27",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-OMM",
+     "kind": "fixed_wing",
+     "model": "EMB - 135BJ",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-AAT",
+     "kind": "fixed_wing",
+     "model": "FALCON2000",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 24
+  },
+  {
+   "sno": 102,
+   "name": "Reliance Commercial Dealers Ltd.",
+   "address": "3rd Floor, Maker Chambers- IV,222,Nariman point, Mumbai - 400 021.",
+   "pincode": "400021",
+   "phone": "022 - 26268000/ 8033",
+   "fax": "022 - 26157071/ 7057",
+   "emails": [
+    "k.unni@ril.com"
+   ],
+   "aop_no": "#02/2008",
+   "aop_valid_until": "2029-01-14",
+   "fleet_type": "mixed",
+   "aircraft_count": 15,
+   "aircraft": [
+    {
+     "registration": "VT-IAH",
+     "kind": "fixed_wing",
+     "model": "A319-115 CJ",
+     "seats": 19,
+     "role": "passenger",
+     "seats_raw": "19"
+    },
+    {
+     "registration": "VT-AKU",
+     "kind": "fixed_wing",
+     "model": "FALCON 900EX",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    },
+    {
+     "registration": "VT-NMA",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76 C++",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-NIT",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76 C++",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-DHA",
+     "kind": "fixed_wing",
+     "model": "GLOBAL EXPRESS BD-700",
+     "seats": 1,
+     "role": "passenger",
+     "seats_raw": "1 6"
+    },
+    {
+     "registration": "VT-HMA",
+     "kind": "fixed_wing",
+     "model": "GLOBAL EXPRESS BD-700",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    },
+    {
+     "registration": "VT-AHI",
+     "kind": "fixed_wing",
+     "model": "GLOBAL 6000 BD-700- 1A10",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    },
+    {
+     "registration": "VT-JIO",
+     "kind": "rotary_wing",
+     "model": "AS 365 N3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    },
+    {
+     "registration": "VT-JMN",
+     "kind": "fixed_wing",
+     "model": "EMBRAER 135ER",
+     "seats": 37,
+     "role": "passenger",
+     "seats_raw": "37"
+    },
+    {
+     "registration": "VT-ASR",
+     "kind": "fixed_wing",
+     "model": "Global 7500 BD700-2A-12",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    },
+    {
+     "registration": "VT-PRI",
+     "kind": "fixed_wing",
+     "model": "Global 7500 BD700-2A-12",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    },
+    {
+     "registration": "VT-AKV",
+     "kind": "fixed_wing",
+     "model": "B737-9",
+     "seats": 19,
+     "role": "passenger",
+     "seats_raw": "19"
+    },
+    {
+     "registration": "VT-JMR",
+     "kind": "fixed_wing",
+     "model": "EMBRAER ERJ 170-200 LR",
+     "seats": 60,
+     "role": "passenger",
+     "seats_raw": "60"
+    },
+    {
+     "registration": "VT-PVS",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-AKI",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 24
+  },
+  {
+   "sno": 103,
+   "name": "Rithwik Green Power and Aviation Pvt. Ltd.",
+   "address": "H. No. 8-2-293/82/A1308/B Plot No-1308A-Road No. – 65 Jubilee Hills, Hyderabad, Telangana – 500033.",
+   "pincode": "500033",
+   "phone": "040-49113333",
+   "fax": "040-49113333",
+   "emails": [
+    "rithwikgreenpoweraviation@gmail.com"
+   ],
+   "aop_no": "#12/2022",
+   "aop_valid_until": "2027-10-25",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-VIN",
+     "kind": "fixed_wing",
+     "model": "King Air B200 GT",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-VIK",
+     "kind": "fixed_wing",
+     "model": "EMB-135 (LEGACY 600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-SRE",
+     "kind": "fixed_wing",
+     "model": "CITATION 525A CJ2+",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-TVM",
+     "kind": "fixed_wing",
+     "model": "CITATION 525A CJ2+",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 25
+  },
+  {
+   "sno": 104,
+   "name": "RPS Aviation Pvt. Ltd.",
+   "address": "Avani Signature, 2nd Floor, 91 A/1, Park Street, Kolkata – 700 016",
+   "pincode": "700016",
+   "phone": "033-40071632",
+   "fax": "033-40071638",
+   "emails": [
+    "info@skysuites.in"
+   ],
+   "aop_no": "#02/2022",
+   "aop_valid_until": "2027-04-10",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-TBT",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 25
+  },
+  {
+   "sno": 105,
+   "name": "RPSG Resources Pvt Ltd.",
+   "address": "Duncan House, 31 Netaji Subhash Road, Kolkata- 7001 01.",
+   "pincode": null,
+   "phone": "033-29525069",
+   "fax": "033-29525069",
+   "emails": [
+    "ravi.dargan@rpsg.in"
+   ],
+   "aop_no": "#08/2014",
+   "aop_valid_until": "2028-06-25",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-SHG",
+     "kind": "fixed_wing",
+     "model": "Bombardier Global 5000",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-MIR",
+     "kind": "fixed_wing",
+     "model": "BD-700-2A12(G7500)",
+     "seats": 16,
+     "role": "passenger",
+     "seats_raw": "16"
+    }
+   ],
+   "source_page": 25
+  },
+  {
+   "sno": 106,
+   "name": "Saarthi Airways Pvt. Ltd.",
+   "address": "37A, Gulmohar Lane, Sirsi Road, Khatipura, Jaipur - 302 006",
+   "pincode": "302006",
+   "phone": "011 - 46082824",
+   "fax": "011 - 25672476",
+   "emails": [
+    "info@saarthiairways.com"
+   ],
+   "aop_no": "#09/2010",
+   "aop_valid_until": "2028-12-13",
+   "fleet_type": "mixed",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-MPG",
+     "kind": "fixed_wing",
+     "model": "SUPER KING AIR B200",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-RSG",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000EX",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-ELX",
+     "kind": "fixed_wing",
+     "model": "Twin Otter DHC-6-300",
+     "seats": 4,
+     "role": "aerial_work",
+     "seats_raw": "4/Aerial Work"
+    },
+    {
+     "registration": "VT-LJH",
+     "kind": "rotary_wing",
+     "model": "AGUSTA A109S",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 25
+  },
+  {
+   "sno": 107,
+   "name": "Saffron Strokes Private Limited",
+   "address": "200, South Ex Plaza 1, 389 Masjid Moth, South Extension Part II, New Delhi 110049",
+   "pincode": "110049",
+   "phone": "011-26256363",
+   "fax": "011-26256363",
+   "emails": [
+    "accountablemanager@saffronstrokes.com"
+   ],
+   "aop_no": "#04/2024",
+   "aop_valid_until": "2029-02-18",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-PMO",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT PREMIER 1A-390",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-SRK",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT PREMIER 1A-390",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 25
+  },
+  {
+   "sno": 108,
+   "name": "Sai Construction Pvt. Ltd.",
+   "address": "605, Sai Chambers, 16, Mumbai- Pune Road Wakdewadi, Shivajinagar, Pune-411003,",
+   "pincode": "411003",
+   "phone": "+91-20 67680072",
+   "fax": "+91-20 67680072",
+   "emails": [
+    "aviation@sbalangroup.com"
+   ],
+   "aop_no": "#04/2025",
+   "aop_valid_until": "2030-02-18",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-VAP",
+     "kind": "fixed_wing",
+     "model": "Hawker800XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 26
+  },
+  {
+   "sno": 109,
+   "name": "Sapphire Airlines Pvt. Ltd.",
+   "address": "Jindal Mansion, 5A Dr. G. Deshmukh Marg, Mumbai, Maharashtra – 400026.",
+   "pincode": "400026",
+   "phone": "022 - 42861000",
+   "fax": "022 - 42863000",
+   "emails": [
+    "am@sapphireair.in"
+   ],
+   "aop_no": "#03/2022",
+   "aop_valid_until": "2027-04-12",
+   "fleet_type": "mixed",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-JSD",
+     "kind": "rotary_wing",
+     "model": "Leonardo AW169",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-JST",
+     "kind": "fixed_wing",
+     "model": "BD-100-1A10 (Challenger3500)",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-JSJ",
+     "kind": "fixed_wing",
+     "model": "BD-700-2A12 (G7500)",
+     "seats": 15,
+     "role": "passenger",
+     "seats_raw": "15"
+    }
+   ],
+   "source_page": 26
+  },
+  {
+   "sno": 110,
+   "name": "Shraddha Energy and Infraprojects Private Limited",
+   "address": "Shraddha House, CTS No.1206A/1, Plot No.887-A, Shirole Road, Off J.M.Road, Shivajinagar, Pune - 411004",
+   "pincode": "411004",
+   "phone": "020 - 25535711",
+   "fax": "020- 25535711",
+   "emails": [
+    "aviation@shraddhagroup.org"
+   ],
+   "aop_no": "#12/2023",
+   "aop_valid_until": "2028-12-06",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-SBJ",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 26
+  },
+  {
+   "sno": 111,
+   "name": "Shivan Aadithya Air Services Pvt. Ltd.",
+   "address": "89/2, Padmavathi Puram Avinashi Road, Gnadhi Nagar, Near SAP Theatre, Tirupur, Coimbatore,Tamilnadu-641603.",
+   "pincode": "641603",
+   "phone": "0421-3980000",
+   "fax": "0421-3980000",
+   "emails": [
+    "jees.george@goldeneagle.aero"
+   ],
+   "aop_no": "#05/2022",
+   "aop_valid_until": "2027-07-20",
+   "fleet_type": "mixed",
+   "aircraft_count": 5,
+   "aircraft": [
+    {
+     "registration": "VT-BST",
+     "kind": "rotary_wing",
+     "model": "A109S",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-RKR",
+     "kind": "rotary_wing",
+     "model": "A109S",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-BGM",
+     "kind": "rotary_wing",
+     "model": "A109S",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-RRR",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT PREMIER 1A-390",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-BOB",
+     "kind": "rotary_wing",
+     "model": "H160-B",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 26
+  },
+  {
+   "sno": 112,
+   "name": "Simm Samm Airways Pvt. Ltd.",
+   "address": "\"MEHEK \"Salaria Bunglow, A.b.Nair Road, Near Juhu Post Office, Mumbai- 400 049",
+   "pincode": "400049",
+   "phone": "022 - 26602729",
+   "fax": "022 - 26602828",
+   "emails": [
+    "ceo@simmsamm.com",
+    "ops@simmsamm.com"
+   ],
+   "aop_no": "#14/2009",
+   "aop_valid_until": "2029-04-08",
+   "fleet_type": "mixed",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-SSF",
+     "kind": "fixed_wing",
+     "model": "HAWKER BEECHCRAFT (PREMIER 1A)",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-SSO",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76C++",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-ASO",
+     "kind": "rotary_wing",
+     "model": "SIKORSKY S-76C++",
+     "seats": 12,
+     "role": "passenger",
+     "seats_raw": "12"
+    }
+   ],
+   "source_page": 26
+  },
+  {
+   "sno": 113,
+   "name": "Span Air pvt. Ltd.",
+   "address": "303, 3rd Floor, Rasvilas Salcon, Plot No. D-1, District Centre Saket, New Delhi-110017.",
+   "pincode": "110017",
+   "phone": "011 -45541928",
+   "fax": "011 -25673004",
+   "emails": [
+    "mail@span-air.com"
+   ],
+   "aop_no": "#06/1995",
+   "aop_valid_until": "2028-11-23",
+   "fleet_type": "mixed",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-SMR",
+     "kind": "fixed_wing",
+     "model": "B 200 GT",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-JSH",
+     "kind": "rotary_wing",
+     "model": "BELL - 429",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-PRY",
+     "kind": "fixed_wing",
+     "model": "HAWKER 900XP",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-SMK",
+     "kind": "rotary_wing",
+     "model": "BELL - 429",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 26
+  },
+  {
+   "sno": 114,
+   "name": "Skyblue Aviation Services Pvt. Ltd.",
+   "address": "4th Floor, Flat No: 507 and 508, KTC Illumination, Plot. 32-34 and 39-41, Gafoornagar, Madhapur, Shaikpet, Hyderabad, Telangana, India-500081.",
+   "pincode": "500081",
+   "phone": "+91 9573255283",
+   "fax": null,
+   "emails": [
+    "am@skyblue.aero"
+   ],
+   "aop_no": "#13/2024",
+   "aop_valid_until": "2029-12-19",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-KSE",
+     "kind": "fixed_wing",
+     "model": "Falcon900EX",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    }
+   ],
+   "source_page": 27
+  },
+  {
+   "sno": 115,
+   "name": "Sky One Airways Pvt. Ltd.",
+   "address": "604, Bhikaji Cama Bhawan, Bhikaji Cama Place, New Delhi, India-110066.",
+   "pincode": "110066",
+   "phone": "011 - 26169793",
+   "fax": "011 - 26178034",
+   "emails": [
+    "cdrram@skyoneairways.in"
+   ],
+   "aop_no": "#04/2013",
+   "aop_valid_until": "2027-12-25",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 5,
+   "aircraft": [
+    {
+     "registration": "VT-JJA",
+     "kind": "rotary_wing",
+     "model": "MI-172",
+     "seats": 2,
+     "role": "passenger",
+     "seats_raw": "2 6"
+    },
+    {
+     "registration": "VT-SKB",
+     "kind": "rotary_wing",
+     "model": "MI-172",
+     "seats": 26,
+     "role": "passenger",
+     "seats_raw": "26"
+    },
+    {
+     "registration": "VT-MAE",
+     "kind": "rotary_wing",
+     "model": "MI-172",
+     "seats": 26,
+     "role": "passenger",
+     "seats_raw": "26"
+    },
+    {
+     "registration": "VT-SKH",
+     "kind": "rotary_wing",
+     "model": "MI-171A2",
+     "seats": 19,
+     "role": "passenger",
+     "seats_raw": "19"
+    },
+    {
+     "registration": "VT-SKE",
+     "kind": "rotary_wing",
+     "model": "MI-172",
+     "seats": 26,
+     "role": "passenger",
+     "seats_raw": "26"
+    }
+   ],
+   "source_page": 27
+  },
+  {
+   "sno": 116,
+   "name": "SkyJets International Pvt. Ltd.",
+   "address": "D.No.2-56/12/2/B, Plot No.2, Siddhi Vinayak Nagar, Beside M.V.V Courtyard, Khanamet, Madhapur, Hyderabad, TG-500081.",
+   "pincode": "500081",
+   "phone": "040-42036499",
+   "fax": "040-42036499",
+   "emails": [
+    "am@aviaman.com"
+   ],
+   "aop_no": "#05/2015",
+   "aop_valid_until": "2029-07-02",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-AUV",
+     "kind": "fixed_wing",
+     "model": "BOMBARDIER CL-600-2B16 (604 VARIANT)",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-NAB",
+     "kind": "fixed_wing",
+     "model": "CESSNA CITATION CJ1+525",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 27
+  },
+  {
+   "sno": 117,
+   "name": "Smart Wings Aviation Pvt. Ltd.",
+   "address": "165/2, 1st floor, Doraisanipalya, Krishnaraju Layout, Bannerghatta road, Bangalore - 560076",
+   "pincode": "560076",
+   "phone": "080-41507603",
+   "fax": "080-44783589",
+   "emails": [
+    "am@smartwingsaviation.com"
+   ],
+   "aop_no": "#09/2025",
+   "aop_valid_until": "2030-07-23",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-RPB",
+     "kind": "rotary_wing",
+     "model": "EC130T2",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 27
+  },
+  {
+   "sno": 118,
+   "name": "Sparzana Aviation Pvt. Ltd.",
+   "address": "Second Floor, Refex Towers, Sterling Road Signal, 313,Valluvar Kottam High Road, Nungambakkam,, CHENNAI, Tamil Nadu, India, 600034",
+   "pincode": "600034",
+   "phone": "044-43405928",
+   "fax": "044-43405928",
+   "emails": [
+    "am@sparzana.com"
+   ],
+   "aop_no": "#06/2022",
+   "aop_valid_until": "2027-09-08",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-RFX",
+     "kind": "fixed_wing",
+     "model": "Hawker900XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 119,
+   "name": "SKB Infracons Pvt. Ltd.",
+   "address": "211, Ansal Bhawan,16, K.G.Marg, New Delhi - 110 001",
+   "pincode": "110001",
+   "phone": "011 -25671569",
+   "fax": "011 -25671568",
+   "emails": [
+    "am.skbinfracons@gmail.com"
+   ],
+   "aop_no": "#05/2007",
+   "aop_valid_until": "2029-06-20",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-HYA",
+     "kind": "fixed_wing",
+     "model": "KING AIR C 90A",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 120,
+   "name": "Sobha Puravankara Aviation Pvt. Ltd.",
+   "address": "E-106, Sunrise Chambers, 22 Ulsoor Road, Ulsoor, Bangalore, Karnataka - 560 042",
+   "pincode": "560042",
+   "phone": "080 - 25289828",
+   "fax": "080 -25289828",
+   "emails": [
+    "dhakshanamoorthi.s@spal.co.in"
+   ],
+   "aop_no": "#03/2012",
+   "aop_valid_until": "2028-03-14",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-SNP",
+     "kind": "fixed_wing",
+     "model": "GULFSTREAM G-200",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 121,
+   "name": "Sreeji Aviation Pvt. Ltd.",
+   "address": "Khand Bazar, Grain Market, Jam Nagar, Gujarat-361001.",
+   "pincode": "361001",
+   "phone": "0288-2553331",
+   "fax": "0288-2556825",
+   "emails": [
+    "aviation@shreeji.in"
+   ],
+   "aop_no": "#02/2023",
+   "aop_valid_until": "2028-02-21",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-MPT",
+     "kind": "fixed_wing",
+     "model": "Beech Superking Air B200",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-LMW",
+     "kind": "fixed_wing",
+     "model": "Beech Superking Air B200",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 122,
+   "name": "Steamhouse India Ltd.",
+   "address": "Office No. 324, Second Floor, Four Point, VIP Road, Surat- 395017.",
+   "pincode": "395017",
+   "phone": "0261-2998109",
+   "fax": "0261-2998109",
+   "emails": [
+    "sndpmsh@outlook.com"
+   ],
+   "aop_no": "#18/2025",
+   "aop_valid_until": "2030-10-20",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-SHL",
+     "kind": "fixed_wing",
+     "model": "PA-46-350P",
+     "seats": 4,
+     "role": "passenger",
+     "seats_raw": "4"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 123,
+   "name": "Suhan Aviation Pvt. Ltd.",
+   "address": "54-B , Sagar Avenue, 4th Floor, Junction of S.V.Road, Lallubhai Park, Andheri (West) Mumbai - 400 058.",
+   "pincode": "400058",
+   "phone": "022 - 66754660/ 61",
+   "fax": "022 - 39167412",
+   "emails": [
+    "rsasan@suhanaviation.com"
+   ],
+   "aop_no": "#01/2016",
+   "aop_valid_until": "2028-03-14",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-DBH",
+     "kind": "rotary_wing",
+     "model": "S-76C++",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 124,
+   "name": "Syandan Aviation Pvt. Ltd.",
+   "address": "2nd Floor, Plot No. 4, Minarch Tower, Sector-44, Sector 45, Gurgaon, Sector -45, Haryana, India, 122003",
+   "pincode": "122003",
+   "phone": "8826694906",
+   "fax": "8826694906",
+   "emails": [
+    "am@syandanaviation.com"
+   ],
+   "aop_no": "#11/2025",
+   "aop_valid_until": "2030-09-10",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-HGX",
+     "kind": "rotary_wing",
+     "model": "A109S",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-HAX",
+     "kind": "rotary_wing",
+     "model": "A109E",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-HFX",
+     "kind": "rotary_wing",
+     "model": "EC-130T2",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-SES",
+     "kind": "rotary_wing",
+     "model": "EC-130T2",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 125,
+   "name": "TAI Jets Private Limited",
+   "address": "208 D, 4th Floor, 80 Feet Road, HBR First Stage, Second Block, HBR Layout, Bengaluru Karnataka- 560043",
+   "pincode": "560043",
+   "phone": "080-48500643",
+   "fax": "080-48500643",
+   "emails": [
+    "manoj@titanaviation.aero"
+   ],
+   "aop_no": "#07/2025",
+   "aop_valid_until": "2030-06-01",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-KJR",
+     "kind": "fixed_wing",
+     "model": "EMB-135BJ (LEGACY 650)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-KJK",
+     "kind": "fixed_wing",
+     "model": "EMB-500 (PHENOM 100E)",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 28
+  },
+  {
+   "sno": 126,
+   "name": "Taj Air Ltd.",
+   "address": "Mandlik House, Mandlik Road,Apollo Bunder, opp. Colaba Police Station, Colaba, Mumbai-400 001.",
+   "pincode": "400001",
+   "phone": "022 -26157993",
+   "fax": "022 -26157555",
+   "emails": [
+    "mehernosh.kapadia@tajhotels.com"
+   ],
+   "aop_no": "#09/1993",
+   "aop_valid_until": "2028-11-14",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-TDT",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000 LX",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 29
+  },
+  {
+   "sno": 127,
+   "name": "Tara Aviation Services Pvt. Ltd.",
+   "address": "Ground floor, No 25, AGT, Business Park, Avinashi Road, Civil Aerodrome Post, Coimbatore 641014 Tamil Nadu",
+   "pincode": "641014",
+   "phone": "+91 9810310000",
+   "fax": "N?A",
+   "emails": [
+    "am@taraaviation.com"
+   ],
+   "aop_no": "#03/2026",
+   "aop_valid_until": "2031-02-11",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-TAT",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-TKG",
+     "kind": "fixed_wing",
+     "model": "PC-12/47E",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 29
+  },
+  {
+   "sno": 128,
+   "name": "Target Air Services Pvt. Ltd.",
+   "address": "703, Nirmal Tower, 26 Barakhamba Road, New Delhi, India 110001.",
+   "pincode": "110001",
+   "phone": "+91 11 40519284",
+   "fax": "+91 11 40519284",
+   "emails": [
+    "info@targetairservices.com"
+   ],
+   "aop_no": "#14/2023",
+   "aop_valid_until": "2028-12-20",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-JPV",
+     "kind": "fixed_wing",
+     "model": "BEECH SUPER KING AIR B-200GT",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-HBX",
+     "kind": "fixed_wing",
+     "model": "HAWKER 400A XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-ACD",
+     "kind": "fixed_wing",
+     "model": "BEECH SUPER KING AIR B-300 (350)",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 29
+  },
+  {
+   "sno": 129,
+   "name": "Thumby Aviation Pvt. Ltd.",
+   "address": "Shree Vihar, T.C. 20/2658, Ambalamukku, kowdiar P.O., Thiruvananthpuram-695 003",
+   "pincode": "695003",
+   "phone": "0417 - 2432635",
+   "fax": "0417 - 2432635",
+   "emails": [
+    "captkingnair@yahoo.co.in"
+   ],
+   "aop_no": "#02/2013",
+   "aop_valid_until": "2029-03-24",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 10,
+   "aircraft": [
+    {
+     "registration": "VT-ASL",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-KNG",
+     "kind": "rotary_wing",
+     "model": "BELL 412 EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-KSA",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-GRA",
+     "kind": "rotary_wing",
+     "model": "AS350B3E",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-GRB",
+     "kind": "rotary_wing",
+     "model": "BELL 407GXP",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-GRC",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-NAV",
+     "kind": "rotary_wing",
+     "model": "BELL412EP",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-GRD",
+     "kind": "rotary_wing",
+     "model": "BELL412EP",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-NAL",
+     "kind": "rotary_wing",
+     "model": "BELL407GX",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-SDS",
+     "kind": "rotary_wing",
+     "model": "EC130-T2",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 29
+  },
+  {
+   "sno": 130,
+   "name": "Trans Bharat Aviation Pvt. Ltd.",
+   "address": "Plot No. 69, Patparganj Industrial area, New Delhi - 110 092",
+   "pincode": "110092",
+   "phone": "011 - 25675477",
+   "fax": "011 -25675477",
+   "emails": [
+    "accm@transbharat.in"
+   ],
+   "aop_no": "#01/1991",
+   "aop_valid_until": "2029-02-27",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 3,
+   "aircraft": [
+    {
+     "registration": "VT-TBC",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "aerial_work",
+     "seats_raw": "6/Aerial Work"
+    },
+    {
+     "registration": "VT-TBF",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-JIB",
+     "kind": "rotary_wing",
+     "model": "BELL 407",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    }
+   ],
+   "source_page": 30
+  },
+  {
+   "sno": 131,
+   "name": "Transworld Jets Pvt Ltd",
+   "address": "593 ,Sector 27, Gurgaon, Haryana-122001 India.",
+   "pincode": "122001",
+   "phone": "+91 124 4833044",
+   "fax": "+91 124 4833044",
+   "emails": [
+    "aks@transworld.com"
+   ],
+   "aop_no": "#07/2024",
+   "aop_valid_until": "2029-07-11",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-KVR",
+     "kind": "fixed_wing",
+     "model": "Hawker-4000",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-TWJ",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000 EX EASY",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    }
+   ],
+   "source_page": 30
+  },
+  {
+   "sno": 132,
+   "name": "United Helicharters Pvt. Ltd.",
+   "address": "Hanger No. C / 2, Juhu Aerodrome, Vile Parle (W), Mumbai - 56, Maharashtra, India.",
+   "pincode": null,
+   "phone": "+91-9867428904",
+   "fax": null,
+   "emails": [
+    "prakash@uhpl.in"
+   ],
+   "aop_no": "#04/2026",
+   "aop_valid_until": "2031-02-19",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-UHE",
+     "kind": "rotary_wing",
+     "model": "AS350B3",
+     "seats": 6,
+     "role": "passenger",
+     "seats_raw": "6"
+    },
+    {
+     "registration": "VT-HEX",
+     "kind": "rotary_wing",
+     "model": "EC-130T2",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    }
+   ],
+   "source_page": 30
+  },
+  {
+   "sno": 133,
+   "name": "Universal Airways Pvt. Ltd.",
+   "address": "4th Floor, Area 1, DLF Square Building,, DLF city Phase-2, Jacaranda Marg, Sector 25, DLF Square Building, GURGAON, Haryana, India, 122002",
+   "pincode": "122002",
+   "phone": "011-25673801",
+   "fax": "011-25673801",
+   "emails": [
+    "rj@universalairways.in"
+   ],
+   "aop_no": "#04/2006",
+   "aop_valid_until": "2028-07-31",
+   "fleet_type": "rotary_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-TWO",
+     "kind": "rotary_wing",
+     "model": "AW139",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 30
+  },
+  {
+   "sno": 134,
+   "name": "Vijayanand Travels Private Limited",
+   "address": "CTS NO.122/78A, New cotton Market, Hubballi, Dist: Dharwad, Karnataka, India, 580029",
+   "pincode": "580029",
+   "phone": "080 - 25232444",
+   "fax": "080- 25232444",
+   "emails": [
+    "vtplgmavn@gmail.com"
+   ],
+   "aop_no": "#09/2023",
+   "aop_valid_until": "2028-09-14",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 2,
+   "aircraft": [
+    {
+     "registration": "VT-PLV",
+     "kind": "fixed_wing",
+     "model": "G-150",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-PLC",
+     "kind": "fixed_wing",
+     "model": "FALCON 2000EX",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    }
+   ],
+   "source_page": 30
+  },
+  {
+   "sno": 135,
+   "name": "Vimaan Airlines Pvt. Ltd.",
+   "address": "12, Pusa Road, First Floor, Karol Bagh New Delhi-110005.",
+   "pincode": "110005",
+   "phone": "+91 11 45213331",
+   "fax": "+91 11 45213331",
+   "emails": [
+    "accountablemgr@vimaanairlines.com"
+   ],
+   "aop_no": "#03/2025",
+   "aop_valid_until": "2030-02-03",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-UYK",
+     "kind": "fixed_wing",
+     "model": "Hawker 800XP",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 30
+  },
+  {
+   "sno": 136,
+   "name": "Ventura Airconnect Ltd.",
+   "address": "803 & 804, Luxuria Business Hub, Near VR Mall, Surat-Dumas Road, Surat-395007.",
+   "pincode": "395007",
+   "phone": "0261-2728002",
+   "fax": "0261-2728003",
+   "emails": [
+    "am@flyairconnect.com"
+   ],
+   "aop_no": "#08/2011",
+   "aop_valid_until": "2028-06-08",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-VAK",
+     "kind": "fixed_wing",
+     "model": "CESSNA CARAVAN 208B",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-VAM",
+     "kind": "fixed_wing",
+     "model": "CESSNA CARAVAN 208B",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-DEV",
+     "kind": "fixed_wing",
+     "model": "CESSNA CARAVAN 208B",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-IOO",
+     "kind": "fixed_wing",
+     "model": "PC-12/45",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 30
+  },
+  {
+   "sno": 137,
+   "name": "VSR Ventures Pvt. Ltd.",
+   "address": "7349/B-10, Vasant Kunj, New Delhi - 110 070",
+   "pincode": "110070",
+   "phone": "011 - 46001227",
+   "fax": "011 - 46001228",
+   "emails": [
+    "vk@vsraviation.com"
+   ],
+   "aop_no": "#07/2014",
+   "aop_valid_until": "2028-04-20",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 17,
+   "aircraft": [
+    {
+     "registration": "VT-BAF",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT KING AIR B200",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-MEG",
+     "kind": "fixed_wing",
+     "model": "PILATUS PC-12",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-CRA",
+     "kind": "fixed_wing",
+     "model": "LEARJET-45",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-SRC",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT KING AIR B200",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-TRI",
+     "kind": "fixed_wing",
+     "model": "LEARJET-45 XR",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-DBL",
+     "kind": "fixed_wing",
+     "model": "LEARJET-45 XR",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-VRS",
+     "kind": "fixed_wing",
+     "model": "LEARJET-40XR",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-CMR",
+     "kind": "fixed_wing",
+     "model": "EMB 135BJ (Legacy600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-BAS",
+     "kind": "fixed_wing",
+     "model": "SKA B200",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-VRV",
+     "kind": "fixed_wing",
+     "model": "LEARJET-45 XR",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-VRA",
+     "kind": "fixed_wing",
+     "model": "LEARJET-40 XR",
+     "seats": 7,
+     "role": "passenger",
+     "seats_raw": "7"
+    },
+    {
+     "registration": "VT-VRR",
+     "kind": "fixed_wing",
+     "model": "LEARJET-45XR",
+     "seats": 9,
+     "role": "passenger",
+     "seats_raw": "9"
+    },
+    {
+     "registration": "VT-VSS",
+     "kind": "fixed_wing",
+     "model": "EMB 135 (Legacy600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-RSM",
+     "kind": "fixed_wing",
+     "model": "BEECHCRAFT KING AIR B200",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    },
+    {
+     "registration": "VT-NSG",
+     "kind": "fixed_wing",
+     "model": "EMB 135 (Legacy600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-VSG",
+     "kind": "fixed_wing",
+     "model": "EMB 135 (Legacy600)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-VSV",
+     "kind": "fixed_wing",
+     "model": "EMB 135 BJ (Legacy650)",
+     "seats": 14,
+     "role": "passenger",
+     "seats_raw": "14"
+    }
+   ],
+   "source_page": 31
+  },
+  {
+   "sno": 138,
+   "name": "Wings Aviation Pvt. Ltd.",
+   "address": "1-11-301/3, AU Reddy Towers, Gagan Vihar Colony, Adjacent Begumpet Airport, Hyderabad 500016.",
+   "pincode": "500016",
+   "phone": "040-277 62304",
+   "fax": null,
+   "emails": [
+    "qc.wings@gmail.com"
+   ],
+   "aop_no": "#05/2026",
+   "aop_valid_until": "2031-03-23",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 1,
+   "aircraft": [
+    {
+     "registration": "VT-TLC",
+     "kind": "fixed_wing",
+     "model": "P68C",
+     "seats": 5,
+     "role": "passenger",
+     "seats_raw": "5"
+    }
+   ],
+   "source_page": 32
+  },
+  {
+   "sno": 139,
+   "name": "Zest Aviation Pvt. Ltd.",
+   "address": "31, Pariseema, C.G.Road, Navrangapura, Ahmedabad-380 006",
+   "pincode": "380006",
+   "phone": "079 – 66660674-0679",
+   "fax": "079 - 26469331",
+   "emails": [
+    "sudeep@zestaviation.com"
+   ],
+   "aop_no": "#07/2012",
+   "aop_valid_until": "2028-06-27",
+   "fleet_type": "fixed_wing",
+   "aircraft_count": 4,
+   "aircraft": [
+    {
+     "registration": "VT-TUS",
+     "kind": "fixed_wing",
+     "model": "GLOBAL EXPRESS XRS",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-ZTT",
+     "kind": "fixed_wing",
+     "model": "CHALLENGER 650 CL-600-2B16",
+     "seats": 10,
+     "role": "passenger",
+     "seats_raw": "10"
+    },
+    {
+     "registration": "VT-ZTP",
+     "kind": "fixed_wing",
+     "model": "BD-700-1A11 (GLOBAL 5500)",
+     "seats": 13,
+     "role": "passenger",
+     "seats_raw": "13"
+    },
+    {
+     "registration": "VT-TAZ",
+     "kind": "fixed_wing",
+     "model": "Cessna Citation 560XL",
+     "seats": 8,
+     "role": "passenger",
+     "seats_raw": "8"
+    }
+   ],
+   "source_page": 32
+  }
+ ]
+}

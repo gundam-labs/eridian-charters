@@ -49,6 +49,7 @@ import AdminHome from './pages/admin/AdminHome';
 import Users from './pages/admin/Users';
 import Settings from './pages/admin/Settings';
 import Airports from './pages/admin/Airports';
+import Operators from './pages/admin/Operators';
 
 const STAFF = ['admin', 'sales', 'ops'];
 const guard = (roles, el) => <ProtectedRoute roles={roles}>{el}</ProtectedRoute>;
@@ -101,6 +102,7 @@ export default function App() {
         <Route path="/admin/users" element={guard(['admin'], <Users />)} />
         <Route path="/admin/settings" element={guard(['admin'], <Settings />)} />
         <Route path="/admin/airports" element={guard(['admin'], <Airports />)} />
+        <Route path="/admin/operators" element={guard(['admin', 'sales'], <Operators />)} />
 
         <Route path="/s" element={guard(['sales', 'admin'], <StaffDashboard title="Sales dashboard" />)} />
         <Route path="/s/requests" element={guard(['sales', 'admin'], <RequestsInbox />)} />

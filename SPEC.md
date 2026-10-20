@@ -302,3 +302,24 @@ Charter operators, travel agents and private flyers sign up themselves and post 
 
 ## Seed (idempotent)
 Approved operator `ops@skyhopaviation.example.in` (SkyHop Aviation) with two published legs; pending travel agent `desk@wanderlusttravels.example.in`.
+
+# v1.4 — Charter operator directory
+
+The DGCA "List of Non-Scheduled Operators" (as on 31.08.2026) loaded as a directory of every NSOP holder and its registered aircraft — the starting point for recruiting operators as listers and for verifying the ones who sign up. Read-only for now; enrichment comes later.
+
+## Data
+- Source PDF parsed by `scripts/parse_dgca_nsop.py` into `backend/src/db/seed-data/dgca-nsop-operators-2026-08-31.json`: 139 operators, 471 aircraft. Every operator's aircraft rows match the "No. of Aircraft's" column; S.No. 1–139 has no gaps; registrations are unique.
+- PDF quirks handled: each page after the first carries a hidden copy of operator #1's first row (removed character-for-character); cell lines split by a page break are printed on both pages (de-duplicated); e-mail addresses wrapped mid-word are re-joined.
+- `charter_operators` (aop_no unique, name, address, pincode, phone, fax, emails[], aop_valid_until, fleet_type, aircraft_count, source, source_as_of, source_sno, in_latest_list, website, notes) and `operator_aircraft` (registration unique, kind fixed_wing|rotary_wing|hot_air_balloon, model, seats, role passenger|aerial_work|cargo, seats_raw). `data_imports` records the loaded list version.
+
+## Import
+`npm run import:operators` (`src/db/import-operators.js`) runs on every start/deploy after migrate. Idempotent: skipped when the list version is already loaded (`--force` to re-run); upserts operators by AOP number without touching website/notes; operators missing from a newer list are kept with `in_latest_list = false`; aircraft are upserted by registration (they follow the operator that now lists them) and aircraft an operator no longer lists are removed.
+
+## API (admin, sales)
+- `GET /operators?q=&fleet_type=&listed=all` → { operators (with fixed/rotary counts, max seats, models), totals, source }. `q` searches name, address, AOP, e-mail, aircraft model and registration.
+- `GET /operators/:id` → operator, aircraft, and listers whose NSOP permit matches its AOP number.
+- `GET /listers` and `/listers/:id` add `dgca_operator` — the directory entry whose AOP number (number + year) matches the lister's NSOP permit.
+
+## Frontend
+- **Administration → Charter operators** (`/admin/operators`, also in the Sales menu): totals, search, fleet filter, AOP validity flags (expired / renewal due within 6 months), detail with full fleet.
+- Lister review shows "Match / No match" against the DGCA list, linking to the operator.
