@@ -6,7 +6,7 @@ import { ListerStatusBanner } from './ListerListings';
 import { LISTER_TYPES } from '../Register';
 import { fmtDate } from '../../lib/format';
 
-const FIELDS = ['name', 'company', 'phone', 'city', 'gstin', 'nsop_permit_no', 'about'];
+const FIELDS = ['name', 'company', 'phone', 'city', 'gstin', 'pan', 'tan', 'nsop_permit_no', 'about'];
 
 export default function ListerProfile() {
   const { data: me, error, loading, setData } = useFetch('/api/lister/me');
@@ -55,6 +55,10 @@ export default function ListerProfile() {
             <input id="p-phone" className="input" type="tel" required disabled={locked} value={f.phone} onChange={set('phone')} /></div>
           <div className="field"><label htmlFor="p-city">City</label>
             <input id="p-city" className="input" disabled={locked} value={f.city} onChange={set('city')} /></div>
+          <div className="field"><label htmlFor="p-pan">PAN{me.lister_type === 'flyer' ? ' (optional)' : ''}</label>
+            <input id="p-pan" className="input" maxLength={10} disabled={locked} required={me.lister_type !== 'flyer'} value={f.pan} onChange={set('pan')} style={{ textTransform: 'uppercase' }} /></div>
+          <div className="field"><label htmlFor="p-tan">TAN (optional)</label>
+            <input id="p-tan" className="input" maxLength={10} disabled={locked} value={f.tan} onChange={set('tan')} style={{ textTransform: 'uppercase' }} /></div>
           <div className="field"><label htmlFor="p-gstin">GSTIN</label>
             <input id="p-gstin" className="input" maxLength={15} disabled={locked} value={f.gstin} onChange={set('gstin')} style={{ textTransform: 'uppercase' }} /></div>
           {me.lister_type === 'operator' && (

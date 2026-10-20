@@ -53,6 +53,8 @@ test('lister signs up, gets approved, publishes and confirms a request', async (
     await l.fill('#r-email', email);
     await l.fill('#r-phone', '+91 90000 12345');
     await l.fill('#r-city', 'Delhi');
+    await l.fill('#r-pan', 'AAACE1234E');
+    await l.fill('#r-tan', 'DELE12345E');
     await l.fill('#r-pw', 'Sup3rSecret!x');
     await l.fill('#r-pw2', 'Sup3rSecret!x');
     await l.screenshot({ path: `${SHOTS}/1-register.png`, fullPage: true });
@@ -87,6 +89,7 @@ test('lister signs up, gets approved, publishes and confirms a request', async (
     await row.waitFor();
     await s.screenshot({ path: `${SHOTS}/4-sales-listers.png` });
     await row.locator('button:has-text("Review")').click();
+    assert.ok((await s.textContent('.modal')).includes('AAACE1234E'), 'PAN shown to the reviewer');
     await s.click('.modal button:has-text("Approve")');
     await s.waitForSelector(`text=${company} approved`);
 

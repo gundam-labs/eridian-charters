@@ -323,3 +323,10 @@ The DGCA "List of Non-Scheduled Operators" (as on 31.08.2026) loaded as a direct
 ## Frontend
 - **Administration → Charter operators** (`/admin/operators`, also in the Sales menu): totals, search, fleet filter, AOP validity flags (expired / renewal due within 6 months), detail with full fleet.
 - Lister review shows "Match / No match" against the DGCA list, linking to the operator.
+
+# v1.5 — Lister PAN and TAN
+
+- `listers.pan`, `listers.tan` (idempotent `ADD COLUMN IF NOT EXISTS`).
+- PAN required for operators and travel agents, optional for private flyers; format `AAAAA9999A` with a valid holder-type 4th letter. TAN optional; format `AAAA99999A`. Spaces are stripped and letters upper-cased.
+- When both a GSTIN and a PAN are given, GSTIN characters 3–12 must equal the PAN (checked at sign-up and on profile edits).
+- Shown on the sign-up form, the lister's profile and the staff review dialog; never on public pages.

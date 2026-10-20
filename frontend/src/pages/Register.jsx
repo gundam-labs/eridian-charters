@@ -42,7 +42,7 @@ export default function Register() {
   const { user, applySession } = useAuth();
   const nav = useNavigate();
   const [f, setF] = useState({
-    lister_type: '', name: '', email: '', phone: '', company: '', city: '', nsop_permit_no: '', gstin: '', password: '', password2: '', website: '',
+    lister_type: '', name: '', email: '', phone: '', company: '', city: '', nsop_permit_no: '', gstin: '', pan: '', tan: '', password: '', password2: '', website: '',
   });
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState('');
@@ -57,6 +57,7 @@ export default function Register() {
     e.preventDefault();
     setError('');
     if (!f.lister_type) { setError('Choose whether you are a charter operator, travel agent or private flyer.'); return; }
+    if (needsCompany && !f.pan.trim()) { setError('Please enter your company’s PAN.'); return; }
     if (f.password.length < 10) { setError('Password must be at least 10 characters.'); return; }
     if (f.password !== f.password2) { setError('Passwords do not match.'); return; }
     if (!agree) { setError('Please accept the lister terms.'); return; }
@@ -129,6 +130,18 @@ export default function Register() {
               <div className="field">
                 <label htmlFor="r-city">City <span className="muted">— optional</span></label>
                 <input id="r-city" className="input" autoComplete="address-level2" value={f.city} onChange={set('city')} />
+              </div>
+              <div className="field">
+                <label htmlFor="r-pan">PAN{!needsCompany && <span className="muted"> — optional</span>}</label>
+                <input id="r-pan" className="input" value={f.pan} onChange={set('pan')} maxLength={10} required={needsCompany}
+                  placeholder="ABCDE1234F" style={{ textTransform: 'uppercase' }} />
+                <span className="hint">{needsCompany ? 'Your company’s PAN.' : 'Your PAN.'}</span>
+              </div>
+              <div className="field">
+                <label htmlFor="r-tan">TAN <span className="muted">— optional</span></label>
+                <input id="r-tan" className="input" value={f.tan} onChange={set('tan')} maxLength={10}
+                  placeholder="MUMA12345B" style={{ textTransform: 'uppercase' }} />
+                <span className="hint">If you deduct TDS.</span>
               </div>
               <div className="field">
                 <label htmlFor="r-gstin">GSTIN <span className="muted">— optional</span></label>

@@ -48,10 +48,15 @@ const LISTER_TYPES = ['operator', 'agent', 'flyer'];
 const EMAIL_RE = /^[^@\s<>"',;]+@[^@\s<>"',;]+\.[^@\s<>"',;]{2,}$/;
 const PHONE_RE = /^\+?[0-9][0-9 ()-]{6,19}$/;
 const GSTIN_RE = /^[0-9]{2}[A-Z0-9]{10}[0-9A-Z]{3}$/;
+// PAN: 5 letters, 4 digits, 1 letter; the 4th letter is the holder type (P person, C company, F firm, …).
+const PAN_RE = /^[A-Z]{3}[ABCFGHLJPTK][A-Z][0-9]{4}[A-Z]$/;
+// TAN: 4 letters, 5 digits, 1 letter.
+const TAN_RE = /^[A-Z]{4}[0-9]{5}[A-Z]$/;
+const PAN_REQUIRED = ['operator', 'agent'];
 const clean = (v, max) => String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max);
 
 /** Validate lister profile fields. partial = only check fields that are present (profile edits). */
-function listerProfile(b, { partial = false, type } = {}) {
+function listerProfile(b, { partial = false, type, current = {} } = {}) {
   const out = {};
   const has = (k) => !partial || b[k] !== undefined;
   const lister_type = type || b.lister_type;
@@ -65,6 +70,14 @@ function listerProfile(b, { partial = false, type } = {}) {
     out.gstin = clean(b.gstin, 15).toUpperCase() || null;
     if (out.gstin && !GSTIN_RE.test(out.gstin)) throw new HttpError(400, 'GSTIN must be 15 characters, e.g. 27ABCDE1234F1Z5');
   }
+  if (has('pan')) {
+    out.pan = clean(b.pan, 20).replace(/\s/g, '').toUpperCase() || null;
+    if (out.pan && !PAN_RE.test(out.pan)) throw new HttpError(400, 'PAN must be 10 characters, e.g. ABCDE1234F');
+  }
+  if (has('tan')) {
+    out.tan = clean(b.tan, 20).replace(/\s/g, '').toUpperCase() || null;
+    if (out.tan && !TAN_RE.test(out.tan)) throw new HttpError(400, 'TAN must be 10 characters, e.g. MUMA12345B');
+  }
   if (has('nsop_permit_no')) out.nsop_permit_no = clean(b.nsop_permit_no, 60) || null;
   if (has('about')) out.about = clean(b.about, 1000) || null;
   if (!partial || out.company !== undefined) {
@@ -73,6 +86,13 @@ function listerProfile(b, { partial = false, type } = {}) {
   if (!partial || out.nsop_permit_no !== undefined) {
     if (lister_type === 'operator' && !out.nsop_permit_no) throw new HttpError(400, 'Charter operators must give their DGCA NSOP permit number');
   }
+  if (!partial || out.pan !== undefined) {
+    if (PAN_REQUIRED.includes(lister_type) && !out.pan) throw new HttpError(400, 'PAN is required for operators and travel agents');
+  }
+  // A GSTIN embeds the holder's PAN (characters 3–12): the two must agree.
+  const pan = out.pan !== undefined ? out.pan : current.pan;
+  const gstin = out.gstin !== undefined ? out.gstin : current.gstin;
+  if (pan && gstin && gstin.slice(2, 12) !== pan) throw new HttpError(400, 'The PAN does not match the PAN inside your GSTIN (characters 3–12)');
   return out;
 }
 
@@ -99,9 +119,9 @@ router.post('/register', async (req, res) => {
       `INSERT INTO users (email, name, role, password_hash, last_login_at) VALUES ($1,$2,'lister',$3, now()) RETURNING id`,
       [email, name, hash])).rows[0];
     const l = (await client.query(
-      `INSERT INTO listers (user_id, lister_type, company, phone, city, gstin, nsop_permit_no, about)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [u.id, lister_type, profile.company, profile.phone, profile.city, profile.gstin, profile.nsop_permit_no, profile.about])).rows[0];
+      `INSERT INTO listers (user_id, lister_type, company, phone, city, gstin, pan, tan, nsop_permit_no, about)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+      [u.id, lister_type, profile.company, profile.phone, profile.city, profile.gstin, profile.pan, profile.tan, profile.nsop_permit_no, profile.about])).rows[0];
     await logEvent({ entity_type: 'lister', entity_id: l.id, action: 'registered', actor_user_id: u.id, detail: { lister_type } }, client);
     return { userId: u.id, lister: l };
   });
