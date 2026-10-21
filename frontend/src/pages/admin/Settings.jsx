@@ -12,6 +12,11 @@ const META = {
   positioning_rate_pct: ['Positioning rate (%)', 'Percentage of hourly rate charged for positioning flights.'],
   taxi_allowance_hours: ['Taxi allowance (hours)', 'Added to every leg before rounding up to 0.1 h.'],
   manifest_cutoff_hours: ['Manifest cut-off (hours)', 'Hours before first departure the manifest is due.'],
+  marketplace_commission_pct: ['Marketplace commission (%)', 'Taken from the fare of flights listed by operators, agents and flyers; the rest is paid out to them.'],
+  lister_confirm_hours: ['Lister confirmation time (hours)', 'How long a lister has to confirm a paid request before it lapses and the hold is released.'],
+  marketplace_checkout_minutes: ['Checkout time (minutes)', 'How long a traveller has to finish paying before the request is dropped.'],
+  traveller_refund_72h_pct: ['Traveller refund > 72 h (%)', 'Refund when a traveller cancels a lister flight more than 72 hours before departure.'],
+  traveller_refund_24h_pct: ['Traveller refund 24–72 h (%)', 'Refund when a traveller cancels 24–72 hours before departure (none within 24 hours).'],
 };
 
 export default function Settings() {

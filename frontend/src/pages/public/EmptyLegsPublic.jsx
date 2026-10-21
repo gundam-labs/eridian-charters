@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { publicApi, errText } from '../../api';
 import { ErrorAlert, Loading, Empty } from '../../components/ui';
 import EmptyLegCard from '../../components/EmptyLegCard';
+import RouteAlertForm from '../../components/RouteAlertForm';
 import PublicLayout from './PublicLayout';
 import { normLeg, monthOptions, useDocumentTitle } from '../../lib/emptyLegs';
 import { inr } from '../../lib/format';
@@ -35,6 +36,8 @@ export default function EmptyLegsPublic() {
   const qs = new URLSearchParams(Object.entries({ from, to, month }).filter(([, v]) => v)).toString();
 
   const all = usePublicLegs('');
+  const [airportList, setAirportList] = useState([]);
+  useEffect(() => { publicApi.get('/api/public/airports').then(r => setAirportList(r.data || [])).catch(() => {}); }, []);
   const filtered = usePublicLegs(qs);
   const legs = qs ? filtered.data : all.data;
   const loading = qs ? filtered.loading : all.loading;
@@ -131,6 +134,8 @@ export default function EmptyLegsPublic() {
             {legs.map(l => <EmptyLegCard key={l.id} leg={l} to={`/empty-legs/${l.id}`} />)}
           </div>
         )}
+
+        {airportList.length > 0 && <div style={{ marginTop: 28 }}><RouteAlertForm airports={airportList} from={from} to={to} /></div>}
 
         <section className="el-how" aria-labelledby="how-title">
           <div className="eyebrow">How empty legs work</div>

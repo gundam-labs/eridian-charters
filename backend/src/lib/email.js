@@ -140,18 +140,21 @@ function fmtWindow(d) {
 
 const PAY_NOTE = 'Once confirmed, payment in full is due 24 hours before departure — for late bookings, within 2 hours of confirmation.';
 
-function sendEmptyLegRequestAck({ to, name, booking, leg }) {
+function sendEmptyLegRequestAck({ to, name, booking, leg, hold = null }) {
   // Marketplace legs (posted by an outside lister) are confirmed by that operator, not by Meridian.
   const who = leg.lister_id ? (leg.operator_name || leg.lister_company || 'the operator') : 'Meridian Charters';
   const payNote = leg.lister_id
-    ? `${who} will confirm the price, payment terms and exact departure time with you directly.`
+    ? (hold
+      ? `We are holding ${formatINR(hold.amount)} (incl. GST) on your payment method. You are charged only if ${who} confirms${booking.respond_by ? ` by ${fmtWindow(booking.respond_by)} IST` : ''}; otherwise the hold is released automatically.`
+      : `${who} will confirm the price, payment terms and exact departure time with you directly.`)
     : PAY_NOTE;
+  const track = booking.access_token ? `${APP_URL()}/b/${booking.access_token}` : null;
   return sendEmail({
     to, type: 'empty_leg_request', subject: `We received your empty-leg request ${booking.booking_no}`,
     text: `Hello ${name}, thank you for your request ${booking.booking_no} for ${legRoute(leg)} departing ${legWindow(leg)}. The booking is confirmed only when ${who} confirms it. ${payNote}`,
     html: layout('Request received', `<p>Hello ${esc(name)},</p><p>Thank you — we have received your request <b>${esc(booking.booking_no)}</b> for the empty leg <b>${esc(legRoute(leg))}</b>, departing ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
       <p>Empty legs depend on the operator's main charter and may be retimed or withdrawn; the booking is confirmed only when ${esc(who)} confirms it.</p>
-      <p>${esc(payNote)}</p>`),
+      <p>${esc(payNote)}</p>${track ? `<p><a href="${esc(track)}">Follow your request</a></p>` : ''}`),
   });
 }
 
@@ -183,11 +186,19 @@ function sendEmptyLegBooked({ to, name, booking, leg, charter, invoice, inviteUr
   });
 }
 
-function sendEmptyLegRequestClosed({ to, name, booking, leg, reason }) {
+async function sendEmptyLegRequestClosed({ to, name, booking, leg, reason }) {
+  // v1.6: a held payment on this request has been released — say so.
+  let holdLine = '';
+  try {
+    const bp = (await pool.query(`SELECT amount, status, provider FROM booking_payments WHERE booking_id = $1 ORDER BY created_at DESC LIMIT 1`, [booking.id])).rows[0];
+    if (bp && bp.status === 'released') {
+      holdLine = `You have not been charged: the hold of ${formatINR(bp.amount)} on your payment method has been released${bp.provider === 'razorpay' ? ' and your bank returns it automatically' : ''}.`;
+    }
+  } catch (_) { /* best effort */ }
   return sendEmail({
     to, type: 'empty_leg_request_closed', subject: `Your empty-leg request ${booking.booking_no}`,
-    text: `Hello ${name}, unfortunately we cannot confirm your request ${booking.booking_no} for ${legRoute(leg)}. Reason: ${reason}`,
-    html: layout('About your request', `<p>Hello ${esc(name)},</p><p>Unfortunately we cannot confirm your request <b>${esc(booking.booking_no)}</b> for ${esc(legRoute(leg))} (${esc(legWindow(leg))}).</p><p>Reason: ${esc(reason)}</p>
+    text: `Hello ${name}, unfortunately we cannot confirm your request ${booking.booking_no} for ${legRoute(leg)}. Reason: ${reason}${holdLine ? ` ${holdLine}` : ''}`,
+    html: layout('About your request', `<p>Hello ${esc(name)},</p><p>Unfortunately we cannot confirm your request <b>${esc(booking.booking_no)}</b> for ${esc(legRoute(leg))} (${esc(legWindow(leg))}).</p><p>Reason: ${esc(reason)}</p>${holdLine ? `<p>${esc(holdLine)}</p>` : ''}
       <p>See other available flights at <a href="${esc(APP_URL())}/empty-legs">our empty-leg deals</a>.</p>`),
   });
 }
@@ -242,27 +253,58 @@ function sendListerDecision({ to, name, status, reason }) {
   });
 }
 
-function sendListerRequestNotice({ to, booking, leg }) {
+function sendListerRequestNotice({ to, booking, leg, hold = null }) {
   const url = `${APP_URL()}/l/requests`;
+  const deadline = booking.respond_by ? ` Please confirm or decline by ${fmtWindow(booking.respond_by)} IST, or the request lapses.` : '';
+  const paid = hold ? ` Payment of ${formatINR(hold.amount)} is held and is charged when you confirm.` : '';
   return sendEmail({
     to, type: 'lister_request', subject: `New booking request ${booking.booking_no} — ${leg.leg_no}`,
-    text: `${booking.guest_name} requested your empty leg ${leg.leg_no} ${legRoute(leg)} for ${booking.pax} pax. Confirm or decline: ${url}`,
+    text: `${booking.guest_name} requested your empty leg ${leg.leg_no} ${legRoute(leg)} for ${booking.pax} pax.${paid}${deadline} Confirm or decline: ${url}`,
     html: layout(`New request on ${leg.leg_no}`, `<p><b>${esc(booking.guest_name)}</b>${booking.guest_company ? ` (${esc(booking.guest_company)})` : ''} requested your empty leg <b>${esc(legRoute(leg))}</b>, ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
       ${booking.message ? `<p>Message: ${esc(booking.message)}</p>` : ''}
+      ${paid ? `<p>${esc(paid.trim())}</p>` : ''}${deadline ? `<p><b>${esc(deadline.trim())}</b></p>` : ''}
       <p>Their contact details are shared with you when you confirm.</p><p><a href="${esc(url)}">Confirm or decline</a></p>`),
   });
 }
 
-function sendListerBookingConfirmed({ to, name, booking, leg, lister }) {
+function sendListerBookingConfirmed({ to, name, booking, leg, lister, payment = null }) {
   const who = leg.operator_name || lister.company || lister.name;
   const contact = [lister.name, lister.phone, lister.email].filter(Boolean).join(' · ');
+  const paid = payment
+    ? `Your payment of ${formatINR(payment.amount)} (incl. GST) has now been charged. They will contact you about passenger details and the exact departure time.`
+    : 'They will contact you to arrange payment, passenger details and the exact departure time.';
   return sendEmail({
     to, type: 'empty_leg_booked_lister', subject: `Empty leg confirmed — ${booking.booking_no}`,
-    text: `Hello ${name}, ${who} has confirmed your empty-leg booking ${booking.booking_no} (${legRoute(leg)}, ${legWindow(leg)}). They will contact you to arrange payment, passenger details and the exact departure time. Contact: ${contact}`,
+    text: `Hello ${name}, ${who} has confirmed your empty-leg booking ${booking.booking_no} (${legRoute(leg)}, ${legWindow(leg)}). ${paid} Contact: ${contact}`,
     html: layout('Your empty leg is confirmed', `<p>Hello ${esc(name)},</p><p><b>${esc(who)}</b> has confirmed your booking <b>${esc(booking.booking_no)}</b> — ${esc(legRoute(leg))}, departing ${esc(legWindow(leg))}, for ${esc(booking.pax)} passenger(s).</p>
-      <p>They will contact you to arrange payment, passenger details and the exact departure time.</p>
+      <p>${esc(paid)}</p>
       <p>Operator contact: ${esc(contact)}</p>
-      <p style="font-size:12px;color:#64748b">This flight is operated by ${esc(who)}, not by Meridian Charters. Payment and the flight itself are arranged directly with them.</p>`),
+      <p style="font-size:12px;color:#64748b">This flight is operated by ${esc(who)}, not by Meridian Charters.${payment ? ' Meridian Charters collects the payment on the operator’s behalf.' : ' Payment and the flight itself are arranged directly with them.'}</p>`),
+  });
+}
+
+function sendMarketplaceCancelled({ to, name, booking, leg, reason, refund }) {
+  const money = refund && refund.amount > 0
+    ? `We have refunded ${formatINR(refund.amount)} (${refund.pct}%) to your original payment method; it usually reaches you in 5–7 working days.`
+    : 'No refund applies under the cancellation terms.';
+  return sendEmail({
+    to, type: 'empty_leg_cancelled', subject: `Your empty-leg flight ${booking.booking_no} is cancelled`,
+    text: `Hello ${name}, your flight ${booking.booking_no} (${legRoute(leg)}, ${legWindow(leg)}) has been cancelled. Reason: ${reason}. ${money}`,
+    html: layout('Flight cancelled', `<p>Hello ${esc(name)},</p><p>Your flight <b>${esc(booking.booking_no)}</b> — ${esc(legRoute(leg))}, ${esc(legWindow(leg))} — has been cancelled.</p>
+      <p>Reason: ${esc(reason)}</p><p>${esc(money)}</p>
+      <p>See other available flights at <a href="${esc(APP_URL())}/empty-legs">our empty-leg deals</a>.</p>`),
+  });
+}
+
+function sendRouteAlert({ to, name, legs, unsubscribeUrl }) {
+  const lines = legs.map((l) => `${legRoute(l)} — ${legWindow(l)} — ${formatINR(l.price_inr)} + GST: ${APP_URL()}/empty-legs/${l.id}`);
+  return sendEmail({
+    to, type: 'route_alert', subject: legs.length === 1 ? `New empty leg: ${legRoute(legs[0])}` : `${legs.length} new empty legs on your routes`,
+    text: `Hello ${name || ''}, new flights match your route alert:\n${lines.join('\n')}\nStop these alerts: ${unsubscribeUrl}`,
+    html: layout('New flights on your route', `<p>Hello ${esc(name || '')},</p><p>New empty-leg flights match your alert:</p>
+      <ul>${legs.map((l) => `<li><a href="${esc(APP_URL())}/empty-legs/${esc(l.id)}"><b>${esc(legRoute(l))}</b></a> — ${esc(legWindow(l))} — ${esc(formatINR(l.price_inr))} + GST</li>`).join('')}</ul>
+      <p>Empty legs go quickly — request soon.</p>
+      <p style="font-size:12px;color:#64748b"><a href="${esc(unsubscribeUrl)}">Stop these alerts</a></p>`),
   });
 }
 
@@ -274,4 +316,4 @@ function sendListerLegWithdrawn({ to, name, leg, reason }) {
   });
 }
 
-module.exports = { sendListerWelcome, sendListerAdminNotice, sendListerDecision, sendListerRequestNotice, sendListerBookingConfirmed, sendListerLegWithdrawn, LISTER_TYPE_LABELS, sendEmail, sendInvite, sendPaymentReceipt, sendPaymentReminder, sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendEmptyLegBooked, sendEmptyLegRequestClosed, sendSourceCancelledWarning, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };
+module.exports = { sendMarketplaceCancelled, sendRouteAlert, sendListerWelcome, sendListerAdminNotice, sendListerDecision, sendListerRequestNotice, sendListerBookingConfirmed, sendListerLegWithdrawn, LISTER_TYPE_LABELS, sendEmail, sendInvite, sendPaymentReceipt, sendPaymentReminder, sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendEmptyLegBooked, sendEmptyLegRequestClosed, sendSourceCancelledWarning, sendQuoteSent, sendCharterAccepted, sendCharterConfirmed, sendCharterCancelled, formatINR, APP_URL };

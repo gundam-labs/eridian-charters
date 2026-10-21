@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { publicApi, errText } from '../../api';
 import { ErrorAlert, Loading, Empty } from '../../components/ui';
 import { RouteLine, PriceBlock } from '../../components/EmptyLegCard';
@@ -10,7 +10,7 @@ import { inr } from '../../lib/format';
 export const TERMS_TEXT = 'Empty legs depend on the operator’s main charter and may be retimed or withdrawn; the booking is confirmed only when Meridian Charters confirms it.';
 /** Terms for a flight posted by an independent lister: they confirm it and the customer pays them directly. */
 export const termsFor = (leg) => (leg?.marketplace
-  ? `This flight is listed and operated by ${leg.operated_by || 'an independent operator'}, not Meridian Charters. Empty legs may be retimed or withdrawn; the booking is confirmed only when the operator confirms it, and payment is arranged directly with them.`
+  ? `This flight is listed and operated by ${leg.operated_by || 'an independent operator'}, not Meridian Charters. Your payment is held when you request and charged only if the operator confirms in time; otherwise the hold is released. Empty legs may be retimed or withdrawn — if the operator cancels a confirmed flight you are refunded in full. If you cancel: 80% back more than 72 hours before departure, 50% from 24 to 72 hours, none within 24 hours.`
   : TERMS_TEXT);
 
 export default function EmptyLegPublicDetail() {
@@ -90,6 +90,7 @@ export default function EmptyLegPublicDetail() {
 }
 
 function RequestForm({ leg, onDone }) {
+  const nav = useNavigate();
   const [f, setF] = useState({ name: '', email: '', phone: '', company: '', pax: '1', message: '', website: '' });
   const [terms, setTerms] = useState(false);
   const [error, setError] = useState('');
@@ -108,6 +109,8 @@ function RequestForm({ leg, onDone }) {
         company: f.company.trim() || undefined, pax: Number(f.pax),
         message: f.message.trim() || undefined, accept_terms: true, website: f.website,
       });
+      // Operator's flight: the request is sent once the payment is held — continue on the request page.
+      if (r.data?.booking_token) { nav(`/b/${r.data.booking_token}?pay=1`); return; }
       onDone(r.data?.booking_no || r.data?.booking?.booking_no || 'received');
     } catch (err) {
       setError(err.response?.status === 429 ? 'Too many requests — please try again in an hour or call our charter desk.' : errText(err));
@@ -146,9 +149,11 @@ function RequestForm({ leg, onDone }) {
         </label>
         <div style={{ marginTop: 12 }}><ErrorAlert error={error} /></div>
         <button className="btn btn-gold btn-block el-submit" disabled={saving}>
-          {saving ? 'Sending request…' : `Request for ${inr(leg.price_inr)} + GST`}
+          {saving ? 'Sending request…' : leg.pay_on_request ? `Request and hold ${inr(leg.total_inr)}` : `Request for ${inr(leg.price_inr)} + GST`}
         </button>
-        <p className="xs muted" style={{ margin: '10px 0 0', textAlign: 'center' }}>You won’t be charged now. We confirm before invoicing.</p>
+        <p className="xs muted" style={{ margin: '10px 0 0', textAlign: 'center' }}>{leg.pay_on_request
+          ? `${inr(leg.total_inr)} incl. GST is held on your card or UPI and charged only if the operator confirms.`
+          : 'You won’t be charged now. We confirm before invoicing.'}</p>
       </div>
     </form>
   );

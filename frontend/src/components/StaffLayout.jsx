@@ -12,6 +12,7 @@ const SECTIONS = [
       { to: '/s/quotes', label: 'Quotes' },
       { to: '/s/empty-legs', label: 'Empty legs' },
       { to: '/s/listers', label: 'Listers' },
+      { to: '/s/marketplace-payouts', label: 'Lister payouts' },
       { to: '/admin/operators', label: 'Charter operators', roles: ['sales'] },
       { to: '/s/members', label: 'Members' },
       { to: '/s/invoices', label: 'Invoices' },

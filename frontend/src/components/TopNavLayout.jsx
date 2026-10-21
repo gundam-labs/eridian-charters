@@ -17,6 +17,7 @@ const NAVS = {
   lister: [
     { to: '/l', label: 'My empty legs', end: true },
     { to: '/l/requests', label: 'Requests' },
+    { to: '/l/payouts', label: 'Payouts' },
     { to: '/l/profile', label: 'Profile' },
     { to: '/empty-legs', label: 'Deals page ↗', external: true },
   ],

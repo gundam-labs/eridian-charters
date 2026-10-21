@@ -12,6 +12,7 @@ const {
 } = require('../lib/emptyLegs');
 const { sendEmptyLegBooked, sendEmptyLegRequestClosed, sendListerLegWithdrawn, APP_URL } = require('../lib/email');
 const { issueInvite } = require('./auth');
+const { notifyForLeg } = require('../lib/routeAlerts');
 
 const router = asyncRouter();
 
@@ -24,7 +25,8 @@ const BOOKING_SELECT = `SELECT b.*,
   el.lister_id, lst.company AS lister_company, el.operator_name,
   fa.city AS from_city, ta.city AS to_city, COALESCE(a.registration, el.ext_registration) AS aircraft_registration,
   COALESCE(a.type, el.ext_aircraft_type) AS aircraft_type,
-  m.member_no, m.contact_name AS member_name, c.charter_no, u.name AS decided_by_name
+  m.member_no, m.contact_name AS member_name, c.charter_no, u.name AS decided_by_name,
+  bp.status AS pay_status, bp.amount::float8 AS pay_amount, bp.refunded_amount::float8 AS pay_refunded, bp.payout_status AS pay_payout_status
   FROM empty_leg_bookings b
   JOIN empty_legs el ON el.id = b.empty_leg_id
   JOIN airports fa ON fa.code = el.from_code
@@ -33,7 +35,8 @@ const BOOKING_SELECT = `SELECT b.*,
   LEFT JOIN listers lst ON lst.id = el.lister_id
   LEFT JOIN members m ON m.id = b.member_id
   LEFT JOIN charters c ON c.id = b.charter_id
-  LEFT JOIN users u ON u.id = b.decided_by`;
+  LEFT JOIN users u ON u.id = b.decided_by
+  LEFT JOIN LATERAL (SELECT * FROM booking_payments x WHERE x.booking_id = b.id ORDER BY x.created_at DESC LIMIT 1) bp ON true`;
 
 function shapeBooking(b) {
   const { leg_no, from_code, to_code, from_city, to_city, depart_earliest, depart_latest, flight_hours, price_inr, list_price_inr, seats, leg_status,
@@ -117,6 +120,8 @@ router.get('/bookings', requireRole('sales', 'ops'), async (req, res) => {
     const st = String(req.query.status).split(',').map((s) => s.trim()).filter(Boolean);
     if (st.some((s) => !BOOKING_STATUSES.includes(s))) throw new HttpError(400, `status must be one of ${BOOKING_STATUSES.join(', ')}`);
     params.push(st); where.push(`b.status = ANY($${params.length})`);
+  } else {
+    where.push(`b.status NOT IN ('pending_payment','expired')`); // unfinished checkouts are noise
   }
   if (req.query.empty_leg_id) {
     if (!isUuid(req.query.empty_leg_id)) throw new HttpError(400, 'Invalid empty_leg_id');
@@ -207,6 +212,7 @@ router.post('/generate/:charterId', requireRole('sales', 'ops'), async (req, res
     return generateForCharter(c, req.user.id, client);
   });
   const { rows } = await pool.query(`${LEG_SELECT} WHERE el.source_charter_id = $1 ORDER BY el.depart_earliest`, [req.params.charterId]);
+  for (const l of created) if (l.status === 'published') notifyForLeg(l.id);
   res.status(created.length ? 201 : 200).json({ created: created.length, empty_legs: rows.map(staffLeg) });
 });
 
@@ -308,6 +314,7 @@ router.post('/:id/publish', requireRole('sales', 'ops'), async (req, res) => {
   const upd = await pool.query(`UPDATE empty_legs SET status = 'published', published_at = now() WHERE id = $1 AND status = 'draft' RETURNING id`, [l.id]);
   if (!upd.rows.length) throw new HttpError(409, 'Empty leg changed — reload and try again');
   await logEvent({ entity_type: 'empty_leg', entity_id: l.id, action: 'published', actor_user_id: req.user.id, detail: { leg_no: l.leg_no, price_inr: Number(l.price_inr) } });
+  notifyForLeg(l.id); // route alerts, in the background
   res.json(await legDetailForStaff(l.id));
 });
 

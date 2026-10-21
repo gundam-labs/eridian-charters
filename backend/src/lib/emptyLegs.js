@@ -20,7 +20,7 @@ const WINDOW_AFTER_MS = 1 * HOUR_MS;
 const TURNAROUND_MS = 30 * MIN_MS;
 
 const LEG_STATUSES = ['draft', 'published', 'booked', 'withdrawn', 'expired'];
-const BOOKING_STATUSES = ['requested', 'confirmed', 'rejected', 'cancelled'];
+const BOOKING_STATUSES = ['pending_payment', 'requested', 'confirmed', 'completed', 'rejected', 'cancelled', 'expired'];
 
 const isTrue = (v) => v === true || String(v).toLowerCase() === 'true' || String(v) === '1';
 const minNoticeHours = (settings) => {
@@ -56,7 +56,7 @@ const LEG_SELECT = `SELECT el.*,
   COALESCE(a.registration, el.ext_registration) AS aircraft_registration, COALESCE(a.type, el.ext_aircraft_type) AS aircraft_type,
   a.home_base AS aircraft_home_base,
   lst.lister_type, lst.company AS lister_company, lst.phone AS lister_phone, lst.status AS lister_status,
-  lu.name AS lister_name, lu.email AS lister_email,
+  lu.name AS lister_name, lu.email AS lister_email, dop.name AS dgca_operator_name,
   sc.charter_no AS source_charter_no, sc.status AS source_charter_status,
   (SELECT count(*)::int FROM empty_leg_bookings b WHERE b.empty_leg_id = el.id) AS bookings_count,
   (SELECT count(*)::int FROM empty_leg_bookings b WHERE b.empty_leg_id = el.id AND b.status = 'requested') AS pending_requests_count,
@@ -68,6 +68,7 @@ const LEG_SELECT = `SELECT el.*,
   LEFT JOIN aircraft a ON a.id = el.aircraft_id
   LEFT JOIN listers lst ON lst.id = el.lister_id
   LEFT JOIN users lu ON lu.id = lst.user_id
+  LEFT JOIN charter_operators dop ON dop.id = el.dgca_operator_id
   LEFT JOIN charters sc ON sc.id = el.source_charter_id`;
 
 /** True for a leg posted by an outside lister (operator, agent or flyer) rather than flown by the Meridian fleet. */

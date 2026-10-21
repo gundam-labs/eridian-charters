@@ -35,6 +35,30 @@ module.exports = {
     return { id: rid('order'), entity: 'order', amount: amount_paise, currency: 'INR', receipt, notes, status: 'created', created_at: Math.floor(Date.now() / 1000) };
   },
 
+  async createHoldOrder({ amount_paise, receipt, notes }) {
+    const o = await module.exports.createOrder({ amount_paise, receipt, notes });
+    return { ...o, payment: { capture: 'manual' } };
+  },
+
+  async capture(payment_id, amount_paise) {
+    const p = payments.get(payment_id);
+    if (!p) throw new HttpError(502, 'Payment provider error: The id provided does not exist');
+    if (p.status !== 'authorized') throw new HttpError(502, `Payment provider error: payment is ${p.status}`);
+    if (amount_paise !== p.amount) throw new HttpError(502, 'Payment provider error: capture amount must equal the authorised amount');
+    Object.assign(p, { status: 'captured', captured: true });
+    return p;
+  },
+
+  async release(payment_id) {
+    const p = payments.get(payment_id);
+    if (p && p.status === 'authorized') p.status = 'refunded';
+    return { released: true, note: 'Test mode — hold released immediately' };
+  },
+
+  async transfer(payment_id, { account, amount_paise, notes }) {
+    return { id: rid('trf'), entity: 'transfer', source: payment_id, recipient: account, amount: amount_paise, currency: 'INR', notes, created_at: Math.floor(Date.now() / 1000) };
+  },
+
   async fetchPayment(id) {
     const p = payments.get(id);
     if (!p) throw new HttpError(502, 'Payment provider error: The id provided does not exist');
@@ -71,6 +95,12 @@ module.exports = {
       ...(method === 'bank_transfer' ? { bank_transfer_ref: `UTR${digits(12)}` } : {}),
     };
     payments.set(p.id, p);
+    return p;
+  },
+  /** An authorised (held, not captured) payment for a hold order. */
+  authorizedPayment({ amount_paise, order_id, method, notes = {} }) {
+    const p = module.exports.capturedPayment({ amount_paise, order_id, method, notes });
+    Object.assign(p, { status: 'authorized', captured: false });
     return p;
   },
   /** Sign a raw webhook body with the mock webhook secret (X-Razorpay-Signature value). */

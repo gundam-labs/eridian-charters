@@ -11,11 +11,11 @@ import { inr, fmtDateTime, toIstInput, istInputToIso, humanize } from '../../lib
 export default function EmptyLegsAdmin() {
   const { user } = useAuth();
   const [params, setParams] = useSearchParams();
-  const tab = params.get('tab') === 'requests' ? 'requests' : 'listings';
+  const tab = ['requests', 'demand'].includes(params.get('tab')) ? params.get('tab') : 'listings';
   const canDecide = ['sales', 'admin'].includes(user.role);
   const pending = useFetch('/api/empty-legs/bookings?status=requested');
   const pendingCount = Array.isArray(pending.data) ? pending.data.length : 0;
-  const setTab = (t) => setParams(t === 'requests' ? { tab: t } : {}, { replace: true });
+  const setTab = (t) => setParams(t !== 'listings' ? { tab: t } : {}, { replace: true });
 
   return (
     <>
@@ -27,8 +27,9 @@ export default function EmptyLegsAdmin() {
         <button role="tab" aria-selected={tab === 'requests'} className={tab === 'requests' ? 'on' : ''} onClick={() => setTab('requests')}>
           Requests {pendingCount > 0 && <span className="tab-count">{pendingCount}</span>}
         </button>
+        <button role="tab" aria-selected={tab === 'demand'} className={tab === 'demand' ? 'on' : ''} onClick={() => setTab('demand')}>Demand</button>
       </div>
-      {tab === 'listings' ? <Listings /> : <Requests canDecide={canDecide} onChanged={pending.reload} />}
+      {tab === 'listings' ? <Listings /> : tab === 'demand' ? <Demand /> : <Requests canDecide={canDecide} onChanged={pending.reload} />}
     </>
   );
 }
@@ -92,7 +93,8 @@ function Listings() {
                     <tr className={editing === l.id ? 'editing' : ''}>
                       <td className="nowrap"><span className="strong">{l.leg_no}</span>
                         <div className="xs">{lister
-                          ? <Link to="/s/listers">Listed by {l.lister_company || l.lister_name}</Link>
+                          ? <><Link to="/s/listers">Listed by {l.lister_company || l.lister_name}</Link>
+                            {l.dgca_check && <div className={`dgca-badge ${l.dgca_check}`}>{l.dgca_check === 'own_fleet' ? '✓ DGCA: own fleet' : l.dgca_check === 'other_operator' ? `DGCA: ${l.dgca_operator_name}` : 'Not in DGCA list'}</div>}</>
                           : l.source_charter_id
                             ? <Link to={`/o/charters/${l.source_charter_id}`}>from {l.source_charter_no || 'charter'}</Link>
                             : <span className="muted">Manual</span>}</div></td>
@@ -307,6 +309,7 @@ function Requests({ canDecide, onChanged }) {
                       <div className="muted xs">{[b.email, b.phone].filter(Boolean).join(' · ')}</div>
                       {b.message && <div className="xs el-msg">“{b.message}”</div>}
                       {b.reject_reason && <div className="xs" style={{ color: 'var(--red-fg)' }}>{b.reject_reason}</div>}
+                      {b.pay_status && <div className="xs" style={{ marginTop: 4 }}><span className="strong">{{ authorized: 'Payment held', captured: 'Paid', released: 'Hold released', refunded: 'Refunded', partially_refunded: 'Part refunded' }[b.pay_status] || b.pay_status}</span> · {inr(b.pay_amount)}</div>}
                     </td>
                     <td className="num">{b.pax}</td>
                     <td><StatusPill status={b.status} /></td>
@@ -404,5 +407,38 @@ function ConfirmModal({ booking: b, onClose, onChanged }) {
         </>
       )}
     </Modal>
+  );
+}
+
+/* ───────────────────────── Demand (route alerts) ───────────────────────── */
+
+function Demand() {
+  const { data, error, loading } = useFetch('/api/marketplace/route-demand');
+  const rows = Array.isArray(data) ? data : [];
+  const total = rows.reduce((n, r) => n + r.travellers, 0);
+  return (
+    <>
+      <p className="muted small" style={{ marginTop: 0 }}>Routes travellers asked to be alerted about on the public deals page. {total > 0 && <strong>{total} traveller{total === 1 ? '' : 's'} waiting.</strong>} Routes with no live flight are the ones to fill.</p>
+      <ErrorAlert error={error} />
+      {loading && !data ? <Loading /> : rows.length === 0 ? (
+        <div className="card"><Empty title="No route alerts yet">Travellers can save a route on the public deals page.</Empty></div>
+      ) : (
+        <div className="card table-wrap">
+          <table className="table">
+            <thead><tr><th>Route</th><th className="num">Travellers</th><th className="num">Live flights</th><th>Latest alert</th></tr></thead>
+            <tbody>
+              {rows.map(r => (
+                <tr key={`${r.from_code}-${r.to_code}`}>
+                  <td className="strong">{r.from_city ? `${r.from_city} (${r.from_code})` : 'Anywhere'} → {r.to_city ? `${r.to_city} (${r.to_code})` : 'Anywhere'}</td>
+                  <td className="num">{r.travellers}</td>
+                  <td className="num">{r.live_matches > 0 ? r.live_matches : <span className="pill pill-amber">None</span>}</td>
+                  <td className="nowrap muted small">{fmtDateTime(r.latest)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
   );
 }

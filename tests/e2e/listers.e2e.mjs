@@ -71,7 +71,20 @@ test('lister signs up, gets approved, publishes and confirms a request', async (
     await l.fill('#n-l', istInput(4, '10:00'));
     await l.fill('#n-ac', 'Citation XLS');
     await l.fill('#n-seats', '8');
+    // DGCA lookup: a registered aircraft fills in model and seats and shows whose fleet it is.
+    await l.fill('#n-ac', '');
+    await l.fill('#n-seats', '');
+    await l.fill('#n-reg', 'vt-ztt');
+    await l.locator('#n-price').focus();
+    await l.waitForSelector('[data-testid=dgca-check]');
+    assert.match(await l.textContent('[data-testid=dgca-check]'), /Zest Aviation/);
+    assert.equal(await l.inputValue('#n-reg'), 'VT-ZTT');
+    assert.match(await l.inputValue('#n-ac'), /CHALLENGER/i);
+    assert.equal(await l.inputValue('#n-seats'), '10');
     await l.fill('#n-reg', 'VT-EEE');
+    await l.locator('#n-price').focus();
+    await l.waitForSelector('[data-testid=dgca-check]:has-text("Not in the DGCA")');
+    await l.fill('#n-op', company);
     await l.fill('#n-price', '110000');
     await l.fill('#n-list', '300000');
     await l.screenshot({ path: `${SHOTS}/2-new-listing.png`, fullPage: true });
@@ -112,9 +125,17 @@ test('lister signs up, gets approved, publishes and confirms a request', async (
     await p.fill('#r-email', `e2e.riya.${stamp}@example.in`);
     await p.fill('#r-phone', '+91 90000 54321');
     await p.check('.el-terms input[type=checkbox]');
+    assert.match(await p.textContent('button.el-submit'), /Request and hold/);
     await p.click('button.el-submit');
-    await p.waitForFunction(() => /ELB-\d{4}-\d{4}/.test(document.body.innerText));
+    // Operator flight: the request page opens with the (test-mode) checkout; payment is held, not charged.
+    await p.waitForURL(/\/b\/[A-Za-z0-9_-]{20,}/);
+    await p.waitForSelector('[data-testid=hold-checkout]');
+    await p.screenshot({ path: `${SHOTS}/5a-hold-checkout.png`, fullPage: true });
+    await p.click('[data-testid=hold-pay]');
+    await p.waitForSelector('[data-testid=booking-status] h1:has-text("Waiting for the operator")');
+    assert.match(await p.textContent('[data-testid=booking-status]'), /Held \(not charged\)/);
     const bookingNo = (await p.textContent('body')).match(/ELB-\d{4}-\d{4}/)[0];
+    const statusUrl = p.url();
     await p.screenshot({ path: `${SHOTS}/5-public-requested.png`, fullPage: true });
 
     // 6. Lister confirms; contact details appear.
@@ -125,7 +146,27 @@ test('lister signs up, gets approved, publishes and confirms a request', async (
     await req.locator('button:has-text("Confirm")').click();
     await l.click('.modal button:has-text("Confirm booking")');
     await l.waitForSelector(`tr:has-text("${bookingNo}") >> text=e2e.riya.${stamp}@example.in`);
+    assert.match(await l.locator('tr', { hasText: bookingNo }).textContent(), /Paid/);
     await l.screenshot({ path: `${SHOTS}/6-lister-confirmed.png`, fullPage: true });
+
+    // 7. The traveller's page shows the booking confirmed and charged.
+    await p.goto(statusUrl);
+    await p.waitForSelector('[data-testid=booking-status] h1:has-text("Confirmed")');
+    assert.match(await p.textContent('[data-testid=booking-status]'), /Charged/);
+    await p.screenshot({ path: `${SHOTS}/7-traveller-confirmed.png`, fullPage: true });
+
+    // 8. Route alert from the deals page; sales sees the demand.
+    await p.goto(`${BASE}/empty-legs`);
+    await p.waitForSelector('[data-testid=route-alert]');
+    await p.selectOption('#ra-from', 'CCU');
+    await p.selectOption('#ra-to', 'GOI');
+    await p.fill('#ra-email', `e2e.alert.${stamp}@example.in`);
+    await p.click('[data-testid=route-alert] button:has-text("Alert me")');
+    await p.waitForSelector('[data-testid=route-alert] .alert-ok');
+    await p.screenshot({ path: `${SHOTS}/8-route-alert.png`, fullPage: true });
+    await s.goto(`${BASE}/s/empty-legs?tab=demand`);
+    await s.waitForSelector('tr:has-text("Kolkata (CCU)")');
+    await s.screenshot({ path: `${SHOTS}/9-demand.png` });
 
     assert.deepEqual(problems, []);
   } catch (err) {

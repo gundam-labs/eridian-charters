@@ -22,6 +22,12 @@ async function api(token, method, path, body) {
   return { status: res.status, data: type.includes('application/json') ? await res.json() : await res.text() };
 }
 const ok = (r, status = 200) => { assert.equal(r.status, status, JSON.stringify(r.data)); return r.data; };
+/** v1.6: a request on a lister flight only reaches the lister once the traveller's payment is held (mock provider). */
+async function requestAndPay(legId, body) {
+  const r = ok(await api(null, 'POST', `/public/empty-legs/${legId}/request`, body), 201);
+  ok(await api(null, 'POST', `/public/bookings/${r.booking_token}/mock-pay`, { method: 'upi' }));
+  return r;
+}
 const login = async (email) => ok(await api(null, 'POST', '/auth/login', { email, password: PASSWORD })).token;
 
 const run = Date.now().toString(36);
@@ -134,8 +140,8 @@ test('listers: sign-up, approval, listing, requests and isolation', async () => 
   // ── Public requests ──
   const reqA = { name: 'Asha Rao', email: `asha-${run}@example.in`, phone: '+91 99000 11122', pax: 4, accept_terms: true, message: 'Two bags each' };
   const reqB = { name: 'Dev Shah', email: `dev-${run}@example.in`, phone: '+91 99000 33344', pax: 2, accept_terms: true };
-  ok(await api(null, 'POST', `/public/empty-legs/${draft.id}/request`, reqA), 201);
-  ok(await api(null, 'POST', `/public/empty-legs/${draft.id}/request`, reqB), 201);
+  await requestAndPay(draft.id, reqA);
+  await requestAndPay(draft.id, reqB);
 
   // Another lister sees nothing of it.
   assert.equal(ok(await api(flyer, 'GET', '/lister/bookings')).length, 0);
@@ -169,7 +175,7 @@ test('listers: sign-up, approval, listing, requests and isolation', async () => 
   // ── Suspend takes everything down ──
   const third = ok(await api(op, 'POST', '/lister/empty-legs', listing({ from_code: 'HYD', to_code: 'BLR' })), 201);
   ok(await api(op, 'POST', `/lister/empty-legs/${third.id}/publish`));
-  ok(await api(null, 'POST', `/public/empty-legs/${third.id}/request`, { ...reqB, email: `dev2-${run}@example.in` }), 201);
+  await requestAndPay(third.id, { ...reqB, email: `dev2-${run}@example.in` });
   assert.equal(ok(await api(sales, 'POST', `/listers/${me.id}/suspend`, { reason: 'Permit under review' })).status, 'suspended');
   assert.equal(ok(await api(op, 'GET', `/lister/empty-legs/${third.id}`)).status, 'withdrawn');
   assert.equal(ok(await api(op, 'GET', `/lister/empty-legs/${plain.id}`)).status, 'withdrawn');

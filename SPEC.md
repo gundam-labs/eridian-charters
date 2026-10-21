@@ -330,3 +330,40 @@ The DGCA "List of Non-Scheduled Operators" (as on 31.08.2026) loaded as a direct
 - PAN required for operators and travel agents, optional for private flyers; format `AAAAA9999A` with a valid holder-type 4th letter. TAN optional; format `AAAA99999A`. Spaces are stripped and letters upper-cased.
 - When both a GSTIN and a PAN are given, GSTIN characters 3–12 must equal the PAN (checked at sign-up and on profile edits).
 - Shown on the sign-up form, the lister's profile and the staff review dialog; never on public pages.
+
+# v1.6 — Marketplace payments, confirmation deadline, route alerts, DGCA aircraft check
+
+Ideas taken from the EchorTech empty-leg platform proposal (Sept 2026): payment hold captured on operator confirmation, split settlement, a confirmation time limit, route alerts, and refund rules for empty legs.
+
+## Payment hold on lister flights
+- A public request on a **lister** flight creates the booking as `pending_payment` and a Razorpay order with **manual capture** (`payment.capture = manual`, hold = checkout + confirmation window + 60 min, max 5 days). The traveller lands on `/b/:token` (secret token) and authorises the payment; only then the booking becomes `requested` and the lister is emailed. Meridian fleet flights are unchanged.
+- Amount = lister price + GST at `gst_rate_pct`. Shown on the public flight ("Request and hold ₹X").
+- Lister **confirms** → the hold is **captured** in the same transaction (a failed capture confirms nothing). Commission = `marketplace_commission_pct` (10%) of the base fare; payout = amount − commission, status `pending`.
+- Any request that closes without confirmation (declined, deadline passed, flight withdrawn, lister suspended, another traveller confirmed) releases its hold via a DB trigger (`release_booking_hold`), so no code path can forget. Razorpay has no void call: an uncaptured authorisation is refunded automatically when its hold period ends. A payment that arrives after the checkout expired is recorded and released.
+- Unfinished checkouts expire after `marketplace_checkout_minutes` (30).
+
+## Confirmation deadline
+- `respond_by` = authorisation time + `lister_confirm_hours` (2), never later than departure − minimum notice. Listers see a countdown; past the deadline confirm returns 409 and the job closes the request ("The operator did not confirm in time") and emails the traveller.
+
+## Cancellations and refunds (lister flights)
+- Lister cancels a confirmed flight (`charter_change` | `weather_technical` | `other`) → 100% refund, payout cancelled, reason kept (`cancel_reason_type`, for a future trust score).
+- Staff cancel (`/marketplace/bookings/:id/cancel`): traveller → 80% > 72 h, 50% at 24–72 h, 0 < 24 h (`traveller_refund_72h_pct`, `traveller_refund_24h_pct`); operator / charter change / force majeure → 100%; `refund_pct` overrides. Payout re-worked on the amount kept.
+
+## Payouts
+- Flown: lister marks it (after departure) or the job completes it 12 h after the departure window → payout `due`.
+- With a Razorpay **Route** linked account on the lister (`razorpay_account_id`, set on the Listers page) the payout is transferred automatically (`POST /payments/:id/transfers`); otherwise finance pays by bank transfer and records the UTR (`/s/marketplace-payouts`). Listers see their earnings at `/l/payouts`.
+
+## Route alerts
+- Public form on the deals page (from/to, optional dates, email; honeypot; 10/hour/IP; max 10 active per email). Matching flights are emailed when published (fleet publish, auto-published generation, lister publish) and on sign-up for flights already live; once per alert per flight. Unsubscribe at `/alerts/stop/:token`. Staff **Demand** tab on Empty legs lists wanted routes with live-flight counts.
+
+## DGCA aircraft check
+- Lister listing form looks the registration up in the DGCA directory (`/lister/aircraft-lookup`) and fills model, seats and "Operated by". Listings store `dgca_check` = own_fleet | other_operator | not_listed, shown to the lister and staff. Aircraft registered for cargo are refused.
+
+## Jobs
+- `runMarketplaceJobs` runs with the 5-minute deadline job and (throttled, 30 s) on lister/payout reads.
+
+## Razorpay setup for production
+1. Keep `PAYMENTS_PROVIDER=razorpay` with live keys; subscribe the webhook to `payment.authorized`, `payment.captured`, `payment.failed`, `refund.processed`, `refund.failed` (plus the existing events).
+2. Manual capture is requested per order; the dashboard's capture settings need not change.
+3. For automatic payouts, enable **Route** on the Razorpay account and create a linked account per lister (KYC in the Razorpay dashboard); paste its `acc_…` id on the lister.
+4. Confirm the GST treatment of commission and of fares collected on behalf of operators with the accountant.
