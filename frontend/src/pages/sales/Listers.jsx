@@ -114,6 +114,7 @@ function ReviewModal({ lister: l, onClose, onApproved, onReject }) {
         <dt>Status</dt><dd><StatusPill status={l.status} />{l.decision_reason ? <span className="muted small"> — {l.decision_reason}</span> : null}</dd>
         {l.decided_by_name && <><dt>Decided by</dt><dd>{l.decided_by_name}, {fmtDateTime(l.decided_at)}</dd></>}
       </dl>
+      {l.status === 'approved' && <PayoutAccount lister={l} />}
       {l.lister_type === 'operator' && l.status === 'pending' && !l.dgca_operator && (
         <div className="alert alert-warn" style={{ marginTop: 16 }}>
           The permit number doesn’t match the DGCA list we hold. Check it with the operator before approving.
@@ -127,5 +128,31 @@ function ReviewModal({ lister: l, onClose, onApproved, onReject }) {
           {saving ? 'Approving…' : l.status === 'suspended' ? 'Reinstate' : 'Approve'}</button>}
       </div>
     </Modal>
+  );
+}
+
+/** Razorpay Route linked account for automatic payouts (created in the Razorpay dashboard). */
+function PayoutAccount({ lister: l }) {
+  const [acc, setAcc] = useState(l.razorpay_account_id || '');
+  const [saved, setSaved] = useState(l.razorpay_account_id || '');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const save = async (e) => {
+    e.preventDefault(); setBusy(true); setError('');
+    try { const r = await api.patch(`/api/listers/${l.id}`, { razorpay_account_id: acc.trim() }); setSaved(r.data.razorpay_account_id || ''); }
+    catch (err) { setError(errText(err)); } finally { setBusy(false); }
+  };
+  return (
+    <form onSubmit={save} style={{ marginTop: 16 }}>
+      <div className="field">
+        <label htmlFor="rz-acc">Razorpay linked account <span className="muted">— for automatic payouts</span></label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input id="rz-acc" className="input" value={acc} onChange={e => setAcc(e.target.value)} placeholder="acc_XXXXXXXXXXXXXX" />
+          <button className="btn" disabled={busy || acc.trim() === saved}>{busy ? 'Saving…' : 'Save'}</button>
+        </div>
+        <span className="hint">{saved ? 'Payouts are transferred automatically after each flight.' : 'Without one, payouts are due for finance to pay by bank transfer.'}</span>
+      </div>
+      <ErrorAlert error={error} />
+    </form>
   );
 }

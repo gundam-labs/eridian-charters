@@ -84,6 +84,15 @@ const registerLimiter = rateLimit({
   legacyHeaders: false,
   skip: isDevLike,
 });
+// Route alert sign-ups: 10 per hour per IP (v1.6).
+const alertLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many alerts from this network. Please try again in an hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: isDevLike,
+});
 // Public empty-leg booking requests: 5 per hour per IP + email (SPEC v1.1).
 const publicRequestLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -135,6 +144,11 @@ app.use('/api/auth', authRoutes);
 app.post('/api/public/empty-legs/:id/request', publicRequestLimiter);
 app.use('/api/public', publicReadLimiter);
 app.use('/api/public/empty-legs', require('./routes/publicEmptyLegs'));
+const publicMarketplace = require('./routes/publicMarketplace');
+app.use('/api/public/bookings', publicMarketplace.bookings);
+app.post('/api/public/route-alerts', alertLimiter);
+app.use('/api/public/route-alerts', publicMarketplace.alerts);
+app.get('/api/public/airports', publicMarketplace.airportsHandler);
 
 // Payment provider webhooks (no auth; HMAC-verified raw body)
 const paymentsRoutes = require('./routes/payments');
@@ -160,6 +174,7 @@ mount('/api/empty-legs', require('./routes/emptyLegs'));
 mount('/api/lister', require('./routes/lister'));
 mount('/api/listers', require('./routes/listers'));
 mount('/api/operators', require('./routes/operators'));
+mount('/api/marketplace', require('./routes/marketplace'));
 mount('/api/payments', paymentsRoutes);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));

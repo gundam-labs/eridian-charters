@@ -8,6 +8,20 @@ const { logEvent } = require('../lib/events');
 const { nextNumber } = require('../lib/numbers');
 const { LEG_SELECT, publicLeg, isBookable, minNoticeHours, expireStaleLegs, salesRecipients } = require('../lib/emptyLegs');
 const { sendEmptyLegRequestAck, sendEmptyLegSalesNotice, sendListerRequestNotice } = require('../lib/email');
+const { priceFor, startHold, newToken } = require('../lib/marketplace');
+
+/** Public shape plus, for lister (marketplace) flights, the total payable incl. GST. */
+async function withTotals(rows) {
+  const settings = await getSettings();
+  return rows.map((l) => {
+    const out = publicLeg(l);
+    if (l.lister_id) {
+      const p = priceFor(l, settings);
+      Object.assign(out, { gst_rate_pct: p.gst_rate_pct, total_inr: p.total, pay_on_request: true });
+    }
+    return out;
+  });
+}
 
 const router = asyncRouter();
 
@@ -42,7 +56,7 @@ router.get('/', async (req, res) => {
     params.push(month); where.push(`to_char(el.depart_earliest AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM') = $${params.length}`);
   }
   const rows = await bookableLegs(where, params);
-  res.json(rows.map(publicLeg));
+  res.json(await withTotals(rows));
 });
 
 async function loadPublic(id) {
@@ -53,7 +67,7 @@ async function loadPublic(id) {
 }
 
 router.get('/:id', async (req, res) => {
-  res.json(publicLeg(await loadPublic(req.params.id)));
+  res.json((await withTotals([await loadPublic(req.params.id)]))[0]);
 });
 
 const clean = (v, max) => String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max);
@@ -87,14 +101,28 @@ router.post('/:id/request', async (req, res) => {
     const dup = await client.query(
       `SELECT 1 FROM empty_leg_bookings WHERE empty_leg_id = $1 AND lower(guest_email) = $2 AND status = 'requested'`, [leg.id, email]);
     if (dup.rows.length) throw new HttpError(409, 'You already have a pending request for this flight — we will be in touch shortly');
+    const marketplace = Boolean(leg.lister_id);
+    // An unfinished checkout by the same person is replaced by this one.
+    if (marketplace) {
+      await client.query(`UPDATE empty_leg_bookings SET status = 'expired', reject_reason = 'Replaced by a newer request'
+        WHERE empty_leg_id = $1 AND lower(guest_email) = $2 AND status = 'pending_payment'`, [leg.id, email]);
+    }
     const booking_no = await nextNumber('ELB', client);
     const row = (await client.query(
-      `INSERT INTO empty_leg_bookings (booking_no, empty_leg_id, channel, guest_name, guest_email, guest_phone, guest_company, pax, message, status)
-       VALUES ($1,$2,'public',$3,$4,$5,$6,$7,$8,'requested') RETURNING *`,
-      [booking_no, leg.id, name, email, phone, company, pax, message])).rows[0];
+      `INSERT INTO empty_leg_bookings (booking_no, empty_leg_id, channel, guest_name, guest_email, guest_phone, guest_company, pax, message, status, access_token)
+       VALUES ($1,$2,'public',$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+      [booking_no, leg.id, name, email, phone, company, pax, message, marketplace ? 'pending_payment' : 'requested', marketplace ? newToken() : null])).rows[0];
+    if (marketplace) {
+      // Lister flight: the request only reaches the operator once the traveller's payment is held.
+      const payment = await startHold(client, { booking: row, leg });
+      return { ...row, payment };
+    }
     await logEvent({ entity_type: 'empty_leg_booking', entity_id: row.id, action: 'requested', detail: { booking_no, channel: 'public', leg_no: leg.leg_no, pax } }, client);
     return row;
   });
+  if (booking.payment) {
+    return res.status(201).json({ booking_no: booking.booking_no, booking_token: booking.access_token, payment: booking.payment });
+  }
   await sendEmptyLegRequestAck({ to: email, name, booking, leg: leg0 });
   // Marketplace legs: the lister who posted the flight decides; Meridian's own legs go to sales.
   if (leg0.lister_id) {

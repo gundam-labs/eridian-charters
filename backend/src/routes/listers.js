@@ -54,6 +54,17 @@ router.get('/:id', async (req, res) => {
 const FROM = { approve: ['pending', 'rejected', 'suspended'], reject: ['pending'], suspend: ['approved'] };
 const TO = { approve: 'approved', reject: 'rejected', suspend: 'suspended' };
 
+/** Link the lister's Razorpay Route account (acc_…) so payouts are transferred automatically. Empty clears it. */
+router.patch('/:id', async (req, res) => {
+  const l = await load(req.params.id);
+  if (req.body?.razorpay_account_id === undefined) throw new HttpError(400, 'Nothing to update');
+  const acc = String(req.body.razorpay_account_id || '').trim();
+  if (acc && !/^acc_[A-Za-z0-9]{6,30}$/.test(acc)) throw new HttpError(400, 'A Razorpay linked account id looks like acc_XXXXXXXXXXXXXX');
+  await pool.query('UPDATE listers SET razorpay_account_id = $2 WHERE id = $1', [l.id, acc || null]);
+  await logEvent({ entity_type: 'lister', entity_id: l.id, action: 'payout_account_updated', actor_user_id: req.user.id, detail: { linked: Boolean(acc) } });
+  res.json((await withDgcaMatch([await load(l.id)]))[0]);
+});
+
 for (const action of Object.keys(FROM)) {
   router.post(`/:id/${action}`, async (req, res) => {
     const l = await load(req.params.id);

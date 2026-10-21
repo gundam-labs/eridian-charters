@@ -48,6 +48,12 @@ const DEFAULT_SETTINGS = {
   refund_half_hours: '48',
   refund_half_pct: '50',
   empty_leg_payment_window_hours: '2',
+  // v1.6 marketplace (lister flights)
+  marketplace_commission_pct: '10',
+  lister_confirm_hours: '2',
+  marketplace_checkout_minutes: '30',
+  traveller_refund_72h_pct: '80',
+  traveller_refund_24h_pct: '50',
 };
 
 // Idempotent schema. Safe to run on every deploy.
@@ -541,6 +547,100 @@ ALTER TABLE listers ADD COLUMN IF NOT EXISTS pan TEXT;
 ALTER TABLE listers ADD COLUMN IF NOT EXISTS tan TEXT;
 `;
 
+// v1.6 — Marketplace payments (hold on request, capture on lister confirm, commission and payouts),
+// a confirmation deadline, route alerts and the DGCA aircraft check on lister listings.
+const SCHEMA_V16 = `
+DO $$
+DECLARE def TEXT;
+BEGIN
+  SELECT pg_get_constraintdef(oid) INTO def FROM pg_constraint
+   WHERE conrelid = 'empty_leg_bookings'::regclass AND conname = 'empty_leg_bookings_status_check';
+  IF def IS NULL OR def NOT LIKE '%pending_payment%' THEN
+    ALTER TABLE empty_leg_bookings DROP CONSTRAINT IF EXISTS empty_leg_bookings_status_check;
+    ALTER TABLE empty_leg_bookings ADD CONSTRAINT empty_leg_bookings_status_check
+      CHECK (status IN ('pending_payment','requested','confirmed','rejected','cancelled','expired','completed'));
+  END IF;
+END $$;
+ALTER TABLE empty_leg_bookings ADD COLUMN IF NOT EXISTS respond_by TIMESTAMPTZ;
+ALTER TABLE empty_leg_bookings ADD COLUMN IF NOT EXISTS access_token TEXT;
+ALTER TABLE empty_leg_bookings ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
+ALTER TABLE empty_leg_bookings ADD COLUMN IF NOT EXISTS cancel_reason_type TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_elb_access_token ON empty_leg_bookings(access_token) WHERE access_token IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_elb_respond_by ON empty_leg_bookings(status, respond_by);
+
+CREATE TABLE IF NOT EXISTS booking_payments (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id          UUID NOT NULL REFERENCES empty_leg_bookings(id),
+  lister_id           UUID NOT NULL REFERENCES listers(id),
+  provider            TEXT NOT NULL,
+  provider_order_id   TEXT UNIQUE NOT NULL,
+  provider_payment_id TEXT UNIQUE,
+  method              TEXT,
+  base_amount         NUMERIC(14,2) NOT NULL,
+  gst_rate_pct        NUMERIC(5,2) NOT NULL,
+  gst_amount          NUMERIC(14,2) NOT NULL,
+  amount              NUMERIC(14,2) NOT NULL,
+  status              TEXT NOT NULL DEFAULT 'created'
+                      CHECK (status IN ('created','authorized','captured','released','refunded','partially_refunded','expired','failed')),
+  authorized_at       TIMESTAMPTZ,
+  captured_at         TIMESTAMPTZ,
+  released_at         TIMESTAMPTZ,
+  refunded_amount     NUMERIC(14,2) NOT NULL DEFAULT 0,
+  provider_refund_id  TEXT,
+  commission_pct      NUMERIC(5,2),
+  commission_amount   NUMERIC(14,2),
+  payout_amount       NUMERIC(14,2),
+  payout_status       TEXT NOT NULL DEFAULT 'none'
+                      CHECK (payout_status IN ('none','pending','due','transferred','paid','cancelled')),
+  payout_ref          TEXT,
+  payout_at           TIMESTAMPTZ,
+  payout_error        TEXT,
+  raw                 JSONB,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_bp_booking ON booking_payments(booking_id);
+CREATE INDEX IF NOT EXISTS idx_bp_lister_payout ON booking_payments(lister_id, payout_status);
+
+-- A closed request releases its held payment, whichever code path closed it.
+CREATE OR REPLACE FUNCTION release_booking_hold() RETURNS trigger AS $f$
+BEGIN
+  IF NEW.status IN ('rejected','cancelled','expired') AND OLD.status IN ('pending_payment','requested') THEN
+    UPDATE booking_payments SET status = CASE WHEN status = 'authorized' THEN 'released' ELSE 'expired' END, released_at = now()
+     WHERE booking_id = NEW.id AND status IN ('created','authorized');
+  END IF;
+  RETURN NEW;
+END $f$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_release_booking_hold ON empty_leg_bookings;
+CREATE TRIGGER trg_release_booking_hold AFTER UPDATE OF status ON empty_leg_bookings
+  FOR EACH ROW EXECUTE FUNCTION release_booking_hold();
+
+ALTER TABLE listers ADD COLUMN IF NOT EXISTS razorpay_account_id TEXT;
+
+ALTER TABLE empty_legs ADD COLUMN IF NOT EXISTS dgca_check TEXT;
+ALTER TABLE empty_legs ADD COLUMN IF NOT EXISTS dgca_operator_id UUID REFERENCES charter_operators(id);
+
+CREATE TABLE IF NOT EXISTS route_alerts (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email      TEXT NOT NULL,
+  name       TEXT,
+  from_code  TEXT REFERENCES airports(code),
+  to_code    TEXT REFERENCES airports(code),
+  date_from  DATE,
+  date_to    DATE,
+  token      TEXT UNIQUE NOT NULL,
+  active     BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CHECK (from_code IS NOT NULL OR to_code IS NOT NULL)
+);
+CREATE INDEX IF NOT EXISTS idx_route_alerts_active ON route_alerts(active, from_code, to_code);
+CREATE TABLE IF NOT EXISTS route_alert_hits (
+  alert_id     UUID NOT NULL REFERENCES route_alerts(id) ON DELETE CASCADE,
+  empty_leg_id UUID NOT NULL REFERENCES empty_legs(id),
+  sent_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (alert_id, empty_leg_id)
+);
+`;
+
 async function initDB() {
   await pool.query(SCHEMA);
   await pool.query(SCHEMA_V11);
@@ -548,6 +648,7 @@ async function initDB() {
   await pool.query(SCHEMA_V13);
   await pool.query(SCHEMA_V14);
   await pool.query(SCHEMA_V15);
+  await pool.query(SCHEMA_V16);
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await pool.query('INSERT INTO settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING', [key, value]);
   }

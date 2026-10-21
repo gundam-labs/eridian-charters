@@ -121,7 +121,9 @@ async function applyPayment(client, {
 /** Email receipts etc. after commit. Never throws. */
 async function sendNotifications(list) {
   const { sendPaymentReceipt } = require('../email');
-  for (const n of list.filter(Boolean)) {
+  const mk = list.filter((n) => n && String(n.kind).startsWith('mk_'));
+  if (mk.length) await require('../marketplace').sendMarketplaceNotifications(mk);
+  for (const n of list.filter((x) => x && !String(x.kind).startsWith('mk_'))) {
     try {
       if (n.kind === 'receipt') {
         const r = (await pool.query(
@@ -153,6 +155,9 @@ async function invoiceForOrder(client, payment, orderEntity) {
 async function handleEvent(client, evt, providerName) {
   const type = evt?.event;
   const payload = evt?.payload || {};
+  // v1.6: payments for lister (marketplace) bookings live in booking_payments, not invoices.
+  const mk = await require('../marketplace').handleMarketplaceEvent(client, evt);
+  if (mk) return mk.notify;
   switch (type) {
     case 'payment.captured':
     case 'order.paid': {

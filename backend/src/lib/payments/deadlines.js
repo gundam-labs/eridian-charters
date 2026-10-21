@@ -104,7 +104,10 @@ async function runDeadlinesThrottled() {
 function startDeadlineJob(intervalMs = 5 * 60 * 1000) {
   const tick = () => runDeadlines()
     .then((r) => { if (r.cancelled?.length || r.reminders?.length) console.log(`[Deadlines] cancelled ${r.cancelled.length}, reminders ${r.reminders.length}`); })
-    .catch((err) => console.error('[Deadlines] run failed:', err.message));
+    .catch((err) => console.error('[Deadlines] run failed:', err.message))
+    // v1.6: marketplace checkouts, confirmation deadlines and payouts on the same schedule.
+    .then(() => require('../marketplace').runMarketplaceJobs())
+    .then((m) => { if (m && (m.expired || m.timed_out.length || m.completed)) console.log(`[Marketplace] expired ${m.expired}, timed out ${m.timed_out.length}, completed ${m.completed}`); });
   setTimeout(tick, 5000).unref();
   const h = setInterval(tick, intervalMs);
   h.unref();

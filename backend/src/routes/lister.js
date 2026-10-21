@@ -12,7 +12,10 @@ const { nextNumber } = require('../lib/numbers');
 const { haversineNm, ceil10 } = require('../lib/pricing');
 const { parseIST } = require('../lib/time');
 const { LEG_SELECT, staffLeg, isBookable, minNoticeHours, expireStaleLegs } = require('../lib/emptyLegs');
-const { sendListerBookingConfirmed, sendEmptyLegRequestClosed } = require('../lib/email');
+const { sendListerBookingConfirmed, sendEmptyLegRequestClosed, sendMarketplaceCancelled } = require('../lib/email');
+const { captureBooking, refundBooking, completeBooking, tryPayout, runMarketplaceJobsThrottled } = require('../lib/marketplace');
+const { notifyForLeg } = require('../lib/routeAlerts');
+const { aopKey } = require('./operators');
 const { listerProfile } = require('./auth');
 
 const router = asyncRouter();
@@ -84,7 +87,8 @@ function ownLeg(l) {
   const s = staffLeg(l);
   const keep = ['id', 'leg_no', 'from_code', 'from_city', 'from_name', 'to_code', 'to_city', 'to_name', 'depart_earliest', 'depart_latest',
     'flight_hours', 'distance_nm', 'seats', 'price_inr', 'list_price_inr', 'savings_pct', 'status', 'notes', 'published_at', 'booked_at',
-    'withdrawn_reason', 'created_at', 'aircraft_type', 'aircraft_registration', 'operator_name', 'operated_by', 'bookings_count', 'pending_requests_count'];
+    'withdrawn_reason', 'created_at', 'aircraft_type', 'aircraft_registration', 'operator_name', 'operated_by', 'bookings_count', 'pending_requests_count',
+    'dgca_check', 'dgca_operator_name'];
   return Object.fromEntries(keep.map((k) => [k, s[k] ?? null]));
 }
 
@@ -127,6 +131,50 @@ function listingFields(b, partial) {
   return out;
 }
 
+// ── DGCA aircraft check ─────────────────────────────────────────────────────
+const normReg = (v) => {
+  const s = String(v || '').toUpperCase().replace(/[\s.]/g, '');
+  const m = s.match(/^VT-?([A-Z]{3})$/);
+  return m ? `VT-${m[1]}` : (s || null);
+};
+
+/**
+ * Look a registration up in the DGCA operator directory.
+ * → { registration, found, model, seats, kind, role, operator: {id, name, aop_no}, check } where check is
+ *   own_fleet (the lister is that operator, by permit number) | other_operator | not_listed.
+ */
+async function dgcaLookup(registration, listerId) {
+  const reg = normReg(registration);
+  if (!reg) return null;
+  const a = (await pool.query(
+    `SELECT a.registration, a.model, a.seats, a.kind, a.role, o.id AS operator_id, o.name AS operator_name, o.aop_no
+       FROM operator_aircraft a JOIN charter_operators o ON o.id = a.operator_id WHERE a.registration = $1`, [reg])).rows[0];
+  if (!a) return { registration: reg, found: false, check: 'not_listed' };
+  const lister = (await pool.query('SELECT lister_type, nsop_permit_no FROM listers WHERE id = $1', [listerId])).rows[0];
+  const own = lister?.lister_type === 'operator' && aopKey(lister.nsop_permit_no) && aopKey(lister.nsop_permit_no) === aopKey(a.aop_no);
+  return {
+    registration: reg, found: true, model: a.model, seats: a.seats, kind: a.kind, role: a.role,
+    operator: { id: a.operator_id, name: a.operator_name, aop_no: a.aop_no }, check: own ? 'own_fleet' : 'other_operator',
+  };
+}
+
+router.get('/aircraft-lookup', async (req, res) => {
+  const r = await dgcaLookup(req.query.registration, req.user.lister_id);
+  if (!r) throw new HttpError(400, 'Enter a registration such as VT-ABC');
+  res.json(r);
+});
+
+/** Apply the DGCA check to listing fields; refuse aircraft the DGCA list registers for cargo only. */
+async function applyDgca(fields, listerId) {
+  if (fields.ext_registration === undefined) return fields;
+  if (!fields.ext_registration) return { ...fields, dgca_check: null, dgca_operator_id: null };
+  const r = await dgcaLookup(fields.ext_registration, listerId);
+  if (r.found && r.role === 'cargo') throw new HttpError(400, `${r.registration} is registered with DGCA as a cargo aircraft and cannot carry passengers`);
+  const out = { ...fields, ext_registration: r.registration, dgca_check: r.check, dgca_operator_id: r.found ? r.operator.id : null };
+  if (r.found && out.operator_name === null) out.operator_name = r.operator.name; // default "Operated by" to the DGCA holder
+  return out;
+}
+
 router.get('/empty-legs', async (req, res) => {
   await expireStaleLegs();
   const { rows } = await pool.query(
@@ -155,7 +203,7 @@ router.post('/empty-legs', async (req, res) => {
   const earliest = parseInstant(b.depart_earliest, 'depart_earliest');
   const latest = b.depart_latest ? parseInstant(b.depart_latest, 'depart_latest') : earliest;
   checkWindow(earliest, latest);
-  const f = listingFields(b, false);
+  const f = await applyDgca(listingFields(b, false), req.user.lister_id);
   const nm = haversineNm({ lat: Number(a.lat), lon: Number(a.lon) }, { lat: Number(z.lat), lon: Number(z.lon) });
   let flight_hours;
   if (b.flight_hours !== undefined && b.flight_hours !== null && b.flight_hours !== '') {
@@ -172,10 +220,10 @@ router.post('/empty-legs', async (req, res) => {
     const leg_no = await nextNumber('EL', client);
     const { rows } = await client.query(
       `INSERT INTO empty_legs (leg_no, lister_id, ext_aircraft_type, ext_registration, operator_name, from_code, to_code,
-         depart_earliest, depart_latest, flight_hours, distance_nm, seats, list_price_inr, price_inr, status, notes, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'draft',$15,$16) RETURNING id`,
+         depart_earliest, depart_latest, flight_hours, distance_nm, seats, list_price_inr, price_inr, status, notes, created_by, dgca_check, dgca_operator_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'draft',$15,$16,$17,$18) RETURNING id`,
       [leg_no, req.user.lister_id, f.ext_aircraft_type, f.ext_registration, f.operator_name, from, to, earliest, latest,
-        flight_hours, Math.round(nm), f.seats, list_price_inr, f.price_inr, f.notes, req.user.id]);
+        flight_hours, Math.round(nm), f.seats, list_price_inr, f.price_inr, f.notes, req.user.id, f.dgca_check ?? null, f.dgca_operator_id ?? null]);
     await logEvent({ entity_type: 'empty_leg', entity_id: rows[0].id, action: 'created', actor_user_id: req.user.id,
       detail: { leg_no, lister_id: req.user.lister_id, price_inr: f.price_inr } }, client);
     return rows[0].id;
@@ -188,7 +236,7 @@ router.patch('/empty-legs/:id', async (req, res) => {
   const l = await loadOwnLeg(req, req.params.id);
   if (!['draft', 'published'].includes(l.status)) throw new HttpError(409, `Cannot edit a listing that is ${l.status}`);
   const b = req.body || {};
-  const sets = listingFields(b, true);
+  const sets = await applyDgca(listingFields(b, true), req.user.lister_id);
   if (b.list_price_inr === null || b.list_price_inr === '') sets.list_price_inr = sets.price_inr ?? Number(l.price_inr);
   const price = sets.price_inr ?? Number(l.price_inr);
   if (sets.list_price_inr !== undefined || sets.price_inr !== undefined) {
@@ -234,6 +282,7 @@ router.post('/empty-legs/:id/publish', async (req, res) => {
     [l.id, req.user.lister_id]);
   if (!upd.rows.length) throw new HttpError(409, 'Listing changed — reload and try again');
   await logEvent({ entity_type: 'empty_leg', entity_id: l.id, action: 'published', actor_user_id: req.user.id, detail: { leg_no: l.leg_no, price_inr: Number(l.price_inr) } });
+  notifyForLeg(l.id); // route alerts, in the background
   res.json(ownLeg(await loadOwnLeg(req, l.id)));
 });
 
@@ -249,9 +298,9 @@ router.post('/empty-legs/:id/withdraw', async (req, res) => {
     await logEvent({ entity_type: 'empty_leg', entity_id: l.id, action: 'withdrawn', actor_user_id: req.user.id, detail: { reason } }, client);
     const rows = (await client.query(
       `UPDATE empty_leg_bookings SET status = 'cancelled', reject_reason = 'Flight withdrawn', decided_by = $2, decided_at = now()
-        WHERE empty_leg_id = $1 AND status = 'requested' RETURNING *`, [l.id, req.user.id])).rows;
+        WHERE empty_leg_id = $1 AND status IN ('requested','pending_payment') RETURNING *`, [l.id, req.user.id])).rows;
     for (const r of rows) await logEvent({ entity_type: 'empty_leg_booking', entity_id: r.id, action: 'cancelled', actor_user_id: req.user.id, detail: { reason: 'Flight withdrawn' } }, client);
-    return rows;
+    return rows.filter((r) => r.status === 'cancelled');
   });
   for (const r of cancelled) await sendEmptyLegRequestClosed({ to: r.guest_email, name: r.guest_name, booking: r, leg: l, reason: 'The flight has been withdrawn by the operator' });
   res.json(ownLeg(await loadOwnLeg(req, l.id)));
@@ -259,23 +308,31 @@ router.post('/empty-legs/:id/withdraw', async (req, res) => {
 
 // ── Requests on the lister's flights ────────────────────────────────────────
 const BOOKING_SELECT = `SELECT b.id, b.booking_no, b.empty_leg_id, b.channel, b.pax, b.message, b.status, b.reject_reason, b.decided_at, b.created_at,
-  b.guest_name, b.guest_email, b.guest_phone, b.guest_company,
+  b.guest_name, b.guest_email, b.guest_phone, b.guest_company, b.respond_by, b.completed_at, b.cancel_reason_type,
+  bp.status AS pay_status, bp.amount::float8 AS pay_amount, bp.refunded_amount::float8 AS pay_refunded, bp.commission_amount::float8 AS pay_commission,
+  bp.payout_amount::float8 AS pay_payout, bp.payout_status, bp.payout_ref, bp.payout_at,
   el.leg_no, el.from_code, el.to_code, el.depart_earliest, el.depart_latest, el.price_inr::float8 AS price_inr, el.seats, el.status AS leg_status,
   el.ext_aircraft_type AS aircraft_type, fa.city AS from_city, ta.city AS to_city
   FROM empty_leg_bookings b
   JOIN empty_legs el ON el.id = b.empty_leg_id
   JOIN airports fa ON fa.code = el.from_code
-  JOIN airports ta ON ta.code = el.to_code`;
+  JOIN airports ta ON ta.code = el.to_code
+  LEFT JOIN LATERAL (SELECT * FROM booking_payments x WHERE x.booking_id = b.id ORDER BY x.created_at DESC LIMIT 1) bp ON true`;
 
 /**
  * Customer contact details are shared with the lister only once they confirm the booking — before that the
  * lister sees the name, party size and message, enough to decide, without being able to go around the platform.
  */
 function shapeRequest(b) {
-  const confirmed = b.status === 'confirmed';
+  const confirmed = ['confirmed', 'completed'].includes(b.status);
   return {
     id: b.id, booking_no: b.booking_no, pax: b.pax, message: b.message, status: b.status, reject_reason: b.reject_reason,
-    decided_at: b.decided_at, created_at: b.created_at,
+    decided_at: b.decided_at, created_at: b.created_at, respond_by: b.status === 'requested' ? b.respond_by : null,
+    completed_at: b.completed_at, cancel_reason_type: b.cancel_reason_type,
+    payment: b.pay_status ? {
+      status: b.pay_status, amount: b.pay_amount, refunded: b.pay_refunded, commission: b.pay_commission, payout: b.pay_payout,
+      payout_status: b.payout_status, payout_ref: b.payout_ref, payout_at: b.payout_at,
+    } : null,
     customer: { name: b.guest_name, company: b.guest_company, email: confirmed ? b.guest_email : null, phone: confirmed ? b.guest_phone : null },
     leg: { id: b.empty_leg_id, leg_no: b.leg_no, from_code: b.from_code, to_code: b.to_code, from_city: b.from_city, to_city: b.to_city,
       depart_earliest: b.depart_earliest, depart_latest: b.depart_latest, price_inr: b.price_inr, seats: b.seats, status: b.leg_status, aircraft_type: b.aircraft_type },
@@ -283,11 +340,13 @@ function shapeRequest(b) {
 }
 
 router.get('/bookings', async (req, res) => {
+  await runMarketplaceJobsThrottled();
   const params = [req.user.lister_id];
-  let extra = '';
+  // Unpaid checkouts never reach the lister.
+  let extra = ` AND b.status NOT IN ('pending_payment','expired')`;
   if (req.query.status) {
     const st = String(req.query.status).split(',').map((s) => s.trim()).filter(Boolean);
-    if (st.some((s) => !['requested', 'confirmed', 'rejected', 'cancelled'].includes(s))) throw new HttpError(400, 'Invalid status');
+    if (st.some((s) => !['requested', 'confirmed', 'completed', 'rejected', 'cancelled'].includes(s))) throw new HttpError(400, 'Invalid status');
     params.push(st); extra = ` AND b.status = ANY($2)`;
   }
   const { rows } = await pool.query(
@@ -307,6 +366,7 @@ router.post('/bookings/:id/confirm', async (req, res) => {
   await expireStaleLegs();
   const b0 = await loadOwnBooking(req, req.params.id);
   if (b0.status !== 'requested') throw new HttpError(409, `Cannot confirm a request that is ${b0.status}`);
+  if (b0.respond_by && new Date(b0.respond_by) < new Date()) throw new HttpError(409, 'The time to confirm this request has passed');
   const result = await withTransaction(async (client) => {
     // Lock the leg, then the booking — the same order as a competing confirm or a withdraw.
     const leg = (await client.query('SELECT * FROM empty_legs WHERE id = $1 AND lister_id = $2 FOR UPDATE', [b0.empty_leg_id, req.user.lister_id])).rows[0];
@@ -315,8 +375,12 @@ router.post('/bookings/:id/confirm', async (req, res) => {
     if (leg.status !== 'published') throw new HttpError(409, `This flight is ${leg.status} and cannot be booked`);
     const settings = await getSettings(client);
     if (!isBookable(leg, settings)) throw new HttpError(409, 'This flight is too close to departure to confirm through the platform');
+    const locked = (await client.query(`SELECT status FROM empty_leg_bookings WHERE id = $1 FOR UPDATE`, [b0.id])).rows[0];
+    if (locked?.status !== 'requested') throw new HttpError(409, 'Request changed — reload and try again');
+    // Charge the traveller's held payment. If the capture fails nothing is confirmed.
+    const payment = await captureBooking(client, b0.id);
     const booking = (await client.query(
-      `UPDATE empty_leg_bookings SET status = 'confirmed', decided_by = $2, decided_at = now() WHERE id = $1 AND status = 'requested' RETURNING *`,
+      `UPDATE empty_leg_bookings SET status = 'confirmed', decided_by = $2, decided_at = now(), respond_by = NULL WHERE id = $1 AND status = 'requested' RETURNING *`,
       [b0.id, req.user.id])).rows[0];
     if (!booking) throw new HttpError(409, 'Request changed — reload and try again');
     await client.query(`UPDATE empty_legs SET status = 'booked', booked_at = now() WHERE id = $1`, [leg.id]);
@@ -326,11 +390,11 @@ router.post('/bookings/:id/confirm', async (req, res) => {
       `UPDATE empty_leg_bookings SET status = 'rejected', reject_reason = 'Booked by another customer', decided_by = $3, decided_at = now()
         WHERE empty_leg_id = $1 AND id <> $2 AND status = 'requested' RETURNING *`, [leg.id, booking.id, req.user.id])).rows;
     for (const r of rejected) await logEvent({ entity_type: 'empty_leg_booking', entity_id: r.id, action: 'rejected', actor_user_id: req.user.id, detail: { reason: 'Booked by another customer' } }, client);
-    return { booking, rejected };
+    return { booking, rejected, payment };
   });
   const leg = (await pool.query(`${LEG_SELECT} WHERE el.id = $1`, [b0.empty_leg_id])).rows[0];
   const profile = await loadProfile(req.user.lister_id);
-  await sendListerBookingConfirmed({ to: result.booking.guest_email, name: result.booking.guest_name, booking: result.booking, leg, lister: profile });
+  await sendListerBookingConfirmed({ to: result.booking.guest_email, name: result.booking.guest_name, booking: result.booking, leg, lister: profile, payment: result.payment });
   for (const r of result.rejected) await sendEmptyLegRequestClosed({ to: r.guest_email, name: r.guest_name, booking: r, leg, reason: 'Booked by another customer' });
   res.json(shapeRequest(await loadOwnBooking(req, b0.id)));
 });
@@ -348,6 +412,60 @@ router.post('/bookings/:id/reject', async (req, res) => {
   const leg = (await pool.query(`${LEG_SELECT} WHERE el.id = $1`, [b.empty_leg_id])).rows[0];
   await sendEmptyLegRequestClosed({ to: b.guest_email, name: b.guest_name, booking: b, leg, reason });
   res.json(shapeRequest(await loadOwnBooking(req, b.id)));
+});
+
+/**
+ * Cancel a booked flight. reason_type: charter_change (the main charter moved or was cancelled) | weather_technical | other.
+ * The traveller is refunded in full; the reason type is kept for the operator's record.
+ */
+router.post('/bookings/:id/cancel', async (req, res) => {
+  const b = await loadOwnBooking(req, req.params.id);
+  if (b.status !== 'confirmed') throw new HttpError(409, `Only confirmed bookings can be cancelled (this one is ${b.status})`);
+  const reasonType = String(req.body?.reason_type || '');
+  if (!['charter_change', 'weather_technical', 'other'].includes(reasonType)) throw new HttpError(400, 'reason_type must be charter_change, weather_technical or other');
+  const reason = String(req.body?.reason || '').trim().slice(0, 1000);
+  if (!reason) throw new HttpError(400, 'A reason is required');
+  await withTransaction(async (client) => {
+    const upd = await client.query(
+      `UPDATE empty_leg_bookings SET status = 'cancelled', reject_reason = $2, cancel_reason_type = $3, decided_by = $4, decided_at = now()
+        WHERE id = $1 AND status = 'confirmed' RETURNING id`, [b.id, reason, `operator_${reasonType}`, req.user.id]);
+    if (!upd.rows.length) throw new HttpError(409, 'Booking changed — reload and try again');
+    await client.query(`UPDATE empty_legs SET status = 'withdrawn', withdrawn_reason = $2 WHERE id = $1 AND status = 'booked'`, [b.empty_leg_id, reason]);
+    await logEvent({ entity_type: 'empty_leg_booking', entity_id: b.id, action: 'cancelled', actor_user_id: req.user.id,
+      detail: { by: 'lister', reason_type: reasonType, reason } }, client);
+  });
+  const refund = await refundBooking({ bookingId: b.id, pct: 100, reason, actorUserId: req.user.id });
+  const leg = (await pool.query(`${LEG_SELECT} WHERE el.id = $1`, [b.empty_leg_id])).rows[0];
+  await sendMarketplaceCancelled({ to: b.guest_email, name: b.guest_name, booking: b, leg, reason, refund: refund || { amount: 0, pct: 100 } });
+  res.json(shapeRequest(await loadOwnBooking(req, b.id)));
+});
+
+/** Mark a confirmed flight as flown (on or after departure). The payout becomes due. */
+router.post('/bookings/:id/complete', async (req, res) => {
+  const b = await loadOwnBooking(req, req.params.id);
+  if (b.status !== 'confirmed') throw new HttpError(409, `Only confirmed bookings can be marked flown (this one is ${b.status})`);
+  if (new Date(b.depart_earliest) > new Date()) throw new HttpError(409, 'You can mark the flight as flown once its departure time has passed');
+  const done = await withTransaction((client) => completeBooking(client, b.id, req.user.id));
+  if (!done) throw new HttpError(409, 'Booking changed — reload and try again');
+  const bp = (await pool.query(`SELECT id FROM booking_payments WHERE booking_id = $1 AND payout_status = 'due'`, [b.id])).rows[0];
+  if (bp) await tryPayout(bp.id);
+  res.json(shapeRequest(await loadOwnBooking(req, b.id)));
+});
+
+/** The lister's earnings: one row per paid booking, with commission and payout status. */
+router.get('/payouts', async (req, res) => {
+  await runMarketplaceJobsThrottled();
+  const rows = (await pool.query(
+    `SELECT bp.id, bp.status, bp.amount::float8 AS amount, bp.base_amount::float8 AS base, bp.gst_amount::float8 AS gst,
+            bp.refunded_amount::float8 AS refunded, bp.commission_pct::float8 AS commission_pct, bp.commission_amount::float8 AS commission,
+            bp.payout_amount::float8 AS payout, bp.payout_status, bp.payout_ref, bp.payout_at, bp.captured_at,
+            b.booking_no, b.status AS booking_status, el.leg_no, el.from_code, el.to_code, el.depart_earliest, el.depart_latest
+       FROM booking_payments bp JOIN empty_leg_bookings b ON b.id = bp.booking_id JOIN empty_legs el ON el.id = b.empty_leg_id
+      WHERE bp.lister_id = $1 AND bp.status IN ('captured','partially_refunded','refunded')
+      ORDER BY el.depart_earliest DESC`, [req.user.lister_id])).rows;
+  const sum = (st) => Math.round(rows.filter((r) => st.includes(r.payout_status)).reduce((s, r) => s + Number(r.payout || 0), 0) * 100) / 100;
+  const acct = (await pool.query('SELECT razorpay_account_id FROM listers WHERE id = $1', [req.user.lister_id])).rows[0];
+  res.json({ payouts: rows, totals: { upcoming: sum(['pending']), due: sum(['due']), paid: sum(['paid', 'transferred']) }, linked_account: Boolean(acct?.razorpay_account_id) });
 });
 
 module.exports = router;

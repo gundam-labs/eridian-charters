@@ -100,7 +100,8 @@ export default function ListerListings() {
                         {l.status === 'withdrawn' && l.withdrawn_reason && <div className="muted xs">{l.withdrawn_reason}</div>}</td>
                       <td className="nowrap"><strong>{legRoute(l)}</strong><div className="muted xs">{l.from_city} → {l.to_city} · {flightTime(l.flight_hours)}</div></td>
                       <td className="nowrap">{w.day}<div className="muted xs">{w.range}</div></td>
-                      <td className="nowrap">{l.aircraft_type}<div className="muted xs">{[l.registration, `${l.seats} seats`].filter(Boolean).join(' · ')}</div></td>
+                      <td className="nowrap">{l.aircraft_type}<div className="muted xs">{[l.registration, `${l.seats} seats`].filter(Boolean).join(' · ')}</div>
+                        {l.dgca_check && <div className={`dgca-badge ${l.dgca_check}`}>{l.dgca_check === 'own_fleet' ? '✓ DGCA: your fleet' : l.dgca_check === 'other_operator' ? `DGCA: ${l.dgca_operator_name}` : 'Not in DGCA list'}</div>}</td>
                       <td className="num nowrap"><strong>{inr(l.price_inr)}</strong>
                         {l.savings_pct > 0 && <div className="muted xs"><s>{inr(l.list_price_inr)}</s> · {l.savings_pct}% off</div>}</td>
                       <td className="nowrap"><StatusPill status={l.status} />
@@ -209,8 +210,27 @@ function NewListingModal({ company, approved, onClose, onDone }) {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [publishNow, setPublishNow] = useState(approved);
+  const [dgca, setDgca] = useState(null);
   const set = (k) => (e) => setF(s => ({ ...s, [k]: e.target.value }));
   const aps = Array.isArray(airports) ? airports : [];
+
+  /** Look the registration up in the DGCA list and fill in what is empty. */
+  const lookup = async () => {
+    const reg = f.registration.trim();
+    if (!reg) { setDgca(null); return; }
+    try {
+      const r = (await api.get(`/api/lister/aircraft-lookup?registration=${encodeURIComponent(reg)}`)).data;
+      setDgca(r);
+      if (r.found) {
+        setF(s => ({
+          ...s, registration: r.registration,
+          aircraft_type: s.aircraft_type || r.model,
+          seats: s.seats || (r.seats ? String(r.seats) : ''),
+          operator_name: r.check === 'other_operator' && (!s.operator_name || s.operator_name === company) ? r.operator.name : s.operator_name,
+        }));
+      }
+    } catch { setDgca(null); }
+  };
   const pct = f.list_price_inr && f.price_inr && Number(f.list_price_inr) > Number(f.price_inr)
     ? Math.round((1 - Number(f.price_inr) / Number(f.list_price_inr)) * 100) : null;
 
@@ -260,7 +280,11 @@ function NewListingModal({ company, approved, onClose, onDone }) {
           <div className="field"><label htmlFor="n-seats">Passenger seats</label>
             <input id="n-seats" className="input" type="number" min="1" max="30" required value={f.seats} onChange={set('seats')} /></div>
           <div className="field"><label htmlFor="n-reg">Registration <span className="muted">— optional, never shown publicly</span></label>
-            <input id="n-reg" className="input" value={f.registration} onChange={set('registration')} placeholder="VT-…" style={{ textTransform: 'uppercase' }} /></div>
+            <input id="n-reg" className="input" value={f.registration} onChange={(e) => { set('registration')(e); setDgca(null); }} onBlur={lookup}
+              placeholder="VT-…" style={{ textTransform: 'uppercase' }} />
+            {dgca && <span className={`dgca-badge ${dgca.check}`} data-testid="dgca-check">{dgca.check === 'own_fleet' ? `✓ In your DGCA fleet — ${dgca.model}`
+              : dgca.check === 'other_operator' ? `In the DGCA list under ${dgca.operator.name} — ${dgca.model}, ${dgca.seats ?? '?'} seats`
+                : 'Not in the DGCA operator list — we’ll check it before your listing is trusted'}</span>}</div>
           <div className="field"><label htmlFor="n-op">Operated by</label>
             <input id="n-op" className="input" value={f.operator_name} onChange={set('operator_name')} placeholder="Operator shown to travellers" />
             <span className="hint">Agents and flyers: the licensed operator flying the aircraft.</span></div>

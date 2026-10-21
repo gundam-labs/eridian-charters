@@ -45,6 +45,38 @@ module.exports = {
     return call('POST', '/orders', { amount: amount_paise, currency: 'INR', receipt, notes, payment_capture: 1 });
   },
 
+  /**
+   * Order whose payment is only authorised (held) — captured later with capture(), or auto-refunded by Razorpay
+   * when holdMinutes pass without a capture. Razorpay allows up to 7200 minutes (5 days).
+   */
+  async createHoldOrder({ amount_paise, receipt, notes, holdMinutes }) {
+    return call('POST', '/orders', {
+      amount: amount_paise, currency: 'INR', receipt, notes,
+      payment: { capture: 'manual', capture_options: { manual_expiry_period: Math.min(7200, Math.max(12, Math.round(holdMinutes))), refund_speed: 'optimum' } },
+    });
+  },
+
+  /** Capture an authorised payment. → payment entity (status 'captured'). */
+  async capture(payment_id, amount_paise) {
+    return call('POST', `/payments/${encodeURIComponent(payment_id)}/capture`, { amount: amount_paise, currency: 'INR' });
+  },
+
+  /**
+   * Release a hold. Razorpay has no void call for authorised payments: they are refunded automatically when the
+   * order's manual_expiry_period passes. → { released: false, note } so callers record that the bank releases it.
+   */
+  async release() {
+    return { released: false, note: 'Released automatically by Razorpay when the hold expires' };
+  },
+
+  /** Route: transfer part of a captured payment to a linked account (the lister). → transfer entity. */
+  async transfer(payment_id, { account, amount_paise, notes }) {
+    const r = await call('POST', `/payments/${encodeURIComponent(payment_id)}/transfers`, {
+      transfers: [{ account, amount: amount_paise, currency: 'INR', notes }],
+    });
+    return (r.items || [])[0] || r;
+  },
+
   /** → Razorpay payment entity (amount, status, method, fee, tax, order_id, …). */
   async fetchPayment(id) {
     return call('GET', `/payments/${encodeURIComponent(id)}`);
